@@ -40,7 +40,7 @@ The intended scope of freedom includes buildings, paths, farm and garden areas, 
 
 The current prototype is an initial systems demonstration. Its procedural artwork and limited decorating zones are not the final world target. Existing character, map, and artwork originality requirements remain in place.
 
-Next design discussion: define the village's starting state, what can be built or moved, and how villagers and restoration projects fit player-authored layouts. Do not start implementation until that discussion is resolved.
+The opening and construction decisions below now define the first chapter's design direction. The chapter script makes that direction reviewable; it does not itself implement or deploy a new version.
 
 ## Agreed opening and construction direction — 17 October 2026
 
@@ -53,6 +53,10 @@ Place a complete building footprint and supply materials; construction visibly p
 Begin material gathering with fallen branches and loose stones. Farming, crafting, and friendships open further materials. Visually distinguish freely gatherable resources from owned supplies: a fallen branch can be collected, while a carpenter's stacked timber requires permission. The exact resource economy, gathering tools, costs, construction timing, and baker's identity remain to be designed.
 
 These decisions describe the next design direction. The live prototype still uses the earlier village-garden opening; this document does not claim the new opening has been implemented.
+
+Cooking is the baker's first gameplay unlock. After moving in, they teach a vegetable-bun recipe using the player's carrots and their flour. Food can support future shared village projects. Cooking should be a usable activity, and neither the home nor friendship is bought through food gifts.
+
+See [Chapter One: Room for One More](chapter-one.md) for the proposed quest sequence, dialogue branches, construction stages, ownership consequences, and recovery rules. The chapter marks unconfirmed names, quantities, and the proposed second project explicitly.
 
 ## Dialogue and writing standard
 
@@ -82,7 +86,7 @@ Example welcome: “I could see myself living here. Somewhere for an oven, a few
 
 The game will connect to [James's existing website](https://james-lost-his-mouse.vercel.app/). Inspection on 17 October 2026 confirmed a JamesCube games collection, individual project pages, and “Play the prototype” links for Volt and The Lamplighter. Those links use `/play.html?game=volt` and `/play.html?game=the-lamplighter`.
 
-Follow that entry pattern for The Fading Kingdom: a games collection entry, project description, and play link. A proposed game key is `the-fading-kingdom`; its route is not implemented. Inspect the website's source and game-loading mechanism before deciding how the separate game repository is deployed and loaded. The website repository has not been supplied or changed.
+The first prototype is integrated into the website's games collection and playable at `/play?game=the-fading-kingdom`. Its static runtime is hosted in `games/the-fading-kingdom/` within `LostMyMouse/james-lost-his-mouse`; the separate game repository holds its source and design documents. See [implementation notes](implementation.md) for the current prototype and verification limits. The revised village-building chapter is not yet implemented.
 
 Mobile, tablet, and PC support are required from the first playable build. Proposed controls:
 
@@ -211,7 +215,7 @@ Avoid login streaks, offline deterioration, or time-limited rewards that punish 
 - Exact map size, camera behaviour, tile resolution, and animation budget.
 - Audio direction, reading support, and accessibility scope.
 - Local saves versus accounts and cross-device saves.
-- Technical stack and game hosting; integration into the existing website requires inspecting its source.
+- Whether the current Canvas 2D prototype should be extended or revised for the larger village-building scope; static website integration already exists.
 
 ## How we will judge the concept
 
