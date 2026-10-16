@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#243f35">
+  <meta name="description" content="A little kindness. A growing kingdom. A cosy farming adventure.">
+  <title>The Fading Kingdom</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <main id="game" aria-label="The Fading Kingdom">
+    <canvas id="world" tabindex="0" aria-label="Village map. Move with arrow keys or WASD. Press E to interact. On touch, tap a destination or use the direction pad."></canvas>
+    <header id="hud" class="hide">
+      <div class="day plaque"><span class="sun" aria-hidden="true">☀</span><div><b id="day">Day 1</b><span>Spring · at your own pace</span></div></div>
+      <div class="top-actions"><button id="journal" class="plaque">▤ <span>Journal</span></button><button id="settings" class="plaque" aria-label="Open menu">☰</button></div>
+    </header>
+    <aside id="quest" class="plaque hide"><span class="eyebrow">A LITTLE BEGINNING</span><b>Bring the garden back</b><span id="quest-progress">Grow flowers. Make friends.</span><div class="quest-track"><i id="quest-fill"></i></div></aside>
+    <div id="location" class="hide">BRAMBLEWICK <span>·</span> YOUR FIRST CHAPTER</div>
+    <div id="toast" role="status" aria-live="polite"></div>
+    <div id="context" class="hide"><button id="interact" class="plaque">Talk / interact <kbd>E</kbd></button></div>
+    <footer id="bottom" class="hide">
+      <div id="hint">Tap to walk · E to interact · J for journal</div>
+      <nav id="toolbar" aria-label="Tools and seeds"></nav>
+      <div id="selection">Hands · Talk, harvest, and explore</div>
+    </footer>
+    <div id="dpad" class="hide" aria-label="Touch movement"><button data-dir="up" aria-label="Move up">▲</button><button data-dir="left" aria-label="Move left">◀</button><button data-dir="down" aria-label="Move down">▼</button><button data-dir="right" aria-label="Move right">▶</button></div>
+    <button id="touch-action" class="hide" aria-label="Interact with nearby object">ACT</button>
+    <section id="welcome">
+      <div class="welcome-card"><span class="eyebrow">A COSY LITTLE ADVENTURE</span><div class="sprig" aria-hidden="true">✦</div><h1>The Fading<br><em>Kingdom</em></h1><p>A little kindness.<br>A growing kingdom.</p><button id="begin" class="primary">Make yourself at home <span>→</span></button><button id="continue" class="quiet hide">Continue your story</button><small>Farm · Make friends · Bring a kingdom to life</small><small class="prototype">FIRST PLAYABLE · CHAPTER ONE</small></div>
+    </section>
+    <dialog id="modal" aria-labelledby="dialog-title"><div id="dialog-body"></div><button id="close-dialog" class="quiet">Back to the village</button></dialog>
+    <div id="fatal" class="hide" role="alert">The village couldn't load. Please reload the page.</div>
+  </main>
+  <script type="module" src="game.js"></script>
+</body>
+</html>
