@@ -282,6 +282,10 @@ Journal:
 
 > Mara has moved in. Visit her kitchen when you'd like to cook together.
 
+### Playable interior requirement
+
+Mara's completed home must be a walkable room the player enters through its door. The player can explore, meet Mara inside, approach the kitchen, and leave freely. Cooking takes place at an actual interior workstation. The player's cottage likewise contains usable bed, storage, mirror, and decoration space. Opening a dialogue panel at an exterior house marker does not fulfil either home. Interior furnishings must keep the exit and kitchen reachable with both touch and keyboard controls.
+
 ## Q06 — Something in the Oven
 
 **First recipe, proposed:** one harvested carrot + one portion of Mara's flour → three vegetable buns. This is an in-game crafting recipe, not real cooking instructions. Mara contributes the flour for the introduction, recipe knowledge, equipment, and her time.
