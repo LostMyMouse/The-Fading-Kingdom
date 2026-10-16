@@ -135,7 +135,7 @@ function nearest(){let best=null,dist=2.8;for(const p of landmarks){const d=Math
 function interactNearby(){const p=nearest();if(p)interact(p.id);else{const idx=state.plots.findIndex(p=>Math.abs(p.x-state.player.x)+Math.abs(p.y-state.player.y)<=1);if(idx>=0){toast(cropAction(state,idx,tool));save();}else toast('Walk closer to a villager, your cottage, a plot, or the garden sign.');}}
 $('interact').onclick=interactNearby;$('touch-action').onclick=interactNearby;
 function clickWorld(event){if(!playing||modal.open)return;const bounds=canvas.getBoundingClientRect(),x=Math.floor(((event.clientX-bounds.left)/bounds.width*width+camera.x)/16),y=Math.floor(((event.clientY-bounds.top)/bounds.height*height+camera.y)/16);if(blocked(x,y))return;
- hover={x,y};if(tool==='decorate'){previewDecor(x,y);return;}
+ clearMovement();hover={x,y};if(tool==='decorate'){previewDecor(x,y);return;}
  const landmark=landmarks.find(p=>p.x===x&&p.y===y),plot=state.plots.findIndex(p=>p.x===x&&p.y===y);
  const action=landmark?()=>interact(landmark.id):plot>=0?()=>{toast(cropAction(state,plot,tool));save();}:null;
  const distance=Math.abs(x-state.player.x)+Math.abs(y-state.player.y);
@@ -165,6 +165,7 @@ function tick(now){
    else if(!path.length&&onArrival){const f=onArrival;onArrival=null;f();}
   }
   const p=nearest();$('context').classList.toggle('hide',!p||tool==='decorate');if(p)$('interact').firstChild.textContent=`${p.label} `;
+  $('touch-action').textContent=p?({rowan:'Talk',orin:'Talk',pip:'Talk',home:'Home',garden:'Garden',packet:'Seeds',greenhouse:'Enter'}[p.id]):'ACT';
  }
  const lerp=reduceMotion?1:1-stepTime/150,px=(oldPos.x+(state.player.x-oldPos.x)*lerp)*16+8,py=(oldPos.y+(state.player.y-oldPos.y)*lerp)*16+12;
  const targetX=playing?px:21*16,targetY=playing?py:14*16;
