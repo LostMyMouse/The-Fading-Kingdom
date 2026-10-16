@@ -58,6 +58,19 @@ Cooking is the baker's first gameplay unlock. After moving in, they teach a vege
 
 See [Chapter One: Room for One More](chapter-one.md) for the proposed quest sequence, dialogue branches, construction stages, ownership consequences, and recovery rules. The chapter marks unconfirmed names, quantities, and the proposed second project explicitly.
 
+## Enterable buildings and playable interiors — agreed requirement
+
+The full game must include playable building interiors alongside the outdoor village. The player walks to a door, enters, moves around inside, interacts with furnishings and people, and leaves through a clear exit. Homes and shared buildings must be usable spaces rather than exterior markers that only open dialogue.
+
+- The player's cottage has a walkable interior with a bed, storage, mirror, and freely placed furnishings.
+- Residents' homes, including the baker's, have explorable interiors. NPCs use those rooms as part of their routines.
+- Cooking happens at the baker's kitchen inside the house: the player enters, approaches the preparation area, and performs the activity. Dialogue supports these actions.
+- Shared buildings introduced through restoration need interiors appropriate to their activity. Their contents and layout should give the player a reason to visit.
+- Interior decoration and rearrangement must preserve reachable doors, essential furniture, workstations, and NPC interactions. Ownership and permission apply inside buildings too.
+- Entry, exit, movement, and interaction must work with touch and keyboard. Save the current room and a valid player position; provide safe recovery if a layout changes.
+
+Separate room scenes with a brief transition are acceptable; seamless indoor/outdoor rendering is not required. Exact room sizes, camera behaviour, and the set of shared buildings remain to be designed. This is a full-game requirement, not a claim about the current prototype.
+
 ## Dialogue and writing standard
 
 **Write so a seven-year-old can follow the conversation and an adult can enjoy it.** Ages 7–11 guide comprehension and interaction design; the game is accessible to any age. Avoid talking down to the player.
