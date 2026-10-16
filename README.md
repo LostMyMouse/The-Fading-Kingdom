@@ -4,6 +4,7 @@ A cosy browser farming and decorating adventure for ages 7–11. Grow a farm, ma
 
 ## Project documents
 
+- [Chapter One: Room for One More](docs/chapter-one.md): proposed new opening, full quest script, dialogue, and repair paths; not yet implemented.
 - [Game design](docs/game-design.md): agreed direction, gameplay systems, and open decisions.
 - [First playable prototype](docs/first-playable.md): a bounded experience and its acceptance criteria.
 - [Art reference](docs/art/approved-visual-direction.png): approved concept direction, not a playable screenshot or production sprite sheet.
