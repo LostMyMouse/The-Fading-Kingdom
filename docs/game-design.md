@@ -15,8 +15,8 @@ The experience should be enjoyable as a farming and decorating game in its own r
 | Area | Decision |
 | --- | --- |
 | Platform | Browser game supporting mobile, tablet, and PC; connected to the existing personal website |
-| Audience | Ages 7–11, welcoming across genders |
-| Setting | Magical fantasy kingdom, with a home village and recurring NPCs |
+| Audience | Designed for ages 7–11, welcoming across genders and accessible to players of any age |
+| Setting | Magical fantasy kingdom; begin on an almost empty plot and build a home village with recurring NPCs |
 | Main activities | Farming, decorating, relationships, and restoration |
 | Restoration | Gradually revitalise the kingdom through farming and cooperation |
 | Decorating and village building | Free placement and meaningful control over the village layout, including buildings, paths, gardens, and shared spaces |
@@ -25,6 +25,7 @@ The experience should be enjoyable as a farming and decorating game in its own r
 | Consequences | Gentle, understandable, repairable setbacks |
 | Relationships | A journal with descriptive stages and clues about NPC feelings |
 | Pace | Player-controlled days; no ticking deadline |
+| Dialogue | Clear, warm, natural language suitable for ages 7–11 without patronising older players |
 | Art | Chunky, simple pixel art; warm, cosy fantasy direction |
 | Player | Customisable, age-neutral storybook appearance |
 | Clothing | Rustic everyday clothes initially; magical clothing obtained through progress |
@@ -40,6 +41,35 @@ The intended scope of freedom includes buildings, paths, farm and garden areas, 
 The current prototype is an initial systems demonstration. Its procedural artwork and limited decorating zones are not the final world target. Existing character, map, and artwork originality requirements remain in place.
 
 Next design discussion: define the village's starting state, what can be built or moved, and how villagers and restoration projects fit player-authored layouts. Do not start implementation until that discussion is resolved.
+
+## Agreed opening and construction direction — 17 October 2026
+
+Start with an almost empty plot, a small cottage, overgrown ground, and basic tools. The player grows their first crops, meets a travelling baker, listens to what they need, and helps create their home. Building the house begins an ongoing relationship; it does not purchase friendship. The resident contributes skills and help to village life in return.
+
+Opening sequence: settle in → grow first crops → meet the baker → understand their needs → choose a house style and agree on a location → gather materials → build together → welcome them into the village.
+
+Place a complete building footprint and supply materials; construction visibly proceeds through a few stages, including foundations and the finished home. The player chooses placement and decorates inside and outside afterwards. The initial house can offer three equally valid exterior styles. Practical needs such as a kitchen and herb space leave creative choices open. Residents do not judge the child for choosing an unfavoured colour or decoration.
+
+Begin material gathering with fallen branches and loose stones. Farming, crafting, and friendships open further materials. Visually distinguish freely gatherable resources from owned supplies: a fallen branch can be collected, while a carpenter's stacked timber requires permission. The exact resource economy, gathering tools, costs, construction timing, and baker's identity remain to be designed.
+
+These decisions describe the next design direction. The live prototype still uses the earlier village-garden opening; this document does not claim the new opening has been implemented.
+
+## Dialogue and writing standard
+
+**Write so a seven-year-old can follow the conversation and an adult can enjoy it.** Ages 7–11 guide comprehension and interaction design; the game is accessible to any age. Avoid talking down to the player.
+
+- Use natural, concise speech, familiar words, and short dialogue turns. Introduce unfamiliar fantasy or craft terms through context. Clarity does not require baby talk.
+- Give each NPC an individual voice, interests, humour, and boundaries. They are people in the story, not constant teachers praising or correcting the player.
+- Prefer specific, believable responses over generic praise, moral speeches, or exaggerated enthusiasm. Avoid labels such as “naughty,” “bad child,” or “good little helper.”
+- Explain a consequence through the character's situation: what happened, why it matters, and what the player can do next. Keep the response proportionate and respectful.
+- Allow ordinary disagreement, mistakes, respectful refusal, and a little understated humour. Adults and children can both misunderstand or apologise.
+- Use meaningful, readable response options that communicate the intended action. Do not make educational progress depend on guessing one exact polite phrase.
+- Keep essential quest instructions concrete. Longer optional conversations can add personality and depth without obscuring the next action.
+- Review the dialogue in the context of each scene, including mistakes and repair. Readability scores alone cannot establish whether it is understandable, enjoyable, or patronising; validate with players across the intended age range.
+
+Example ownership response: “Those boards are mine. Please ask before taking them. Bring them back and we can get started.”
+
+Example welcome: “I could see myself living here. Somewhere for an oven, a few herbs by the door… What do you think?”
 
 ## Design pillars
 
