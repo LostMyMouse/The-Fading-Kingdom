@@ -19,7 +19,7 @@ The experience should be enjoyable as a farming and decorating game in its own r
 | Setting | Magical fantasy kingdom, with a home village and recurring NPCs |
 | Main activities | Farming, decorating, relationships, and restoration |
 | Restoration | Gradually revitalise the kingdom through farming and cooperation |
-| Decorating | Free placement, rather than selecting finished layouts |
+| Decorating and village building | Free placement and meaningful control over the village layout, including buildings, paths, gardens, and shared spaces |
 | Social choices | Both dialogue and practical actions affect relationships |
 | Ownership | Stealing (taking without asking) is an explicit concept with consequences and repair |
 | Consequences | Gentle, understandable, repairable setbacks |
@@ -31,9 +31,19 @@ The experience should be enjoyable as a farming and decorating game in its own r
 
 Stardew Valley is a reference for the broad farming and village relationship experience. Characters, maps, artwork, interface, and narrative will be original.
 
+## Village-building direction — 17 October 2026
+
+The user emphasised that the world should feel like Stardew Valley and that being able to build the village their own way is important. Treat a coherent, explorable farming-and-village world and meaningful player control of its layout as core design goals. Small decorative patches alone do not fulfil that ambition.
+
+The intended scope of freedom includes buildings, paths, farm and garden areas, and shared village spaces. Restoration and relationships should open construction possibilities while leaving meaningful spatial decisions to the player. The exact building-placement, relocation, ownership, terrain-editing, and village-growth rules still need discussion; these are not implemented features or permission to start a new build pass.
+
+The current prototype is an initial systems demonstration. Its procedural artwork and limited decorating zones are not the final world target. Existing character, map, and artwork originality requirements remain in place.
+
+Next design discussion: define the village's starting state, what can be built or moved, and how villagers and restoration projects fit player-authored layouts. Do not start implementation until that discussion is resolved.
+
 ## Design pillars
 
-1. **Make a place your own.** Growing and decorating visibly change the world.
+1. **Build your village your way.** Village building is a core pillar. Growing, placing, and arranging the village visibly change the world; the player makes meaningful layout choices.
 2. **Relationships open possibilities.** NPCs become collaborators with interests, needs, skills, and boundaries.
 3. **Mistakes can be repaired.** Feedback explains the consequence and offers a practical way forward.
 4. **Explore at your own pace.** The player has direction without a clock demanding efficiency.
