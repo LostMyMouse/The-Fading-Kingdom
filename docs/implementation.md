@@ -23,9 +23,13 @@ The game repository is the source of truth. The website contains a matching stat
 
 ## Verification
 
-Nine Node tests cover crop timing, two-night magical crops, independent repair in either order and across reload, reward deduplication, complete restoration/unlock, protected placement, landmark reachability, invalid-save rejection, and seed recovery. JavaScript syntax checks pass.
+Ten Node tests cover crop timing, two-night magical crops, independent repair in either order and across reload, reward deduplication, complete restoration/unlock, protected placement, landmark reachability, invalid-save rejection, seed recovery, and relative asset resolution for clean URLs. JavaScript syntax checks pass.
 
-The local preview could not be reached through the browser in this session. A background helper launch was rejected by automatic approval review. Browser interaction, screenshots, responsive layout, actual touch input, save restrictions in private browsing, and performance on iOS/Android remain unverified. Do not describe simulated or automated rules testing as physical-device validation.
+The local preview could not be reached through the browser in this session. After the owner authorised production publication, testing continued on the live website. A Vercel clean-URL issue found there was corrected by anchoring relative asset URLs to the game directory, with an added regression test.
+
+Verified in the desktop browser: character creation, tap/click-to-walk, keyboard interaction, planting, watering, sleeping, harvesting three daisies, borrowing, deliberate stealing confirmation, the explained consequence, journal repair guidance, separate return of the seeds and can, cooperation with Orin, garden restoration, greenhouse seed/cape unlock, rotated bench placement, and save/reload retaining progression. Phone-sized standalone and embedded website layouts were inspected at 390 × 844. Further responsive checks are recorded in the delivery notes.
+
+Actual touch hardware, save restrictions in private browsing, and performance across iOS/Android and different desktop engines remain unverified. Viewport emulation and automated rules testing are not physical-device validation.
 
 ## Next acceptance pass
 

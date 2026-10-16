@@ -15,7 +15,8 @@ function scheduleSave(){clearTimeout(saveTimer);saveTimer=setTimeout(save,500);}
 function updateHud(){
  $('day').textContent=`Day ${state.day}${saveError?' · not saved':''}`;
  const flowers=Math.min(state.inventory.flower,3),wood=Math.min(state.inventory.wood,2);
- $('quest-progress').textContent=state.events.greenhouse?'Moonflowers and a magical cape unlocked!':state.events.restored?'Visit the greenhouse, then make the garden yours.':`Daisies ${flowers}/3 · Wood ${wood}/2${disputes(state)?' · Repair trust':''}`;
+ const belongings=state.events.packet==='taken'||state.events.borrow==='late'?' · Make things right':state.events.borrow==='held'?' · Return borrowed can':'';
+ $('quest-progress').textContent=state.events.greenhouse?'Moonflowers and a magical cape unlocked!':state.events.restored?'Visit the greenhouse, then make the garden yours.':`Daisies ${flowers}/3 · Wood ${wood}/2${belongings}`;
  $('quest-fill').style.width=`${state.events.restored?100:(flowers/3*45+wood/2*25+(state.events.introduced?15:0)+(state.events.helpedOrin?15:0))}%`;
  document.querySelectorAll('#toolbar button').forEach((b,i)=>{const t=tools[i][0];b.setAttribute('aria-pressed',t===tool);const counter=b.querySelector('.count');counter.textContent=CROPS[t]?state.inventory[CROPS[t].seed]:'';b.setAttribute('aria-label',`${tools[i][1]}${CROPS[t]?`, ${state.inventory[CROPS[t].seed]} remaining`:''}`);});
  $('selection').textContent=tool==='decorate'?`${mode==='move'?'Move an item':mode==='store'?'Tap an item to store it':`${decorType} · ${state.inventory[decorType]} in storage`} · Tap a space to preview`:tool==='hands'?'Hands · Talk, harvest, and explore':tool==='water'?'Watering can · Tap a planted plot':`${CROPS[tool].name} seeds · Tap an empty plot`;
@@ -34,6 +35,7 @@ function show(title,text,choices=[],eyebrow='BRAMBLEWICK'){
  const list=document.createElement('div');list.className='choices';
  for(const choice of choices){const b=document.createElement('button');b.textContent=choice.label;b.className=choice.style||'';b.disabled=!!choice.disabled;b.onclick=choice.fn;list.append(b);}body.append(list);
  if(!modal.open)modal.showModal();
+ (list.querySelector('button')||$('close-dialog')).focus({preventScroll:true});
 }
 function close(){modal.close();canvas.focus({preventScroll:true});}
 $('close-dialog').onclick=close;

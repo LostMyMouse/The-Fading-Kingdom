@@ -12,10 +12,12 @@ A cosy browser farming and decorating adventure for ages 7–11. Grow a farm, ma
 
 A dependency-free Canvas 2D prototype with farming, player-controlled days, character customisation, free decoration, three NPCs, a friendship journal, borrowing and stealing encounters, a garden restoration, and a moonflower greenhouse unlock.
 
-Run `node tools/serve.mjs`, then open `http://127.0.0.1:4175`. No dependency installation or build step is required. To run checks: `node --check game.js`, `node --check world.js`, and `node --test tests/game.test.mjs`.
+Play on [JamesCube](https://james-lost-his-mouse.vercel.app/play.html?game=the-fading-kingdom).
+
+Run `node tools/serve.mjs`, then open `http://127.0.0.1:4175`. No dependency installation or build step is required. To run checks: `node --check game.js`, `node --check world.js`, and `node --test tests/game.test.mjs tests/hosting.test.mjs`.
 
 For JamesCube, copy `index.html`, `style.css`, `game.js`, `model.js`, and `world.js` unchanged into `games/the-fading-kingdom/`, then add the project registry entry. Relative paths work in the website's existing iframe. See [integration notes](docs/implementation.md).
 
 Controls: WASD / arrows to walk, E / Space to interact, J for journal, 1–6 for tools. Tap the map to walk or use the touch direction pad and ACT button. Tap a ripe crop to harvest. Select Decorate for placement, movement, storage, rotation, and undo. Save data stays in the current browser under `the-fading-kingdom:save:v1`.
 
-This is a prototype. Automated rule tests pass; browser/device verification status is recorded in the implementation notes. Production art and physical-device playtests are still needed.
+This is a prototype. Ten automated tests pass, and the main progression loop has been exercised in the live browser. Browser/device verification status is recorded in the implementation notes. Production art and physical-device playtests are still needed.
