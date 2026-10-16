@@ -6,6 +6,15 @@
   <meta name="theme-color" content="#243f35">
   <meta name="description" content="A little kindness. A growing kingdom. A cosy farming adventure.">
   <title>The Fading Kingdom</title>
+  <script>
+    // Vercel's clean URLs can remove index.html without adding a trailing slash.
+    // Keep every relative asset anchored to this game's own directory.
+    if (!/\/$|\.html$/.test(location.pathname)) {
+      const base = document.createElement('base');
+      base.href = location.pathname + '/';
+      document.head.append(base);
+    }
+  </script>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
