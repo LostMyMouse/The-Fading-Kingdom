@@ -18,6 +18,8 @@ Turn a quiet patch of land into the beginning of a village by growing something,
 
 **Starting area:** one cottage, a small area suitable for crops, free building land, a road, a water source, fallen wood, loose stones, and a few signs of older settlement. Mara and Orin visit from the road. There is no finished village square or row of occupied homes. The reason the wider kingdom declined stays open.
 
+Dialogue examples below describe the initial script. The live character voices and revised ownership encounter now follow [dialogue and ownership](dialogue-and-ownership.md); that revision supersedes formal speech and explicit moral choice labels here.
+
 ## Writing and presentation rules
 
 - Dialogue cards normally contain one or two short sentences, one thought at a time. Longer scenes advance through several cards.
@@ -183,32 +185,13 @@ Journal while borrowed:
 
 > Return Orin's basket before building the frame.
 
-### O03 — Clear ownership and taking without asking
+### O03 — Boards by the cart
 
-An optional timber stack by Orin's cart is labelled **Orin's wood — set aside for another job**. It is visually distinct from fallen wood. The default interaction opens choices; touching or walking beside it never takes it.
+Orin’s boards sit beside his tools. A note on the string reads “Mill roof”. Inspecting offers “Pick up a bundle”, “Ask Orin about the boards” and “Leave it”. There is no second confirmation or negative warning. Pickup produces a neutral world message; the bundle stays a separate, returnable story object.
 
-Options:
+When the player next talks to Orin, he notices: “Ah. There’s my wood. I was starting to blame the squirrels.” Then: “Those boards are for the mill roof. Can you pop them back?” The player can explain a mix-up, ask to use some, or return them. Orin needs them back before lending or working on the frame. A frame-building attempt can also prompt this conversation.
 
-- “Ask Orin about the wood.” → Orin: “That stack's for another job. There's fallen wood by the path you can use.” Offer a marker; no reward or penalty for asking.
-- “Leave it here.” → Close and continue playing.
-- “Take the bundle without asking.” → A short confirmation: “This wood belongs to Orin. Take it anyway?” Choices: **Leave it** / **Take it**.
-
-If taken, show an identifiable returnable bundle in the carried-items list. In this first encounter it cannot be sold, crafted, or deposited into the house; the ownership marker stays attached. This keeps the repair route simple and prevents a reward exploit. More complex consumed-item stories belong in later chapters.
-
-**Orin:** “I set that wood aside for another job. Please bring it back before we build together.”
-
-**Consequence:** Orin pauses his own contribution to the frame until the wood is returned. Gathering, farming, house planning, other conversations, and unrelated decoration remain available. He continues to speak to the player normally.
-
-Repair responses at Orin or the stack:
-
-- “I took your wood. I'll put it back.”
-- “Here it is. I should have asked.”
-
-Both return the complete bundle and resolve the immediate boundary.
-
-**Orin:** “Thanks for bringing it back. The fallen wood is yours to use. We can work with that.”
-
-Returning it does not also return a separately borrowed basket. An apology without returning it does not clear the material boundary. No permanent label, village-wide rejection, fine, or inaccessible replacement resource is introduced.
+Putting the bundle back before being noticed is an ordinary world action. Return after noticing resolves that boundary without clearing a separately borrowed basket. Farming, free gathering, cooking and decorating continue. No exact apology, moral label or village-wide rejection is introduced.
 
 ### O04 — Return and follow-through
 

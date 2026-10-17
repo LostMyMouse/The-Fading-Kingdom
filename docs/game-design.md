@@ -71,6 +71,10 @@ The full game must include playable building interiors alongside the outdoor vil
 
 Separate room scenes with a brief transition are acceptable; seamless indoor/outdoor rendering is not required. Exact room sizes, camera behaviour, and the set of shared buildings remain to be designed. This is a full-game requirement, not a claim about the current prototype.
 
+## Revised dialogue and ownership direction
+
+The agreed tone is casual, characterful conversation with everyday humour, using Animal Crossing as a reference for readability and personality. The runtime now uses original, distinct voices and optional chatter. The timber encounter uses ordinary actions and contextual ownership; Orin explains his needs when the player next talks to him or asks for frame-building help. This supersedes earlier explicit “Take without asking” labels and pre-action moral warnings. See [dialogue and ownership](dialogue-and-ownership.md) for the current specification.
+
 ## Dialogue and writing standard
 
 **Write so a seven-year-old can follow the conversation and an adult can enjoy it.** Ages 7–11 guide comprehension and interaction design; the game is accessible to any age. Avoid talking down to the player.
@@ -187,7 +191,7 @@ An entry should explain useful context: what the player learned, something the N
 
 Stealing means intentionally taking someone else's belongings without permission. Teach the distinction between owned goods, things offered for sharing, and freely gatherable resources. A relationship does not automatically grant permission to take a friend's possessions.
 
-Make ownership clear before the decision: “These are Rowan's seeds” with choices such as “Ask for some,” “Leave them,” and an explicit “Take without asking.” Names here are illustrative. Walking near an item or mis-tapping must not count as stealing. Borrowing with permission and forgetting to return something is a separate situation, even though both can affect trust.
+Make ownership understandable from context before the decision: a stack beside a carpenter’s tools, a note about its use, or goods in a resident’s home. Offer ordinary actions such as “Pick up a bundle”, “Ask about it” and “Leave it”. Do not label the choice as stealing or forecast its moral result. The owner responds naturally in a later relevant encounter. Walking near an item or mis-tapping must not count as stealing. Borrowing with permission and forgetting to return something is a separate situation, even though both can affect trust.
 
 Consequences should be concrete and proportionate: the owner loses supplies they need, pauses lending, or delays an optional invitation. The NPC explains the connection: “I needed those seeds for the garden. Please return them before we plant together.” Do not shame or label the player as a bad person. Repeated taking can keep the same relevant boundary in place; it does not trigger endless stacked penalties or unrelated village-wide rejection.
 

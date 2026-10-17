@@ -12,6 +12,7 @@ This is an expanded prototype. Procedural pixel art, basic animation and a small
 
 ## Project documents
 
+- [Dialogue and ownership](docs/dialogue-and-ownership.md): character voices, everyday chatter and the revised timber encounter.
 - [Game design](docs/game-design.md): agreed direction and open decisions.
 - [Chapter One script](docs/chapter-one.md): narrative target and detailed quest branches.
 - [Chapter One release notes](docs/chapter-one-release.md): implemented scope, differences, verification and limits.
@@ -20,9 +21,9 @@ This is an expanded prototype. Procedural pixel art, basic animation and a small
 
 ## Development
 
-Run `node tools/serve.mjs` and open `http://127.0.0.1:4175/`. No installs or build step. Run `node --test tests/*.test.mjs` for the twenty-two rules and hosting tests.
+Run `node tools/serve.mjs` and open `http://127.0.0.1:4175/`. No installs or build step. Run `node --test tests/*.test.mjs` for the twenty-nine rules and hosting tests.
 
-Runtime files: `index.html`, `chapter.css`, `chapter.js`, `chapter-model.js`, `chapter-world.js`, plus the reused `world.js` and `model.js` character/icon modules. Copy them together into the website's `games/the-fading-kingdom/` folder. The earlier `game.js` and `style.css` remain historical source.
+Runtime files: `index.html`, `chapter.css`, `chapter.js`, `chapter-model.js`, `chapter-world.js`, `chapter-dialogue.js`, plus the reused `world.js` and `model.js` character/icon modules. Copy them together into the website's `games/the-fading-kingdom/` folder. The earlier `game.js` and `style.css` remain historical source.
 
 Controls: tap an object to walk to it; arrows/WASD to walk; E/Space to interact; J for journal; 1–5 for tools. Placement supports arrow keys, Enter, Escape, and R for supported rotation. Touch movement controls are provided. Show me guides you toward the current objective.
 
