@@ -12,6 +12,7 @@ This is an expanded prototype. Procedural pixel art, basic animation and a small
 
 ## Project documents
 
+- [Next-version direction](docs/next-version-direction.md): arrival premise, practical equipment upgrades, expressive portraits and emotional animation.
 - [Dialogue and ownership](docs/dialogue-and-ownership.md): character voices, everyday chatter and the revised timber encounter.
 - [Game design](docs/game-design.md): agreed direction and open decisions.
 - [Chapter One script](docs/chapter-one.md): narrative target and detailed quest branches.

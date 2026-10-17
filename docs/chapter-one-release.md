@@ -39,3 +39,7 @@ Inspected layouts at 320×740 phone portrait, 844×390 phone landscape, 1024×76
 The complete house/cooking/ownership-repair paths are exercised by automated rule tests. A complete manual browser playthrough through every construction and cooking step is still required; this pass does not claim it occurred. Native touch hardware, alternate browser engines, fullscreen behaviour, audio output, backup import/download, and child playtesting remain unverified.
 
 Additional regressions cover guidance to loose supplies versus owned timber and preventing house placement on the player. The final rules/hosting total is 22 passing checks.
+
+## Dialogue and ownership revision
+
+Casual, original character voices, optional persistent everyday chatter, and contextual timber pickup replace the explicit moral warning. Discovery occurs in conversation or at the frame lift. Save migration preserves existing chapter progress. See dialogue-and-ownership.md for the current specification and the seven additional rules regressions (29 passing checks total). The save menu also offers a visible text export fallback and an attached file input for backup restoration.

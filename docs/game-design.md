@@ -223,6 +223,10 @@ Build anticipation through new crops, relationship stories, creative options, an
 
 Avoid login streaks, offline deterioration, or time-limited rewards that punish absence. Optional challenges can add depth for older players without making the core experience hurried.
 
+## Next-version requirements
+
+The opening must explain how the player arrived to help the kingdom. Earned equipment must make farming easier through practical upgrades. Dialogue needs dedicated expressive portraits, with later world-character animation responding to emotion. See [next-version direction](next-version-direction.md) for the proposed arrival premise, equipment examples, portrait reference interpretation, and acceptance criteria. These requirements extend beyond the current dialogue release.
+
 ## Open decisions
 
 - Exact touch layout, keyboard bindings, supported browser versions, and minimum device performance.
