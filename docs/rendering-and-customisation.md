@@ -29,3 +29,13 @@ Review the corrected sprites at actual phone, tablet and desktop sizes. Confirm 
 
 ## Deferred gathering
 Chopping and mining, including axes/pickaxes obtained from characters or shops, are recorded in next-version-direction.md. No gathering tools or economy have been added by this pass.
+
+## Validation and current limits
+
+47 automated checks pass, including opposing limb travel, blocked stroll destinations, room visibility, stable save state and reduced-motion poses. JavaScript syntax checks pass. The production deployment completed. The live bakery was inspected at the existing 663×1052 browser size; its canvas backing and CSS size matched at DPR 1 (663×849 scene), with the 2× world scale rendered inside that backing. Mara’s work sequence was observed at frames 22 and 23. The enlarged walking preview was inspected for both contact phases of the left-facing gait after the resolution correction. This is not a complete four-direction animation approval. An attempted later preview check timed out; it is not counted as a pass.
+
+The latest direction-specific arm overlap refinement is deployed and syntax-checked, but still needs the full visual animation review. No claim of final production animation quality is made. The player and environment remain earlier procedural art; modular character layers are a proposed next proof, not an implemented wardrobe.
+
+Your pre-test story was backed up, restored through the game UI, and compared exactly via exported JSON. The temporary preview tab was closed and viewport override reset. Source and website runtime are synchronised.
+
+Final artwork: outputs/world-characters/mara-world.png and orin-world.png. Generation prompts and built-in imagegen provenance: generation-prompts.md.
