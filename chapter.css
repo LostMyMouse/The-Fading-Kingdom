@@ -9,3 +9,7 @@ dialog.character-dialogue{width:min(700px,calc(100% - 24px))}
 .dialogue-copy h2{margin:0 0 10px}.dialogue-copy p{margin:0;overflow-wrap:anywhere}
 @media(max-width:480px) and (min-height:521px){.dialogue-scene{grid-template-columns:96px minmax(0,1fr);gap:12px}.character-portrait{width:96px;height:96px}.dialogue-copy{display:contents}.dialogue-copy h2{margin:0}.dialogue-copy p{grid-column:1/-1;margin-top:5px}dialog.character-dialogue{padding:18px}.character-dialogue .choices{margin-top:14px}}
 @media(max-height:520px){.dialogue-scene{grid-template-columns:88px minmax(0,1fr);gap:16px;margin-top:8px}.character-portrait{width:88px;height:88px}.dialogue-copy h2{font-size:23px;margin-bottom:4px}.dialogue-copy p{font-size:14px}.character-dialogue .choices{margin-top:12px;gap:6px}}
+
+.layered-preview{width:96px;height:120px;image-rendering:auto;background:#dce2be}.wardrobe-select{display:block;clear:both;margin-top:10px}.wardrobe-select select{margin-left:8px;max-width:100%}
+
+.layered-preview{float:none;display:block;margin:10px auto 14px}.wardrobe-save{position:sticky;bottom:0;width:100%;z-index:1;box-shadow:0 -7px 12px #fcf2d9}

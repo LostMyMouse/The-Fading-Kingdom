@@ -1,4 +1,4 @@
-import {blocked,mara,FIXED} from './chapter-model.js';
+import {blocked,mara,FIXED,route} from './chapter-model.js';
 // Scene actors are transient presentation state; they never change saves or rewards.
 export const SPRITE_RECTS={
  mara:[[78,21,147,227],[320,21,147,230],[552,21,146,227],[793,21,150,230],[94,258,139,223],[337,261,134,219],[572,261,136,219],[812,261,139,219],[85,491,142,223],[332,492,141,222],[561,491,143,223],[808,492,141,222],[93,723,130,221],[339,723,129,223],[568,723,129,222],[812,723,127,223],[84,964,145,237],[323,964,145,237],[559,964,146,237],[793,962,150,239],[76,1217,154,274],[314,1217,159,274],[547,1216,175,275],[793,1217,161,274]],
@@ -12,34 +12,64 @@ export function animationFrame({direction='down',walking=false,work=false,emotio
  if(emotion==='surprised')return 17;
  if(talking)return reduce?0:Math.floor(clock/280)%2?17:0;
  if(work)return reduce?20:20+Math.floor(clock/440)%4;
- if(!reduce&&clock%5600<180)return 16;
+ if(!reduce&&direction==='down'&&clock%5600<180)return 16;
  return (rows[direction]??0)*4;
+}
+export function routineFor(s,name,anchor){
+ if(s.room==='bakery')return [
+  {x:11,y:5,hold:11000,work:true,face:'down',activity:'Baking'},
+  {x:10,y:6,hold:6000,face:'left',activity:'Tidying the kitchen'},
+  {x:11,y:7,hold:7000,face:'down',activity:'Taking a break'}
+ ];
+ if(name==='orin')return [
+  {...anchor,hold:11000,work:true,face:'down',activity:'Carpentry'},
+  {x:18,y:19,hold:6500,face:'left',activity:'Checking supplies'},
+  {x:16,y:19,hold:7500,face:'right',activity:'Taking a break'}
+ ];
+ if(s.house?.stage===3)return [
+  {...anchor,hold:9000,face:'up',activity:'Checking the herbs'},
+  {x:anchor.x,y:anchor.y+2,hold:6000,face:'down',activity:'Getting some air'},
+  {x:anchor.x+1,y:anchor.y+2,hold:7000,face:'left',activity:'Taking a break'}
+ ];
+ return [
+  {...anchor,hold:10000,face:'down',activity:'Sorting the cart'},
+  {x:24,y:16,hold:6000,face:'right',activity:'Stretching her legs'},
+  {x:24,y:18,hold:6500,face:'left',activity:'Taking a break'}
+ ];
 }
 export function createActors(){
  const actors=new Map();
  return {reset(){actors.clear();},update(s,dt,{paused=false,reduce=false,cue=null}={}){
-  const anchors=[];if(s.room==='outside')anchors.push(['orin',FIXED.orin]);const m=mara(s);if(m)anchors.push(['mara',m]);
+  const delta=Math.max(0,Math.min(dt,50)),anchors=[];if(s.room==='outside')anchors.push(['orin',FIXED.orin]);const m=mara(s);if(m)anchors.push(['mara',m]);
   const visible=new Set(anchors.map(([name])=>name));for(const name of actors.keys())if(!visible.has(name))actors.delete(name);
   return anchors.map(([name,anchor])=>{
    const key=s.room+':'+anchor.x+','+anchor.y;let a=actors.get(name);
-   if(!a||a.key!==key){a={key,x:anchor.x,y:anchor.y,direction:'down',clock:name==='orin'?1500:3200};actors.set(name,a);}
-   const speaking=cue?.speaker===name;if(!paused||speaking)a.clock+=Math.max(0,Math.min(dt,50));
-   const distance=Math.abs(s.player.x-anchor.x)+Math.abs(s.player.y-anchor.y);
-   let target=anchor;const phase=a.clock%10000;
-   if(!paused&&!reduce&&!speaking&&distance>5&&phase>=6000&&phase<7600){
-    const dirs=[[0,1],[-1,0],[0,-1],[1,0]],d=dirs[Math.floor(a.clock/10000)%4];
-    const candidate={x:anchor.x+d[0],y:anchor.y+d[1]};
-    if(!blocked(s,candidate.x,candidate.y)&&!(s.room==='outside'&&candidate.y===16&&candidate.x>=17&&candidate.x<=19)&&!s.plots.some(p=>p.x===candidate.x&&p.y===candidate.y)&&!(s.room==='outside'&&candidate.y===17&&candidate.x===20))target=candidate;
-   }
+   const stops=routineFor(s,name,anchor);
+   if(!a||a.key!==key){const initial=Math.max(0,stops.findIndex(p=>p.x===anchor.x&&p.y===anchor.y));a={key,node:{...anchor},x:anchor.x,y:anchor.y,next:null,progress:0,path:[],index:initial,wait:stops[initial].hold,direction:stops[initial].face,clock:0};actors.set(name,a);}
+   const speaking=cue?.speaker===name;if(!paused||speaking)a.clock+=delta;
    let walking=false;
-   if(reduce){a.x=anchor.x;a.y=anchor.y;}
-   else if(!paused){const dx=target.x-a.x,dy=target.y-a.y,delta=Math.abs(dx)+Math.abs(dy);
-    if(delta>.001){walking=true;a.direction=Math.abs(dx)>Math.abs(dy)?dx>0?'right':'left':dy>0?'down':'up';const n=Math.min(1,dt/1000*2.5/delta);a.x+=dx*n;a.y+=dy*n;}
-    else if(distance<=4){const dx=s.player.x-anchor.x,dy=s.player.y-anchor.y;a.direction=Math.abs(dx)>Math.abs(dy)?dx>0?'right':'left':dy>0?'down':'up';}
+   if(!paused&&!speaking&&!reduce){
+    if(a.next){
+     // A blocked path pauses the errand. It never causes a resident to chase the player.
+     const occupied=s.player.x===a.next.x&&s.player.y===a.next.y;
+     if(!occupied&&!blocked(s,a.next.x,a.next.y)){
+      a.progress=Math.min(1,a.progress+delta/750);walking=true;
+      a.x=a.node.x+(a.next.x-a.node.x)*a.progress;a.y=a.node.y+(a.next.y-a.node.y)*a.progress;
+      if(a.progress===1){a.node={...a.next};a.next=null;a.progress=0;}
+     }else if(blocked(s,a.next.x,a.next.y)){a.path=[];a.next=null;a.x=a.node.x;a.y=a.node.y;a.wait=1000;}
+    }else if(a.path.length){a.next=a.path.shift();a.progress=0;const dx=a.next.x-a.node.x,dy=a.next.y-a.node.y;a.direction=dx>0?'right':dx<0?'left':dy>0?'down':'up';}
+    else if(a.wait>0){a.wait=Math.max(0,a.wait-delta);a.direction=stops[a.index].face;}
+    else{
+     a.index=(a.index+1)%stops.length;const stop=stops[a.index];a.wait=stop.hold;
+     const decor=s.room==='outside'?[...s.decor,...[17,18,19].map(x=>({x,y:16,room:'outside',type:'bench'}))]:s.decor;
+     a.path=route(s,a.node,stop,s.room,s.house,decor);
+     if(!a.path.length&&(a.node.x!==stop.x||a.node.y!==stop.y))a.wait=400;
+    }
    }
-   const work=!speaking&&!walking&&distance>2&&(name==='orin'||s.room==='bakery')&&phase<4200;
-   const emotion=speaking?cue.emotion:'neutral',talking=speaking&&cue.talking;
-   return {name,anchor:{...anchor},x:a.x,y:a.y,direction:a.direction,walking,work,emotion,talking,clock:a.clock,frame:animationFrame({direction:a.direction,walking,work,emotion,talking,clock:a.clock,reduce})};
+   if(speaking&&cue.talking){const dx=s.player.x-a.x,dy=s.player.y-a.y;a.direction=Math.abs(dx)>Math.abs(dy)?dx>0?'right':'left':dy>0?'down':'up';}
+   const work=!speaking&&!walking&&!a.next&&!a.path.length&&!!stops[a.index].work;
+   const emotion=speaking?cue.emotion:'neutral',talking=!!(speaking&&cue.talking);
+   return {name,anchor:{...anchor},x:a.x,y:a.y,tileX:Math.round(a.x),tileY:Math.round(a.y),direction:a.direction,walking,work,emotion,talking,activity:stops[a.index].activity,clock:a.clock,frame:animationFrame({direction:a.direction,walking,work,emotion,talking,clock:a.clock,reduce})};
   });
  }};
 }
