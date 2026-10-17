@@ -16,3 +16,5 @@ This remains a cutout walking rig, not hand-authored frame-by-frame animation. F
 
 ## Validation for this pass
 54 automated checks passed, including legacy appearance migration, independent NPC routines, measured source material samples, rectangle bounds and opposing gait. All eight wardrobe combinations were inspected in four directions and both contact poses. Six skin, six hair and six clothing palettes were inspected separately; a dark-skin/light-hair/blue-vest/cap combination was also stepped beside both NPCs. This is not exhaustive inspection of every palette cross-product. The review caught and corrected sleeve detachment, harsh colour banding and incomplete fabric recolouring. The atlas was never accepted on generation alone.
+
+Live creator checks: 320×740 phone and 768×1024 tablet, with document scroll widths matching the viewport. Hairstyle, outfit, cap and skin draft changes repainted correctly; sticky preview and final control remained reachable. Draft was cancelled before Begin my story, so testing did not replace the existing story. Desktop cast comparison reviewed at 1280×720. No physical touch-device test is claimed.
