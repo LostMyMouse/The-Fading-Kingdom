@@ -34,6 +34,7 @@ function reachable(s,room,house,decor){
 }
 export function validHouse(s,x,y){
  if(!Number.isInteger(x)||!Number.isInteger(y)||x<16||x>44||y<7||y>29)return false;
+ if(s.room==='outside'&&within(s.player.x,s.player.y,x,y,x+4,y+3))return false;
  const h={x,y,stage:0,style:0,trim:0};
  for(let yy=y;yy<=y+4;yy++)for(let xx=x;xx<=x+5;xx++)if(blocked(s,xx,yy,'outside',null)||yy===17||Object.values(FIXED).some(p=>p.x===xx&&p.y===yy)||RESOURCES.some(p=>p.x===xx&&p.y===yy))return false;
  return reachable(s,'outside',h,s.decor);
@@ -112,7 +113,7 @@ export function readSave(raw){
  if(s.house&&(!int(s.house.x,16,44)||!int(s.house.y,7,29)||!int(s.house.stage,0,3)||!int(s.house.style,0,2)||!int(s.house.trim,0,2)))throw Error('Invalid home');
  if(!Array.isArray(s.decor)||s.decor.length>200)throw Error('Invalid decoration');const checked={...s,decor:[]};for(const d of s.decor){if(!DECOR.includes(d.type)||!['outside','home','bakery'].includes(d.room)||!int(d.x,1,52)||!int(d.y,3,35)||!int(d.rotation,0,1)||checked.decor.some(o=>o.x===d.x&&o.y===d.y&&o.room===d.room))throw Error('Invalid item');checked.decor.push({type:d.type,x:d.x,y:d.y,room:d.room,rotation:d.rotation});}
  const clean={...base,day:s.day,room:s.room,player:Object.fromEntries(Object.keys(base.player).map(k=>[k,s.player[k]])),inventory:Object.fromEntries(Object.keys(base.inventory).map(k=>[k,s.inventory[k]])),carry:{wood:s.carry.wood,stone:s.carry.stone},plots:s.plots.map(p=>({x:p.x,y:p.y,planted:p.planted,watered:p.watered,ripe:p.ripe})),gathered:[...s.gathered],house:s.house?{x:s.house.x,y:s.house.y,stage:s.house.stage,style:s.house.style,trim:s.house.trim}:null,decor:checked.decor,story:Object.fromEntries(Object.keys(base.story).map(k=>[k,s.story[k]])),settings:{sound:typeof s.settings?.sound==='boolean'?s.settings.sound:true,music:typeof s.settings?.music==='boolean'?s.settings.music:false}};
- if(clean.house&&!validHouse({...clean,decor:[]},clean.house.x,clean.house.y))throw Error('Blocked home');
+ if(clean.house&&!validHouse({...clean,decor:[],player:{...clean.player,x:-99,y:-99}},clean.house.x,clean.house.y))throw Error('Blocked home');
  const items=clean.decor;clean.decor=[];for(const d of items){if(!validDecor({...clean,room:d.room,player:{...clean.player,x:-99,y:-99}},d.type,d.x,d.y))throw Error('Blocked decoration');clean.decor.push(d);}
  if(clean.room==='bakery'&&clean.house?.stage!==3)clean.room='outside';
  if(blocked(clean,clean.player.x,clean.player.y))Object.assign(clean.player,clean.room==='outside'?{x:12,y:14}:{x:8,y:11});

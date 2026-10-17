@@ -20,7 +20,7 @@ This is an expanded prototype. Procedural pixel art, basic animation and a small
 
 ## Development
 
-Run `node tools/serve.mjs` and open `http://127.0.0.1:4175/`. No installs or build step. Run `node --test tests/*.test.mjs` for the twenty rules and hosting tests.
+Run `node tools/serve.mjs` and open `http://127.0.0.1:4175/`. No installs or build step. Run `node --test tests/*.test.mjs` for the twenty-two rules and hosting tests.
 
 Runtime files: `index.html`, `chapter.css`, `chapter.js`, `chapter-model.js`, `chapter-world.js`, plus the reused `world.js` and `model.js` character/icon modules. Copy them together into the website's `games/the-fading-kingdom/` folder. The earlier `game.js` and `style.css` remain historical source.
 

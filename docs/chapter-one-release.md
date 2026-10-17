@@ -25,7 +25,7 @@ The world canvas is not a screen-reader representation. Menus and controls use s
 
 ## Checks
 
-Twenty Node tests pass: ten retained prototype/hosting regressions and ten Chapter One tests covering farming, house styles/sites and routing, carrying, independent ownership repair, construction and relocation, enterable rooms, cooking transactions and reloads, seed recovery, decoration conservation, and invalid-save rejection. Syntax checks pass for the new runtime modules.
+Twenty-two Node tests pass: ten retained prototype/hosting regressions and twelve Chapter One tests covering farming, house styles/sites and routing, carrying, independent ownership repair, construction and relocation, enterable rooms, cooking transactions and reloads, seed recovery, decoration conservation, and invalid-save rejection. Syntax checks pass for the new runtime modules.
 
 Local HTTP serving works, but the in-app browser could not reach loopback and the bundled local browser could not launch. The owner previously authorised testing through live publication; the website deployment completed successfully. Browser verification and any fixes are recorded below as they are completed. Phone/tablet viewport checks do not establish physical iOS/Android compatibility.
 
@@ -37,3 +37,5 @@ Verified through normal UI interactions: new character creation; tool collection
 Inspected layouts at 320×740 phone portrait, 844×390 phone landscape, 1024×768 tablet, and 1280×900 desktop. The narrow website launcher initially overflowed; a game-specific launcher layout fixed it. At 320 pixels the document's scroll width/height match the viewport and placement remains visible above the edge confirmation tray. The revised runtime produced no captured browser errors during this pass.
 
 The complete house/cooking/ownership-repair paths are exercised by automated rule tests. A complete manual browser playthrough through every construction and cooking step is still required; this pass does not claim it occurred. Native touch hardware, alternate browser engines, fullscreen behaviour, audio output, backup import/download, and child playtesting remain unverified.
+
+Additional regressions cover guidance to loose supplies versus owned timber and preventing house placement on the player. The final rules/hosting total is 22 passing checks.
