@@ -11,20 +11,22 @@ function piece(c,image,rect,box,x,y,w,h,dx=0,dy=0,dark=false){
 }
 function walk(c,image,rect,actor,x,y,w,h){
  const p=gaitPose(actor.frame),side=actor.direction==='left'||actor.direction==='right',sign=actor.direction==='left'?-1:1,back=actor.direction==='up'?-1:1;
+ const sideArm=actor.direction==='left'?[.66,.51,.96,.79]:[.04,.51,.34,.79];
+ const torso=actor.direction==='left'?[.15,.53,.66,.88]:actor.direction==='right'?[.34,.53,.85,.88]:[.25,.53,.75,.88];
  const leftLeg=side?p.leftLeg*sign*2.5:0,rightLeg=side?p.rightLeg*sign*2.5:0;
  const leftY=side?0:p.leftLeg*back,rightY=side?-1:p.rightLeg*back;
  // Texture-bearing limbs come from the character artwork; only their positions are animated.
  piece(c,image,rect,[.23,.84,.50,1],x,y,w,h,leftLeg,leftY,true);
  piece(c,image,rect,[.50,.84,.77,1],x,y,w,h,rightLeg,rightY);
- if(side)piece(c,image,rect,[.66,.51,.96,.79],x,y,w,h,p.rightArm*sign*2,0,true);
+ if(side)piece(c,image,rect,sideArm,x,y,w,h,p.rightArm*sign*2,0,true);
  else{
   piece(c,image,rect,[0,.51,.25,.80],x,y,w,h,0,p.leftArm*back*1.5);
   piece(c,image,rect,[.75,.51,1,.80],x,y,w,h,0,p.rightArm*back*1.5);
  }
  // Head and torso keep the source palette, proportions, apron and shading.
  piece(c,image,rect,[0,0,1,.53],x,y,w,h);
- piece(c,image,rect,[.21,.53,.79,.88],x,y,w,h);
- if(side)piece(c,image,rect,[.66,.51,.96,.79],x,y,w,h,p.leftArm*sign*2,0);
+ piece(c,image,rect,torso,x,y,w,h);
+ if(side)piece(c,image,rect,sideArm,x,y,w,h,p.leftArm*sign*2,0);
 }
 export function drawCharacter(c,actor,x,y){
  const image=images.get(actor.name);if(!image?.complete||!image.naturalWidth)return false;
