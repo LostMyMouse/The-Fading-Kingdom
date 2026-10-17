@@ -1,3 +1,5 @@
+> Visual consistency assessment superseded: James identified that this player did not match the NPCs. See coherent-player-release.md for the corrective template work. The checks below establish functionality, not cast art approval.
+
 # Layered player and independent residents · version 0.6.0
 
 ## Implemented

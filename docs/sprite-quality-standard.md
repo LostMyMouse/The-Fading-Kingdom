@@ -24,3 +24,8 @@ Both use the same player renderer as the game and do not write story progress.
 
 ## NPC behaviour
 Residents follow their own authored work, errand and rest routines. Player proximity or movement must not change their route, work state or facing. Only explicit conversation makes its speaker face the player and pause. A blocked path may wait for space; it must not become following behaviour.
+
+## Mandatory cast comparison (added after the 0.6.0 mismatch)
+A player-only matrix is insufficient. For every sprite change, render the player between Mara and Orin at exactly the same height, foot baseline and camera zoom in front, left, right and back views. Inspect passing and both contact poses. Compare head/body ratios, shoulder width, hand shape, outlines, shading contrast and apparent pixel density. Review close-up AND gameplay size. If any direction has detached or cropped limbs, the candidate fails even if the front view looks good. Record the actual result; automated tests and successful generation are not visual approval.
+
+Shared world contract: character-rig.js. Cast comparison: cast-review.html. Both existing NPCs remain references, and portrait approval remains separately governed by portrait-art-direction.md.

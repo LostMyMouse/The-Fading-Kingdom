@@ -1,70 +1,50 @@
 import {SKINS,HAIRS,SHIRTS} from './model.js';
-export const PLAYER_PARTS={
- head:[[28,39,163,187],[261,39,145,185],[481,38,146,186],[699,37,158,187]],
- short:[[16,251,188,180],[237,249,190,189],[460,249,190,189],[684,249,188,183]],
- tied:[[10,459,194,191],[230,459,197,196],[461,458,196,197],[684,458,176,208]],
- linen:[[11,692,209,170],[283,692,124,170],[480,692,127,170],[654,693,223,169]],
- vest:[[11,897,212,188],[290,897,127,188],[470,897,127,188],[660,897,217,183]],
- arms:[[[18,1125,65,188],[147,1125,64,188]],[[279,1125,58,193],[353,1125,59,188]],[[476,1125,59,188],[550,1125,59,193]],[[677,1123,63,188],[806,1123,63,188]]],
- legs:[[[18,1353,85,182],[125,1353,85,181]],[[260,1349,86,186],[350,1352,84,174]],[[453,1352,85,174],[541,1349,87,186]],[[678,1352,84,182],[785,1352,79,181]]],
- hat:[[18,1580,190,114],[240,1582,194,128],[453,1582,194,128],[682,1579,184,131]]
-};
-const views={down:0,right:1,left:2,up:3};
-export function playerPose(frame=0,walking=false,reduce=false){
- const phase=walking&&!reduce?[0,1,0,-1][((frame%4)+4)%4]:0;
- return {leftLeg:phase,rightLeg:-phase,leftArm:-phase,rightArm:phase};
-}
-let atlas=null,ready=false,failed=false,loading=null;const cache=new Map();
-export function preparePlayer(){if(loading)return loading;loading=new Promise(resolve=>{atlas=new Image();atlas.onload=()=>{ready=true;resolve(true);};atlas.onerror=()=>{failed=true;resolve(false);};atlas.src=new URL('./assets/player/parts.png',import.meta.url).href;});return loading;}
+import {drawRig,gaitPose} from './character-rig.js';
+// Whole, coherent figures share proportions. Swaps are made at measured landmarks, not by stretching isolated anatomy.
+export const PLAYER_RECTS=[
+ [[35,175,217,364],[287,175,218,367],[519,175,219,367],[773,175,213,364]],
+ [[38,584,209,361],[288,584,217,363],[519,584,218,363],[777,584,209,361]],
+ [[35,988,217,366],[287,988,218,369],[519,988,218,369],[773,988,213,366]]
+];
+const views={down:0,left:1,right:2,up:3};
+// The same joints/timeline as the NPCs, fitted to this character's hair and sleeve silhouette.
+const layout={left:{arm:[.51,.53,.73,.80],torso:[.24,.53,.67,.88]},right:{arm:[.27,.53,.49,.80],torso:[.33,.53,.76,.88]}};
+export function playerPose(frame=0,walking=false,reduce=false){return gaitPose(walking&&!reduce?frame:0);}
+let atlas=null,cap=null,ready=false,failed=false,loading=null;const cache=new Map();
+export function preparePlayer(){if(loading)return loading;loading=Promise.all([['atlas','./assets/player/coherent-template.png'],['cap','./assets/player/parts.png']].map(([name,url])=>new Promise(resolve=>{const img=new Image();img.onload=()=>resolve(true);img.onerror=()=>resolve(false);if(name==='atlas')atlas=img;else cap=img;img.src=new URL(url,import.meta.url).href;}))).then(([body])=>{ready=body;failed=!body;return body;});return loading;}
 export function playerArtStatus(){return failed?'unavailable':ready?'ready':'loading';}
 const rgb=hex=>[1,3,5].map(i=>parseInt(hex.slice(i,i+2),16));
-function materialPixel(r,g,b,kind){
- const light=.299*r+.587*g+.114*b;if(light<(kind==='hair'?22:40)||Math.max(r,g,b)-Math.min(r,g,b)<12&&light>190)return null;
- if(kind==='skin'){if(light>220||r<g*1.08)return null;return 'skin';}
- if(kind==='hair'){return r>125&&r>g*1.3&&g>b*1.2?'skin':'hair';}
- if(kind==='linen'){return light>85?'shirt':null;}
- if(kind==='vest'){return light>48&&light<170?'shirt':null;}
+const mix=(a,b,t)=>a.map((v,i)=>Math.round(v*(1-t)+b[i]*t));
+// Five shared, warm material ramps. Eyes, outlines, boots and cream sleeves retain their authored colours.
+export function materialRamp(hex){const base=rgb(hex);return [mix(base,[43,28,26],.58),mix(base,[59,35,26],.30),base,mix(base,[255,217,158],.24),mix(base,[255,234,185],.42)];}
+export function sourceMaterial(r,g,b,y){
+ const light=(r+g+b)/3;if(light<37)return null;
+ if(y<.22&&r>g*1.12&&g>b*1.04)return 'hair';
+ if(y>=.22&&r>g*1.25&&g>b*1.45&&r>85)return 'skin';
+ if(y<.64&&r>g*1.28&&g>b*1.05&&g<b*1.9&&light<160)return 'hair';
+ if(y>.48&&y<.80&&g>r*.83&&g>b*1.45&&light>50)return 'shirt';
  return null;
 }
-function part(name,index,look,limb=0){
- const rect=name==='arms'||name==='legs'?PLAYER_PARTS[name][index][limb]:PLAYER_PARTS[name][index];
- const kind=name==='head'||name==='arms'?'skin':name==='short'||name==='tied'?'hair':name;
- const key=name+':'+index+':'+limb+':'+look.skin+':'+look.hair+':'+look.shirt;
- if(cache.has(key)){const hit=cache.get(key);cache.delete(key);cache.set(key,hit);return hit;}
- const out=document.createElement('canvas');out.width=rect[2];out.height=rect[3];const c=out.getContext('2d',{willReadFrequently:true});c.drawImage(atlas,...rect,0,0,rect[2],rect[3]);
- if(['skin','hair','linen','vest'].includes(kind)){
-  const pixels=c.getImageData(0,0,out.width,out.height),data=pixels.data;
-  const colours={skin:rgb(SKINS[look.skin??1]),hair:rgb(HAIRS[look.hair??0]),shirt:rgb(SHIRTS[look.shirt??0])};
-  for(let j=0;j<data.length;j+=4){
-   if(data[j+3]<90){data[j+3]=0;continue;}const slot=materialPixel(data[j],data[j+1],data[j+2],kind);if(!slot)continue;
-   const brightness=.299*data[j]+.587*data[j+1]+.114*data[j+2],target=colours[slot],reference=slot==='skin'?155:slot==='hair'?63:kind==='vest'?105:205;
-   const factor=Math.max(.38,Math.min(1.65,brightness/reference));for(let k=0;k<3;k++)data[j+k]=Math.min(255,Math.round(target[k]*factor));
-  }c.putImageData(pixels,0,0);
+function body(d,look){
+ const key=[d,look.style===1?1:0,look.outfit??0,look.skin??1,look.hair??0,look.shirt??0].join(':');
+ if(cache.has(key))return cache.get(key);
+ const out=document.createElement('canvas');out.width=216;out.height=366;const c=out.getContext('2d',{willReadFrequently:true});c.imageSmoothingEnabled=false;
+ c.drawImage(atlas,...PLAYER_RECTS[look.style===1?1:0][d],0,0,216,366);
+ const original=c.getImageData(0,0,216,366);
+ if(look.outfit===1){const r=PLAYER_RECTS[2][d];c.clearRect(0,183,216,117);c.drawImage(atlas,r[0],r[1]+r[3]*.5,r[2],r[3]*.32,0,183,216,117);
+  // Preserve tied hair in front of a new shirt, including the low ponytail in profile/back views.
+  const composite=c.getImageData(0,0,216,366);for(let y=183;y<235;y++)for(let x=0;x<216;x++){const i=(y*216+x)*4;const [r,g,b,a]=original.data.slice(i,i+4);if(a>100&&r>g*1.12&&g>b*1.04&&g<b*1.9&&(r+g+b)/3<160){for(let k=0;k<4;k++)composite.data[i+k]=original.data[i+k];}}c.putImageData(composite,0,0);
  }
- cache.set(key,out);if(cache.size>96)cache.delete(cache.keys().next().value);return out;
+ const pixels=c.getImageData(0,0,216,366),data=pixels.data;
+ const ramps={skin:materialRamp(SKINS[look.skin??1]),hair:materialRamp(HAIRS[look.hair??0]),shirt:materialRamp(SHIRTS[look.shirt??0])};
+ for(let i=0;i<data.length;i+=4){if(data[i+3]<100){data[i+3]=0;continue;}const y=Math.floor(i/4/216)/366,kind=sourceMaterial(data[i],data[i+1],data[i+2],y);if(!kind)continue;
+  const light=.299*data[i]+.587*data[i+1]+.114*data[i+2];const thresholds=kind==='hair'?[46,61,79,104]:kind==='skin'?[77,116,153,186]:[76,105,136,163];const stops=[20,...thresholds,255];let index=0;while(index<4&&light>stops[index+1])index++;const t=Math.max(0,Math.min(1,(light-stops[index])/(stops[index+1]-stops[index])));
+  const colour=mix(ramps[kind][index],ramps[kind][Math.min(4,index+1)],t);for(let k=0;k<3;k++)data[i+k]=colour[k];
+ }c.putImageData(pixels,0,0);cache.set(key,out);if(cache.size>96)cache.delete(cache.keys().next().value);return out;
 }
-function image(c,img,x,y,w,h,rotation=0,pivot=.5){
- c.save();c.translate(x,y);if(rotation)c.rotate(rotation);c.drawImage(img,-w*pivot,0,w,h);c.restore();
-}
+const CAP_RECTS=[[18,1580,190,114],[453,1582,194,128],[240,1582,194,128],[682,1579,184,131]];
 export function drawPlayer(c,x,y,look={},frame=0,direction='down',walking=false,reduce=false){
- if(!ready)return false;const d=views[direction]??0,p=playerPose(frame,walking,reduce),side=d===1||d===2,sign=d===2?-1:1,back=d===3?-1:1;
- const outfit=look.outfit===1?'vest':'linen',style=look.style===1?'tied':'short';x=Math.round(x);y=Math.round(y);
- const head=part('head',d,look),hair=part(style,d,look),shirt=part(outfit,d,look);
- c.fillStyle='#304d3c40';c.fillRect(x-6,y+1,12,2);
- // The rear limbs draw first, then clothing hides their shoulder and hip joins.
- const legs=[p.leftLeg,p.rightLeg],arms=[p.leftArm,p.rightArm];
- const rear=side?(d===1?1:0):1,front=1-rear;
- for(const i of [rear,front]){
-  const travel=legs[i],xx=side?x+(i?1:-1):x+(i?2.5:-2.5);
-  image(c,part('legs',d,look,i),xx,y-7,side?3.6:3.8,8+(side?0:travel*back),side?travel*sign*-.22:0);
- }
- const arm=(i)=>{const travel=arms[i],xx=side?x-sign*(i===front?1.5:-.8):x+(i?5:-5);image(c,part('arms',d,look,i),xx,y-17,2.7,8+(side?0:travel*back*.9),side?travel*sign*-.30:0);};
- if(side)arm(rear);else{arm(0);arm(1);}
- image(c,shirt,x,y-18,side?8:13,11);
- if(side)arm(front);
- // Head, hollow hair layer and optional cap are separately swappable.
- image(c,head,x,y-31,side?11.5:13.3,15);
- image(c,hair,x+(d===1?-.8:d===2?.8:0),y-32.4,side?15.8:17.2,style==='tied'?18:17);
- if(look.hat===1)image(c,part('hat',d,look),x,y-34,16,d===0?7.5:9);
+ if(!ready)return false;const d=views[direction]??0,img=body(d,look);drawRig(c,img,[0,0,216,366],{direction,frame,layout,walking:walking&&!reduce},x,y);
+ if(look.hat===1&&cap?.complete&&cap.naturalWidth){c.drawImage(cap,...CAP_RECTS[d],Math.round(x)-9.5,Math.round(y)-31,19,10);}
  return true;
 }
