@@ -78,3 +78,7 @@ James requested an arrival cutscene for a later version. Show the journey into t
 ## Approved portrait style
 
 The current Mara and Orin portrait atlases are approved by James and anchor all future dialogue portrait generation. Follow docs/portrait-art-direction.md and use both canonical images as visual references. Do not deviate from this style.
+
+## Gathering by chopping and mining · later version
+
+James requested active gathering: chop wood and mine stone, ore and other materials. Players must first obtain the appropriate tools, such as an axe or pickaxe, from characters, a shop, crafting or another believable route. Early loose branches and stones remain useful before tools are acquired. Distinguish loose supplies from owned timber and planted trees; preserve contextual ownership and repairable consequences. Design tool availability, animations, regeneration, effort and upgrade order before implementation. Do not silently grant all tools at the start. This mechanic is deferred until the visual foundation is settled.

@@ -5,7 +5,7 @@ export const T=16;
 const r=(c,x,y,w,h,col)=>{c.fillStyle=col;c.fillRect(Math.round(x),Math.round(y),w,h);};
 const noise=(x,y)=>((x*374761393+y*668265263)^(x*31+y*57))>>>0;
 function plant(c,x,y,col='#f4d99e'){r(c,x,y,1,5,'#52754c');r(c,x-2,y-2,5,3,col);r(c,x,y-1,1,1,'#bd8747');}
-function label(c,x,y,name){c.font='6px monospace';c.textAlign='center';const w=c.measureText(name).width;r(c,x-w/2-3,y-7,w+6,10,'#304a3ce8');c.fillStyle='#fff1cf';c.fillText(name,x,y);}
+function label(c,x,y,name){c.font='7px system-ui';c.textAlign='center';const w=c.measureText(name).width;r(c,x-w/2-3,y-7,w+6,10,'#304a3ce8');c.fillStyle='#fff1cf';c.fillText(name,x,y);}
 function tree(c,x,y,i){x=x*16+8;y=y*16+12;r(c,x-15,y,30,4,'#47684155');r(c,x-3,y-24,6,27,'#6a513c');r(c,x,y-22,2,24,'#98724a');const cols=i%3===0?['#566c45','#71864d','#91a25c']:['#365d43','#4b7950','#699254'];for(let k=0;k<3;k++){r(c,x-20+k*3,y-35-k*9,40-k*6,20,cols[k]);r(c,x-15+k*3,y-43-k*7,30-k*6,13,cols[k]);}r(c,x-8,y-59,7,2,'#a3b76c');}
 function building(c,h,time,home=false){
  const x=h.x*16,y=h.y*16,w=home?96:80,stage=h.stage;
@@ -57,7 +57,7 @@ export function draw(c,s,v){
  if(guide){const g=guide;c.strokeStyle='#fff1ac';c.lineWidth=1;const bounce=reduce?0:Math.floor(Math.sin(time/250)*2);c.beginPath();c.moveTo(g.x*16+4,g.y*16-9+bounce);c.lineTo(g.x*16+8,g.y*16-5+bounce);c.lineTo(g.x*16+12,g.y*16-9+bounce);c.stroke();}
  const people=[{x:px,y:py,look:s.player,name:'',frame,dir:direction}];
  for(const actor of v.npcs||[]){people.push({x:actor.x*16+8,y:actor.y*16+12,actor,name:actor.name==='mara'?'Mara':'Orin',look:actor.name==='mara'?{skin:2,hair:2,shirt:3,style:1}:{skin:3,hair:0,shirt:1,hat:'cap'}});}
- const layers=people.map(p=>({y:p.y,draw:()=>{if(!p.actor||!drawCharacter(c,p.actor,p.x,p.y))person(c,p.x,p.y,p.look,p.frame||0,p.dir||'down');if(p.name)label(c,p.x,p.y-32,p.name);if(!p.name&&(s.carry.wood+s.carry.stone||s.story.basket==='held')){r(c,p.x-8,p.y-2,7,6,'#bd9b65');r(c,p.x-8,p.y-3,7,1,'#ead09a');if(s.story.basket==='held'){r(c,p.x-8,p.y-6,1,4,'#ead09a');r(c,p.x-2,p.y-6,1,4,'#ead09a');r(c,p.x-7,p.y-7,5,1,'#ead09a');}}}}));
+ const layers=people.map(p=>({y:p.y,draw:()=>{if(!p.actor||!drawCharacter(c,p.actor,p.x,p.y))person(c,p.x,p.y,p.look,p.frame||0,p.dir||'down');if(p.name)label(c,p.x,p.y-36,p.name);if(!p.name&&(s.carry.wood+s.carry.stone||s.story.basket==='held')){r(c,p.x-8,p.y-2,7,6,'#bd9b65');r(c,p.x-8,p.y-3,7,1,'#ead09a');if(s.story.basket==='held'){r(c,p.x-8,p.y-6,1,4,'#ead09a');r(c,p.x-2,p.y-6,1,4,'#ead09a');r(c,p.x-7,p.y-7,5,1,'#ead09a');}}}}));
 
  if(out)for(let j=0;j<TREES.length;j++){const t=TREES[j];layers.push({y:t.y*16+12,draw:()=>tree(c,t.x,t.y,j)});}layers.sort((a,b)=>a.y-b.y).forEach(p=>p.draw());
  c.restore();
