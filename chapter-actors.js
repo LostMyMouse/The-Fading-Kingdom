@@ -1,3 +1,4 @@
+import {createBakeryVisitor} from './chapter-visits.js';
 import {blinkAt} from './chapter-motion.js';
 import {blocked,mara,FIXED,route} from './chapter-model.js';
 // Scene actors are transient presentation state; they never change saves or rewards.
@@ -39,11 +40,11 @@ export function routineFor(s,name,anchor){
  ];
 }
 export function createActors(){
- const actors=new Map();
- return {reset(){actors.clear();},update(s,dt,{paused=false,reduce=false,cue=null}={}){
-  const delta=Math.max(0,Math.min(dt,50)),anchors=[];if(s.room==='outside')anchors.push(['orin',FIXED.orin]);const m=mara(s);if(m)anchors.push(['mara',m]);
+ const actors=new Map(),visitor=createBakeryVisitor();
+ return {reset(){actors.clear();visitor.reset();},location(name){return name==='orin'?visitor.location():null;},update(s,dt,{paused=false,reduce=false,cue=null}={}){
+  const visit=visitor.update(s,dt,{paused,reduce,cue});const delta=Math.max(0,Math.min(dt,50)),anchors=[];if(s.room==='outside'&&!visit)anchors.push(['orin',FIXED.orin]);const m=mara(s);if(m)anchors.push(['mara',m]);
   const visible=new Set(anchors.map(([name])=>name));for(const name of actors.keys())if(!visible.has(name))actors.delete(name);
-  return anchors.map(([name,anchor])=>{
+  const views=anchors.map(([name,anchor])=>{
    const key=s.room+':'+anchor.x+','+anchor.y;let a=actors.get(name);
    const stops=routineFor(s,name,anchor);
    if(!a||a.key!==key){const initial=Math.max(0,stops.findIndex(p=>p.x===anchor.x&&p.y===anchor.y));a={key,node:{...anchor},x:anchor.x,y:anchor.y,next:null,progress:0,path:[],index:initial,wait:stops[initial].hold,direction:stops[initial].face,clock:0};actors.set(name,a);}
@@ -71,7 +72,7 @@ export function createActors(){
    const work=!speaking&&!walking&&!a.next&&!a.path.length&&!!stops[a.index].work;
    const emotion=speaking?cue.emotion:'neutral',talking=!!(speaking&&cue.talking);
    return {blink:blinkAt(a.clock,name==='mara'?1:4,reduce),gait:a.clock/150,name,anchor:{...anchor},x:a.x,y:a.y,tileX:Math.round(a.x),tileY:Math.round(a.y),direction:a.direction,walking,work,emotion,talking,activity:stops[a.index].activity,clock:a.clock,frame:animationFrame({direction:a.direction,walking,work,emotion,talking,clock:a.clock,reduce})};
-  });
+  });if(visit&&visit.room===s.room){visit.frame=animationFrame({...visit,reduce});views.push(visit);}return views;
  }};
 }
 

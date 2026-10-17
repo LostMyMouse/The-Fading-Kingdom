@@ -5,7 +5,8 @@ if (!/\/$|\.html$/.test(location.pathname)) {const base=document.createElement('
 </script>
 <link rel="stylesheet" href="chapter.css"></head><body><main id="game">
 <header><div class="brand"><span class="leaf" aria-hidden="true">✦</span><div>The Fading Kingdom<small id="place-name">ROOM FOR ONE MORE</small></div></div><div class="header-actions"><span id="day">Spring · Day 1</span><button id="journal" disabled aria-label="Open journal">Journal</button><button id="menu" disabled aria-label="Open menu">☰</button></div></header>
-<section id="scene" aria-label="Game world"><canvas id="world" tabindex="0" aria-label="Walk with arrow keys or WASD. Doorways enter and exit automatically. E interacts with other things. Tap an object to walk to it. In placement mode arrow keys move the preview and Enter confirms."></canvas>
+<section id="scene" aria-label="Game world"><p id="village-moment" class="sr-only" aria-live="polite"></p>
+<canvas id="world" tabindex="0" aria-label="Walk with arrow keys or WASD. Doorways enter and exit automatically. E interacts with other things. Tap an object to walk to it. In placement mode arrow keys move the preview and Enter confirms."></canvas>
 <button id="treasury" class="hide" disabled aria-label="Open village fund">Village · 12 G</button>
 <aside id="objective"><span class="eyebrow" id="quest-title">A little ground</span><p id="quest-text">Pick up your tools by the cottage.</p><button id="guide">Show me</button></aside>
 <div id="toast" role="status" aria-live="polite"></div>

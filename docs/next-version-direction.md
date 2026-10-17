@@ -89,3 +89,7 @@ Version 0.6.0 implements two hair styles, two shirts, one optional cap and saved
 
 ## Village cooperation and movement milestone · 0.7.0
 Implemented the village treasury, once-per-day bakery contributions, physical flour replacement, nursery berries and fruit buns, and the market stall. This is the first local cooperation chain; wider social memories and additional businesses remain future work. World characters now blink, walking uses continuous travel timing and finished doorways transition automatically. Hairstyle/shirt/hat expansion is deferred at James’s request. See village-economy.md and character-motion.md for exact scope and limitations.
+
+
+## Bakery life · 0.8.0
+Persistent cross-room breakfast visits, a remembered workshop lunch, and an earned bakery window-box/light improvement are implemented. The sideways basket/hand attachment bug is recorded for the later animation polish pass, alongside all carried tools in every direction.

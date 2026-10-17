@@ -33,3 +33,7 @@ Save key: `the-fading-kingdom:chapter-one:v2`. Earlier version-one saves are pre
 
 ## Village cooperation · 0.7.0
 The shared village treasury now supports Mara’s first home, daily bakery contributions, a working nursery with berries and a market stall. A missing order-flour sack leads to a smaller batch and can be returned or physically replaced through Orin. See docs/village-economy.md. World characters blink; movement preserves frame time at tile boundaries; doorways enter and exit automatically. See docs/character-motion.md. Expanded wardrobe options remain for a later pass.
+
+
+### 0.8.0 · A lived-in bakery
+Orin visits the kitchen for breakfast, a shared lunch job creates remembered dialogue and a one-time village contribution, and the completed job unlocks flowering windows and warm bakery lights. See docs/bakery-life.md for scope and save compatibility.

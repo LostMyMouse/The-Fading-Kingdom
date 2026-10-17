@@ -1,3 +1,4 @@
+import {BAKERY_LINES} from './chapter-bakery.js';
 // Authored line expressions; no sentiment analysis or morality score.
 export const EXPRESSIONS=['neutral','happy','amused','thoughtful','surprised','concerned'];
 const groups={
@@ -64,6 +65,9 @@ const groups={
 groups.concerned.push('Bit of a small batch today. I couldn’t find that sack for the morning orders.');
 groups.thoughtful.push('Oh, that sack? I’d set it aside for the morning orders.','Pop it on the shelf when you’re ready. Then I can get the full batch going.','Orin’s got a delivery from the mill. Two carrots for a sack, he said. Could you put a fresh one on the shelf?','That sack’s for the morning orders. The little tin by the mixing bowl is for cooking together. Help yourself to that when we bake.');
 groups.happy.push('There we go. A full batch tomorrow. Thanks for sorting that out.','Been saving this one. Two berries, a carrot and a bit of flour. Fruit buns! Fancy trying it when you’ve got some berries?','Sold the last loaf! I’ve put a little gold in the village pot. What shall we build next?','That stall’s getting busy! Orin came for one bun and stayed for three.','Berry juice on the counter. That’s how you know they’re good. Three fruit buns, ready to go.');
+groups.happy.push(BAKERY_LINES.accept,BAKERY_LINES.delivered,BAKERY_LINES.ready,BAKERY_LINES.done,BAKERY_LINES.built);
+groups.thoughtful.push(BAKERY_LINES.ask,BAKERY_LINES.waiting,BAKERY_LINES.late,BAKERY_LINES.porch);
+groups.amused.push(BAKERY_LINES.decline,'Caught myself watering the window boxes before breakfast. Nearly watered my toast as well.','Remember that tray we made for Orin? He brought it back so clean I nearly put it straight in the cupboard.','Those carrot buns you and Mara made? Didn’t get much carpentry done until they were gone.');
 const authored=new Map(Object.entries(groups).flatMap(([expression,lines])=>lines.map(text=>[text,expression])));
 export function portraitFor(speaker,text,expression=authored.get(text)||'neutral'){
  const name=speaker.toLowerCase();if(!['mara','orin'].includes(name))return null;

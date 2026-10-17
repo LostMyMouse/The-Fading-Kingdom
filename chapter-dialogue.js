@@ -4,6 +4,9 @@ export function chatLine(s,who){
  let lines;
  if(who==='mara'){
   if(s.economy?.flour.noticed&&['held','used','replacement'].includes(s.economy.flour.state)&&turn%4===0)return 'Bit of a small batch today. I couldn’t find that sack for the morning orders.';
+  if(s.economy?.bakery?.porch&&turn%3===0)return 'Caught myself watering the window boxes before breakfast. Nearly watered my toast as well.';
+  if(s.economy?.bakery?.order.state==='done'&&turn%3===0)return 'Remember that tray we made for Orin? He brought it back so clean I nearly put it straight in the cupboard.';
+  if(s.economy?.bakery?.order.state==='late'&&turn%3===0)return 'Orin had a loaf this time. We can do his carrot buns when your garden’s ready.';
   if(!e.invited)lines=[
    'That wheel squeaks every time I turn left. Right turns? Quiet as anything. Very picky wheel.',
    'I found flour in my boots this morning. No idea how. Well… some idea.',
@@ -27,6 +30,7 @@ export function chatLine(s,who){
    'The herbs are in. Now I just have to remember which little green thing is which.'
   ];
  }else if(who==='orin'){
+  if(s.economy?.bakery?.order.state==='done'&&turn%3===0)return 'Those carrot buns you and Mara made? Didn’t get much carpentry done until they were gone.';
   if(e.timber==='taken'&&e.timberNoticed)return 'Still need those boards for the mill. Other than that? Can’t complain. Well, I could. Splinter in my thumb.';
   lines=[
    s.house?.stage===3?'Walked past Mara’s place earlier. Smoke coming out of the chimney. That’s the nice bit of building a house.':'Measure twice, cut once. I measured three times this morning. Couldn’t find my pencil.',
