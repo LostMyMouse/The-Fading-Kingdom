@@ -1,46 +1,18 @@
 <!doctype html>
-<html lang="en">
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-  <meta name="theme-color" content="#243f35">
-  <meta name="description" content="A little kindness. A growing kingdom. A cosy farming adventure.">
-  <title>The Fading Kingdom</title>
-  <script>
-    // Vercel's clean URLs can remove index.html without adding a trailing slash.
-    // Keep every relative asset anchored to this game's own directory.
-    if (!/\/$|\.html$/.test(location.pathname)) {
-      const base = document.createElement('base');
-      base.href = location.pathname + '/';
-      document.head.append(base);
-    }
-  </script>
-  <link rel="stylesheet" href="style.css">
-</head>
-<body>
-  <main id="game" aria-label="The Fading Kingdom">
-    <canvas id="world" tabindex="0" aria-label="Village map. Move with arrow keys or WASD. Press E to interact. On touch, tap a destination or use the direction pad."></canvas>
-    <header id="hud" class="hide">
-      <div class="day plaque"><span class="sun" aria-hidden="true">☀</span><div><b id="day">Day 1</b><span>Spring · at your own pace</span></div></div>
-      <div class="top-actions"><button id="journal" class="plaque" aria-label="Open friendship journal">▤ <span>Journal</span></button><button id="settings" class="plaque" aria-label="Open menu">☰</button></div>
-    </header>
-    <aside id="quest" class="plaque hide"><span class="eyebrow">A LITTLE BEGINNING</span><b>Bring the garden back</b><span id="quest-progress">Grow flowers. Make friends.</span><div class="quest-track"><i id="quest-fill"></i></div></aside>
-    <div id="location" class="hide">BRAMBLEWICK <span>·</span> YOUR FIRST CHAPTER</div>
-    <div id="toast" role="status" aria-live="polite"></div>
-    <div id="context" class="hide"><button id="interact" class="plaque">Talk / interact <kbd>E</kbd></button></div>
-    <footer id="bottom" class="hide">
-      <div id="hint">Tap to walk · E to interact · J for journal</div>
-      <nav id="toolbar" aria-label="Tools and seeds"></nav>
-      <div id="selection">Hands · Talk, harvest, and explore</div>
-    </footer>
-    <div id="dpad" class="hide" aria-label="Touch movement"><button data-dir="up" aria-label="Move up">▲</button><button data-dir="left" aria-label="Move left">◀</button><button data-dir="down" aria-label="Move down">▼</button><button data-dir="right" aria-label="Move right">▶</button></div>
-    <button id="touch-action" class="hide" aria-label="Interact with nearby object">ACT</button>
-    <section id="welcome">
-      <div class="welcome-card"><span class="eyebrow">A COSY LITTLE ADVENTURE</span><div class="sprig" aria-hidden="true">✦</div><h1>The Fading<br><em>Kingdom</em></h1><p>A little kindness.<br>A growing kingdom.</p><button id="begin" class="primary">Make yourself at home <span>→</span></button><button id="continue" class="quiet hide">Continue your story</button><small>Farm · Make friends · Bring a kingdom to life</small><small class="prototype">FIRST PLAYABLE · CHAPTER ONE</small></div>
-    </section>
-    <dialog id="modal" aria-labelledby="dialog-title"><div id="dialog-body"></div><button id="close-dialog" class="quiet">Back to the village</button></dialog>
-    <div id="fatal" class="hide" role="alert">The village couldn't load. Please reload the page.</div>
-  </main>
-  <script type="module" src="game.js"></script>
-</body>
-</html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#29483b"><meta name="description" content="Build a village your way. A cosy farming adventure about growing a community."><title>The Fading Kingdom · Room for One More</title>
+<script>
+if (!/\/$|\.html$/.test(location.pathname)) {const base=document.createElement('base');base.href=location.pathname+'/';document.head.append(base);}
+</script>
+<link rel="stylesheet" href="chapter.css"></head><body><main id="game">
+<header><div class="brand"><span class="leaf" aria-hidden="true">✦</span><div>The Fading Kingdom<small id="place-name">ROOM FOR ONE MORE</small></div></div><div class="header-actions"><span id="day">Spring · Day 1</span><button id="journal" aria-label="Open journal">Journal</button><button id="menu" aria-label="Open menu">☰</button></div></header>
+<section id="scene" aria-label="Game world"><canvas id="world" tabindex="0" aria-label="Walk with arrow keys or WASD. E to interact. Tap an object to walk to it. In placement mode arrow keys move the preview and Enter confirms."></canvas>
+<aside id="objective"><span class="eyebrow" id="quest-title">A little ground</span><p id="quest-text">Pick up your tools by the cottage.</p><button id="guide">Show me</button></aside>
+<div id="toast" role="status" aria-live="polite"></div>
+<div id="activity" class="hide"><span id="activity-text"></span><button id="activity-next">Continue</button></div>
+<div id="placement" class="hide"><div><b id="placement-title">Choose a spot</b><span id="placement-status"></span></div><div class="placement-buttons"><button id="placement-confirm">Place here</button><button id="rotate">Rotate</button><button id="placement-cancel">Cancel</button></div></div>
+<div id="movement" aria-label="Movement controls"><button data-dir="up" aria-label="Walk up">▲</button><button data-dir="left" aria-label="Walk left">◀</button><button data-dir="down" aria-label="Walk down">▼</button><button data-dir="right" aria-label="Walk right">▶</button></div>
+<button id="interact">Interact <kbd>E</kbd></button>
+<section id="welcome"><div class="welcome-card"><span class="eyebrow">A LITTLE KINDNESS. A GROWING KINGDOM.</span><div class="ornament" aria-hidden="true">✦</div><h1>The Fading<br><em>Kingdom</em></h1><p>A quiet plot. A passing traveller.<br>A village waiting to begin.</p><button id="continue" class="primary hide">Continue your story</button><button id="begin" class="primary">Begin a new story →</button><small>CHAPTER ONE · ROOM FOR ONE MORE</small><small id="legacy-note"></small></div></section></section>
+<footer><nav id="tools" aria-label="Tools and activities"></nav><div class="footer-note"><span id="selection">Hands · explore and talk</span><button id="basket">Your basket</button></div></footer>
+<dialog id="dialog" aria-labelledby="dialog-title"><div id="dialog-content"></div><button id="close" class="quiet">Back to the world</button></dialog><div id="fatal" class="hide" role="alert">The game couldn’t load. Reload to try again.</div>
+</main><script type="module" src="chapter.js"></script></body></html>
