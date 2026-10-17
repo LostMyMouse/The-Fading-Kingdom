@@ -1,3 +1,4 @@
+import {portraitFor} from './chapter-portraits.js';
 import {ARRIVAL,EQUIPMENT} from './chapter-progression.js';
 import {SAVE_KEY,W,H,STYLES,DECOR,RESOURCES,FIXED,fresh,mara,blocked,route,validHouse,validDecor,goal,act,readSave,wateringArea,canEarnWideCan} from './chapter-model.js';
 import {draw} from './chapter-world.js';
@@ -21,8 +22,16 @@ function run(id,data){const text=act(s,id,data);save();sound(['farm','bake','fin
 function reply(name,id,data,after){const text=run(id,data);show(name,text,[['All right',()=>{close();after?.();}]]);}
 function show(title,text,choices=[],tag='ROOM FOR ONE MORE'){
  stop();const body=$('dialog-content');body.classList.remove('arrival-card');body.replaceChildren();body.append(el('div',tag,'eyebrow'));
- if(title==='Mara'||title==='Orin'){const row=el('div',null,'portrait-line'),p=el('canvas');p.width=24;p.height=30;person(p.getContext('2d'),12,29,title==='Mara'?{skin:2,hair:2,shirt:3,style:1}:{skin:3,hair:0,shirt:1,hat:'cap'});row.append(p,el('h2',title));row.lastChild.id='dialog-title';body.append(row);}else{const h=el('h2',title);h.id='dialog-title';body.append(h);}
- if(text)body.append(el('p',text));const row=el('div',null,'choices');for(const [label,fn,cls,disabled]of choices){const b=el('button',label,cls);b.disabled=!!disabled;b.onclick=fn;row.append(b);}body.append(row);if(!dialog.open)dialog.showModal();(row.querySelector('button')||$('close')).focus();
+ const portrait=portraitFor(title,text);dialog.classList.toggle('character-dialogue',!!portrait);
+ if(portrait){
+  const scene=el('div',null,'dialogue-scene'),frame=el('div',null,'character-portrait');
+  frame.style.backgroundImage='url("'+portrait.src+'")';frame.style.backgroundPosition=portrait.position;
+  frame.setAttribute('role','img');frame.setAttribute('aria-label',title+' looks '+portrait.expression);
+  frame.dataset.expression=portrait.expression;frame.dataset.speaker=portrait.name;
+  const copy=el('div',null,'dialogue-copy'),h=el('h2',title);h.id='dialog-title';copy.append(h);
+  if(text)copy.append(el('p',text));scene.append(frame,copy);body.append(scene);
+ }else{const h=el('h2',title);h.id='dialog-title';body.append(h);if(text)body.append(el('p',text));}
+ const row=el('div',null,'choices');for(const [label,fn,cls,disabled]of choices){const b=el('button',label,cls);b.disabled=!!disabled;b.onclick=fn;row.append(b);}body.append(row);if(!dialog.open)dialog.showModal();(row.querySelector('button')||$('close')).focus();
 }
 function close(){if(arrivalOpen)finishArrival();dialog.close();stop();canvas.focus({preventScroll:true});}
 $('close').onclick=close;dialog.addEventListener('cancel',()=>{if(arrivalOpen)finishArrival();stop();});

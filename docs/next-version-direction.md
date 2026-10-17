@@ -40,7 +40,7 @@ The first permanent wide-spout can is now earned from Orin after completing Mara
 
 ## Portraits and emotions
 
-The user's attached Stardew Valley dialogue image establishes the desired role of a prominent character portrait beside the text, with a visible name and an expression appropriate to what is being said. Use an original interface and original portraits. The current tiny enlarged walking sprites are placeholders, not the final portrait standard.
+The user's attached Stardew Valley dialogue image establishes the desired role of a prominent character portrait beside the text, with a visible name and an expression appropriate to what is being said. Use an original interface and original portraits. Dedicated Mara and Orin bust portraits now have six expressions each: neutral, happy, amused, thoughtful, surprised and concerned. Walking sprites remain procedural and will receive a matching production art pass later.
 
 Create dedicated head-and-shoulders portraits with stable silhouettes, clothing, skin tones and palettes that match the world characters. Proposed shared expression set: neutral, pleased, amused, thoughtful, surprised, worried, frustrated/disappointed, and relieved. Exact counts can vary when a character needs a particular expression.
 
@@ -70,3 +70,7 @@ No portrait or animation should warn about a future wrong choice while the chara
 4. Portrait identity and emotion remain consistent across the dialogue scene and world sprite.
 5. A misunderstanding, an ordinary chat and a happy scene each have appropriate distinct expressions, without pre-labelling moral outcomes.
 6. Narrow phone and reduced-motion modes preserve both the conversation and its meaning.
+
+## Arrival cutscene · deferred
+
+James requested an arrival cutscene for a later version. Show the journey into the kingdom, quiet signs of decline, and arrival at the cottage. Keep the replayable letter until that pass. The cutscene should be skippable, replayable, and support reduced motion; no timed choices. Sender identity and cause of fading remain open.
