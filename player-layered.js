@@ -14,14 +14,14 @@ export function playerPose(frame=0,walking=false,reduce=false){
  const phase=walking&&!reduce?[0,1,0,-1][((frame%4)+4)%4]:0;
  return {leftLeg:phase,rightLeg:-phase,leftArm:-phase,rightArm:phase};
 }
-let atlas=null,ready=false,failed=false;const cache=new Map();
-export function preparePlayer(){if(atlas)return;atlas=new Image();atlas.onload=()=>{ready=true;};atlas.onerror=()=>{failed=true;};atlas.src=new URL('./assets/player/parts.png',import.meta.url).href;}
+let atlas=null,ready=false,failed=false,loading=null;const cache=new Map();
+export function preparePlayer(){if(loading)return loading;loading=new Promise(resolve=>{atlas=new Image();atlas.onload=()=>{ready=true;resolve(true);};atlas.onerror=()=>{failed=true;resolve(false);};atlas.src=new URL('./assets/player/parts.png',import.meta.url).href;});return loading;}
 export function playerArtStatus(){return failed?'unavailable':ready?'ready':'loading';}
 const rgb=hex=>[1,3,5].map(i=>parseInt(hex.slice(i,i+2),16));
 function materialPixel(r,g,b,kind){
- const light=.299*r+.587*g+.114*b;if(light<40||Math.max(r,g,b)-Math.min(r,g,b)<12&&light>190)return null;
+ const light=.299*r+.587*g+.114*b;if(light<(kind==='hair'?22:40)||Math.max(r,g,b)-Math.min(r,g,b)<12&&light>190)return null;
  if(kind==='skin'){if(light>220||r<g*1.08)return null;return 'skin';}
- if(kind==='hair'){return r>145&&r>g*1.3&&g>b*1.2?'skin':'hair';}
+ if(kind==='hair'){return r>125&&r>g*1.3&&g>b*1.2?'skin':'hair';}
  if(kind==='linen'){return light>85?'shirt':null;}
  if(kind==='vest'){return light>48&&light<170?'shirt':null;}
  return null;
@@ -53,12 +53,12 @@ export function drawPlayer(c,x,y,look={},frame=0,direction='down',walking=false,
  c.fillStyle='#304d3c40';c.fillRect(x-6,y+1,12,2);
  // The rear limbs draw first, then clothing hides their shoulder and hip joins.
  const legs=[p.leftLeg,p.rightLeg],arms=[p.leftArm,p.rightArm];
- const rear=side?0:1,front=1-rear;
+ const rear=side?(d===1?1:0):1,front=1-rear;
  for(const i of [rear,front]){
   const travel=legs[i],xx=side?x+(i?1:-1):x+(i?2.5:-2.5);
   image(c,part('legs',d,look,i),xx,y-7,side?3.6:3.8,8+(side?0:travel*back),side?travel*sign*-.22:0);
  }
- const arm=(i)=>{const travel=arms[i],xx=side?x+(i?1.5:-1):x+(i?5:-5);image(c,part('arms',d,look,i),xx,y-17,2.7,8+(side?0:travel*back*.9),side?travel*sign*-.30:0);};
+ const arm=(i)=>{const travel=arms[i],xx=side?x-sign*(i===front?1.5:-.8):x+(i?5:-5);image(c,part('arms',d,look,i),xx,y-17,2.7,8+(side?0:travel*back*.9),side?travel*sign*-.30:0);};
  if(side)arm(rear);else{arm(0);arm(1);}
  image(c,shirt,x,y-18,side?8:13,11);
  if(side)arm(front);
