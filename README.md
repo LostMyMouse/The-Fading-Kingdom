@@ -1,24 +1,29 @@
 # The Fading Kingdom
 
-A cosy browser farming and decorating adventure for ages 7–11. Grow a farm, make a home, build friendships, and help revitalise a magical kingdom. Thoughtful words and dependable actions open up opportunities to work with its people.
+A cosy browser farming and village-building adventure, designed for ages 7–11 and welcoming all ages.
+
+## Play Chapter One
+
+[Play on JamesCube](https://james-lost-his-mouse.vercel.app/play?game=the-fading-kingdom).
+
+Grow a carrot, welcome a travelling baker, choose and place their home, gather materials, build in stages with a carpenter, enter the finished house, and cook together. Your own cottage is a walkable room with a bed, mirror and storage. Decorate inside and outside. Borrowing and taking owned wood have separate, repairable consequences.
+
+This is an expanded prototype. Procedural pixel art, basic animation and a small cast establish the systems; production art, full resident schedules, further chapters and physical-device testing remain ahead. It is not a finished commercial release.
 
 ## Project documents
 
-- [Chapter One: Room for One More](docs/chapter-one.md): proposed new opening, full quest script, dialogue, and repair paths; not yet implemented.
-- [Game design](docs/game-design.md): agreed direction, gameplay systems, and open decisions.
-- [First playable prototype](docs/first-playable.md): a bounded experience and its acceptance criteria.
-- [Art reference](docs/art/approved-visual-direction.png): approved concept direction, not a playable screenshot or production sprite sheet.
+- [Game design](docs/game-design.md): agreed direction and open decisions.
+- [Chapter One script](docs/chapter-one.md): narrative target and detailed quest branches.
+- [Chapter One release notes](docs/chapter-one-release.md): implemented scope, differences, verification and limits.
+- [Original prototype notes](docs/implementation.md): historical garden-opening implementation.
+- [Art reference](docs/art/approved-visual-direction.png): approved concept direction, not a gameplay screenshot.
 
-## First playable
+## Development
 
-A dependency-free Canvas 2D prototype with farming, player-controlled days, character customisation, free decoration, three NPCs, a friendship journal, borrowing and stealing encounters, a garden restoration, and a moonflower greenhouse unlock.
+Run `node tools/serve.mjs` and open `http://127.0.0.1:4175/`. No installs or build step. Run `node --test tests/*.test.mjs` for the twenty rules and hosting tests.
 
-Play on [JamesCube](https://james-lost-his-mouse.vercel.app/play.html?game=the-fading-kingdom).
+Runtime files: `index.html`, `chapter.css`, `chapter.js`, `chapter-model.js`, `chapter-world.js`, plus the reused `world.js` and `model.js` character/icon modules. Copy them together into the website's `games/the-fading-kingdom/` folder. The earlier `game.js` and `style.css` remain historical source.
 
-Run `node tools/serve.mjs`, then open `http://127.0.0.1:4175`. No dependency installation or build step is required. To run checks: `node --check game.js`, `node --check world.js`, and `node --test tests/game.test.mjs tests/hosting.test.mjs`.
+Controls: tap an object to walk to it; arrows/WASD to walk; E/Space to interact; J for journal; 1–5 for tools. Placement supports arrow keys, Enter, Escape, and R for supported rotation. Touch movement controls are provided. Show me guides you toward the current objective.
 
-For JamesCube, copy `index.html`, `style.css`, `game.js`, `model.js`, and `world.js` unchanged into `games/the-fading-kingdom/`, then add the project registry entry. Relative paths work in the website's existing iframe. See [integration notes](docs/implementation.md).
-
-Controls: WASD / arrows to walk, E / Space to interact, J for journal, 1–6 for tools. Tap the map to walk or use the touch direction pad and ACT button. Tap a ripe crop to harvest. Select Decorate for placement, movement, storage, rotation, and undo. Save data stays in the current browser under `the-fading-kingdom:save:v1`.
-
-This is a prototype. Ten automated tests pass, and the main progression loop has been exercised in the live browser. Browser/device verification status is recorded in the implementation notes. Production art and physical-device playtests are still needed.
+Save key: `the-fading-kingdom:chapter-one:v2`. Earlier version-one saves are preserved separately. The menu can download and restore chapter backups. Local saves do not sync automatically between devices.

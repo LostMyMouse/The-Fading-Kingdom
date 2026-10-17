@@ -52,7 +52,15 @@ export function goal(s){const e=s.story,h=s.house;
  if(!e.invited)return {title:'Room for one more',text:'Meet Mara by the road when you’re ready.',target:{x:22,y:16}};
  if(!h)return {title:'A place to call home',text:'Choose Build to plan Mara’s home.',target:{x:30,y:10}};
  const target={x:h.x+2,y:h.y+4};
- if(h.stage<3)return {title:'From the ground up',text:h.stage===0?'Deliver 6 stone at the building sign.':h.stage===1?'Deliver 8 wood; return Orin’s belongings; lift the frame.':'Place the herb planter and choose the finishing touches.',target};
+ if(h.stage<2){
+  const type=h.stage===0?'stone':'wood',needed=h.stage===0?6:8,total=s.inventory[type]+s.carry[type],cap=e.basket==='held'?2:1;
+  if(s.carry.wood+s.carry.stone&&(s.carry.wood+s.carry.stone>=cap||total>=needed))return {title:'Gather and lend a hand',text:'Drop your carried materials at the building sign.',target};
+  if(total<needed){const node=RESOURCES.filter(n=>n.type===type&&!s.gathered.includes(n.id)).sort((a,b)=>Math.abs(a.x-s.player.x)+Math.abs(a.y-s.player.y)-Math.abs(b.x-s.player.x)-Math.abs(b.y-s.player.y))[0];if(node)return {title:'Gather and lend a hand',text:`Gather loose ${type} · ${total}/${needed}. Drop it at the building sign.`,target:node};}
+  if(h.stage===1&&e.timber==='taken')return {title:'Put things right',text:'Return Orin’s wood before lifting the frame.',target:FIXED.timber};
+  if(h.stage===1&&e.basket==='held')return {title:'Keep your promise',text:'Return the basket to Orin before lifting the frame.',target:FIXED.orin};
+  return {title:'From the ground up',text:h.stage===0?'Lay the foundations at the building sign.':'Lift the frame together at the building sign.',target};
+ }
+ if(h.stage===2)return {title:'From the ground up',text:'Place the herb planter and choose the finishing touches.',target};
  if(!e.cooked)return {title:'Something in the oven',text:e.cooking?'Return to the kitchen to finish your batch.':'Enter Mara’s home and cook together.',target};
  return {title:'A village begins',text:e.nursery?'Explore the old nursery, grow crops, or decorate.':'Talk to Mara about the old path, or make the village yours.',target:e.nursery?FIXED.nursery:target};
 }
@@ -69,7 +77,7 @@ export function act(s,id,data={}){
  case 'orin':e.orin=true;return 'You find the wood and stone. I’ll help with the frame. Mara’s bringing the kitchen.';
  case 'borrow':if(e.basket!=='none')return 'We’ve already agreed about the basket.';if(e.timber==='taken')return 'Please bring my wood back before borrowing something else.';e.basket='held';return 'Of course. Bring it back before we start the frame. It carries two bundles instead of one.';
  case 'returnBasket':if(e.basket!=='held')return 'You’re not holding my basket.';if(s.carry.wood+s.carry.stone)return 'Drop your materials at storage or the building sign first.';e.basket='returned';e.dependable=!e.late;return e.late?'Thanks. Let’s get the tools out.':'Right where I need it. Thanks for remembering.';
- case 'take':if(e.timber!=='untouched')return 'There’s no other bundle to take.';e.timber='taken';return 'I set that wood aside for another job. Please bring it back before we build together.';
+ case 'take':if(e.timber!=='untouched')return 'There’s no other bundle to take.';e.timber='taken';return h?.stage===3?'I set that wood aside for another job. Please bring it back before borrowing anything else.':'I set that wood aside for another job. Please bring it back before we build together.';
  case 'returnWood':if(e.timber!=='taken')return 'The wood is already where it belongs.';e.timber='returned';e.returned=true;return 'Thanks for bringing it back. The fallen wood is yours to use.';
  case 'gather':{if(s.room!=='outside')return 'The loose materials are outside.';const node=RESOURCES.find(n=>n.id===data.id);if(!node||s.gathered.includes(node.id))return 'You’ve gathered this already.';const cap=e.basket==='held'?2:1;if(s.carry.wood+s.carry.stone>=cap)return 'Your bag is full. Drop these at storage or the building sign.';s.gathered.push(node.id);s.carry[node.type]++;return `Collected ${node.type}. Carrying ${s.carry.wood+s.carry.stone}/${cap}.`;}
  case 'deposit':i.wood+=s.carry.wood;i.stone+=s.carry.stone;s.carry={wood:0,stone:0};return `Materials stored: ${i.wood} wood, ${i.stone} stone.`;

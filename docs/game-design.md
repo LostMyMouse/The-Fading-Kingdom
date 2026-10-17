@@ -1,6 +1,6 @@
 # The Fading Kingdom — game design
 
-Status: initial design, 17 October 2026.
+Status: evolving design, 17 October 2026. Chapter One now has an initial playable implementation; see [release notes](chapter-one-release.md) for its scope and remaining work. Older prototype-specific proposals below are historical context, not a claim that all of them are in the current opening.
 
 This document preserves the direction agreed during concept development. Sections labelled “proposed” are starting points for discussion, not confirmed decisions. The reason the kingdom declined remains open.
 
@@ -52,7 +52,7 @@ Place a complete building footprint and supply materials; construction visibly p
 
 Begin material gathering with fallen branches and loose stones. Farming, crafting, and friendships open further materials. Visually distinguish freely gatherable resources from owned supplies: a fallen branch can be collected, while a carpenter's stacked timber requires permission. The exact resource economy, gathering tools, costs, construction timing, and baker's identity remain to be designed.
 
-These decisions describe the next design direction. The live prototype still uses the earlier village-garden opening; this document does not claim the new opening has been implemented.
+The initial Chapter One implementation follows this opening and replaces the earlier village-garden opening. The full script and production quality targets extend beyond this first implementation; see the release notes for precise boundaries.
 
 Cooking is the baker's first gameplay unlock. After moving in, they teach a vegetable-bun recipe using the player's carrots and their flour. Food can support future shared village projects. Cooking should be a usable activity, and neither the home nor friendship is bought through food gifts.
 

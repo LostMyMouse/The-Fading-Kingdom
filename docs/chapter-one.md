@@ -1,8 +1,8 @@
 # Chapter One: Room for One More
 
-Story and quest draft · 17 October 2026 · Not implemented
+Story and quest target · 17 October 2026 · Initial implementation available
 
-This replaces the village-garden opening as the intended next version. The live prototype remains unchanged. The agreed foundations are an almost empty plot, player-designed village building, staged construction, a first baker resident, and cooking as their first unlock. Names, quantities, dialogue, and pacing below are authored proposals for review and playtesting.
+The first playable implementation now replaces the village-garden opening. See [release notes](chapter-one-release.md) for implemented scope and remaining differences, including production art, full NPC routines and choreography. This script remains the narrative target rather than proof every beat is complete. The agreed foundations are an almost empty plot, player-designed village building, staged construction, a first baker resident, and cooking as their first unlock. Names, quantities, dialogue, and pacing below are authored proposals for review and playtesting.
 
 ## The chapter in one sentence
 
