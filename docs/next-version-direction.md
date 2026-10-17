@@ -74,3 +74,7 @@ No portrait or animation should warn about a future wrong choice while the chara
 ## Arrival cutscene · deferred
 
 James requested an arrival cutscene for a later version. Show the journey into the kingdom, quiet signs of decline, and arrival at the cottage. Keep the replayable letter until that pass. The cutscene should be skippable, replayable, and support reduced motion; no timed choices. Sender identity and cause of fading remain open.
+
+## Approved portrait style
+
+The current Mara and Orin portrait atlases are approved by James and anchor all future dialogue portrait generation. Follow docs/portrait-art-direction.md and use both canonical images as visual references. Do not deviate from this style.
