@@ -1,5 +1,7 @@
 # Sprite rendering and customisation investigation · 17 October 2026
 
+Historical investigation for version 0.5. The layered player proof described here is now implemented in version 0.6; see layered-player-release.md for the current scope and checks.
+
 ## Findings
 The first world renderer shrank roughly 220–275px-tall sprite regions into a 28px-tall intermediate game canvas, then enlarged that canvas by 2.3 or 3. This discarded details before the browser displayed them. Fractional scaling also made the pixel grid uneven. The name labels were six-pixel canvas text enlarged in the same pass.
 

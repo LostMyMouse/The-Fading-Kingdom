@@ -1,6 +1,6 @@
 # Next version: arrival, useful equipment and expressive characters
 
-Recorded from the user’s direction · 17 October 2026. Update: the opening invitation and first permanent wide-spout can are now implemented; see arrival-and-equipment-release.md. Further tool tiers, dedicated expressive portraits and emotion-driven world animation remain upcoming requirements.
+Recorded from the user’s direction · 17 October 2026. Update: the opening invitation and first permanent wide-spout can are now implemented; see arrival-and-equipment-release.md. Dedicated expressive portraits, a layered player wardrobe prototype and initial independent resident routines are now implemented. Further tool tiers, full daily NPC schedules and the arrival cutscene remain future work; see layered-player-release.md.
 
 ## An early reason to arrive
 
@@ -82,3 +82,7 @@ The current Mara and Orin portrait atlases are approved by James and anchor all 
 ## Gathering by chopping and mining · later version
 
 James requested active gathering: chop wood and mine stone, ore and other materials. Players must first obtain the appropriate tools, such as an axe or pickaxe, from characters, a shop, crafting or another believable route. Early loose branches and stones remain useful before tools are acquired. Distinguish loose supplies from owned timber and planted trees; preserve contextual ownership and repairable consequences. Design tool availability, animations, regeneration, effort and upgrade order before implementation. Do not silently grant all tools at the start. This mechanic is deferred until the visual foundation is settled.
+
+## Layered player prototype and independent residents
+
+Version 0.6.0 implements two hair styles, two shirts, one optional cap and saved skin/hair/clothing colours. Follow sprite-quality-standard.md before extending the parts. Residents now follow local work/errand/rest routines independent of player proximity. Full persistent daily schedules and autonomous movement between buildings remain a later pass.
