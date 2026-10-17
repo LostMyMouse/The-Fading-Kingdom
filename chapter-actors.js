@@ -43,3 +43,6 @@ export function createActors(){
   });
  }};
 }
+
+/** Opposing limb travel for a four-beat walk: pass, left contact, pass, right contact. */
+export function gaitPose(frame){const phase=[0,1,0,-1][((frame%4)+4)%4];return {leftLeg:phase,rightLeg:-phase,leftArm:-phase,rightArm:phase};}

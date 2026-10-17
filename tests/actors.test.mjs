@@ -43,3 +43,13 @@ test('all action and walking rectangles remain in their source image',()=>{
  for(const direction of ['up','down','left','right']){const frames=new Set([0,150,300,450].map(clock=>animationFrame({direction,walking:true,clock})));assert.equal(frames.size,4);}
  assert.deepEqual([0,440,880,1320].map(clock=>animationFrame({work:true,clock})),[20,21,22,23]);
 });
+
+test('contact poses alternate legs and opposing arms in every direction',async()=>{
+ const {gaitPose}=await import('../chapter-actors.js');
+ for(const row of [0,1,2,3]){
+  const left=gaitPose(row*4+1),right=gaitPose(row*4+3);
+  assert.equal(left.leftLeg,1);assert.equal(right.rightLeg,1);
+  assert.equal(left.leftArm,-left.leftLeg);assert.equal(left.rightArm,-left.rightLeg);
+  for(const limb of ['leftLeg','rightLeg','leftArm','rightArm'])assert.equal(left[limb],-right[limb]);
+ }
+});
