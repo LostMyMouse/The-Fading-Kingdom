@@ -15,3 +15,5 @@ dialog.character-dialogue{width:min(700px,calc(100% - 24px))}
 .layered-preview{float:none;display:block;margin:10px auto 14px}.wardrobe-save{position:sticky;bottom:0;width:100%;z-index:1;box-shadow:0 -7px 12px #fcf2d9}
 
 .wardrobe-preview-bar{position:sticky;top:-24px;z-index:2;background:#fcf2d9;padding:10px 0;box-shadow:0 5px 8px #fcf2d9}.wardrobe-preview-bar .layered-preview{margin:0 auto}@media(max-width:700px){.wardrobe-preview-bar{top:-20px}}
+
+#treasury{position:absolute;right:18px;top:18px;z-index:1;min-height:44px;padding:8px 12px;background:#fff1d7f2;border:1px solid #ac996a;box-shadow:0 3px #38523522;font-size:13px;font-weight:650;max-width:150px}.ledger-line{font-size:13px;border-bottom:1px solid #ded2ae;padding-bottom:7px}@media(max-width:700px){#treasury{right:10px;top:10px;font-size:11px;max-width:104px;padding:7px 9px}}@media(max-height:520px){#treasury{top:8px;right:10px}}

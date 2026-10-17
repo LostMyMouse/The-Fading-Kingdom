@@ -86,3 +86,6 @@ James requested active gathering: chop wood and mine stone, ore and other materi
 ## Layered player prototype and independent residents
 
 Version 0.6.0 implements two hair styles, two shirts, one optional cap and saved skin/hair/clothing colours. Follow sprite-quality-standard.md before extending the parts. Residents now follow local work/errand/rest routines independent of player proximity. Full persistent daily schedules and autonomous movement between buildings remain a later pass.
+
+## Village cooperation and movement milestone · 0.7.0
+Implemented the village treasury, once-per-day bakery contributions, physical flour replacement, nursery berries and fruit buns, and the market stall. This is the first local cooperation chain; wider social memories and additional businesses remain future work. World characters now blink, walking uses continuous travel timing and finished doorways transition automatically. Hairstyle/shirt/hat expansion is deferred at James’s request. See village-economy.md and character-motion.md for exact scope and limitations.

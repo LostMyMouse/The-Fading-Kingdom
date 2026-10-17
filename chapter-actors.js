@@ -1,3 +1,4 @@
+import {blinkAt} from './chapter-motion.js';
 import {blocked,mara,FIXED,route} from './chapter-model.js';
 // Scene actors are transient presentation state; they never change saves or rewards.
 export const SPRITE_RECTS={
@@ -12,7 +13,6 @@ export function animationFrame({direction='down',walking=false,work=false,emotio
  if(emotion==='surprised')return 17;
  if(talking)return reduce?0:Math.floor(clock/280)%2?17:0;
  if(work)return reduce?20:20+Math.floor(clock/440)%4;
- if(!reduce&&direction==='down'&&clock%5600<180)return 16;
  return (rows[direction]??0)*4;
 }
 export function routineFor(s,name,anchor){
@@ -22,6 +22,7 @@ export function routineFor(s,name,anchor){
   {x:11,y:7,hold:7000,face:'down',activity:'Taking a break'}
  ];
  if(name==='orin')return [
+  ...(s.economy?.projects.market?[{x:6,y:17,hold:7500,face:'up',activity:'Buying breakfast'}]:[]),
   {...anchor,hold:11000,work:true,face:'down',activity:'Carpentry'},
   {x:18,y:19,hold:6500,face:'left',activity:'Checking supplies'},
   {x:16,y:19,hold:7500,face:'right',activity:'Taking a break'}
@@ -69,7 +70,7 @@ export function createActors(){
    if(speaking&&cue.talking){const dx=s.player.x-a.x,dy=s.player.y-a.y;a.direction=Math.abs(dx)>Math.abs(dy)?dx>0?'right':'left':dy>0?'down':'up';}
    const work=!speaking&&!walking&&!a.next&&!a.path.length&&!!stops[a.index].work;
    const emotion=speaking?cue.emotion:'neutral',talking=!!(speaking&&cue.talking);
-   return {name,anchor:{...anchor},x:a.x,y:a.y,tileX:Math.round(a.x),tileY:Math.round(a.y),direction:a.direction,walking,work,emotion,talking,activity:stops[a.index].activity,clock:a.clock,frame:animationFrame({direction:a.direction,walking,work,emotion,talking,clock:a.clock,reduce})};
+   return {blink:blinkAt(a.clock,name==='mara'?1:4,reduce),gait:a.clock/150,name,anchor:{...anchor},x:a.x,y:a.y,tileX:Math.round(a.x),tileY:Math.round(a.y),direction:a.direction,walking,work,emotion,talking,activity:stops[a.index].activity,clock:a.clock,frame:animationFrame({direction:a.direction,walking,work,emotion,talking,clock:a.clock,reduce})};
   });
  }};
 }

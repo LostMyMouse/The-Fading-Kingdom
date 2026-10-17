@@ -30,3 +30,6 @@ Runtime files: `index.html`, `chapter.css`, `chapter.js`, `chapter-model.js`, `c
 Controls: tap an object to walk to it; arrows/WASD to walk; E/Space to interact; J for journal; 1–5 for tools. Placement supports arrow keys, Enter, Escape, and R for supported rotation. Touch movement controls are provided. Show me guides you toward the current objective.
 
 Save key: `the-fading-kingdom:chapter-one:v2`. Earlier version-one saves are preserved separately. The menu can download and restore chapter backups. Local saves do not sync automatically between devices.
+
+## Village cooperation · 0.7.0
+The shared village treasury now supports Mara’s first home, daily bakery contributions, a working nursery with berries and a market stall. A missing order-flour sack leads to a smaller batch and can be returned or physically replaced through Orin. See docs/village-economy.md. World characters blink; movement preserves frame time at tile boundaries; doorways enter and exit automatically. See docs/character-motion.md. Expanded wardrobe options remain for a later pass.

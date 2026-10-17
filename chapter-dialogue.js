@@ -3,6 +3,7 @@ export function chatLine(s,who){
  const turn=s.conversation?.[who]||0,e=s.story;
  let lines;
  if(who==='mara'){
+  if(s.economy?.flour.noticed&&['held','used','replacement'].includes(s.economy.flour.state)&&turn%4===0)return 'Bit of a small batch today. I couldn’t find that sack for the morning orders.';
   if(!e.invited)lines=[
    'That wheel squeaks every time I turn left. Right turns? Quiet as anything. Very picky wheel.',
    'I found flour in my boots this morning. No idea how. Well… some idea.',

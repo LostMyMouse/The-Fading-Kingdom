@@ -1,5 +1,6 @@
+import {blinkImage} from './character-blink.js';
 import {SKINS,HAIRS,SHIRTS} from './model.js';
-import {drawRig,gaitPose} from './character-rig.js';
+import {drawRig,gaitPose,pixelAnchor} from './character-rig.js';
 // Whole, coherent figures share proportions. Swaps are made at measured landmarks, not by stretching isolated anatomy.
 export const PLAYER_RECTS=[
  [[35,175,217,364],[287,175,218,367],[519,175,219,367],[773,175,213,364]],
@@ -43,8 +44,8 @@ function body(d,look){
  }c.putImageData(pixels,0,0);cache.set(key,out);if(cache.size>96)cache.delete(cache.keys().next().value);return out;
 }
 const CAP_RECTS=[[18,1580,190,114],[453,1582,194,128],[240,1582,194,128],[682,1579,184,131]];
-export function drawPlayer(c,x,y,look={},frame=0,direction='down',walking=false,reduce=false){
- if(!ready)return false;const d=views[direction]??0,img=body(d,look);drawRig(c,img,[0,0,216,366],{direction,frame,layout,walking:walking&&!reduce},x,y);
- if(look.hat===1&&cap?.complete&&cap.naturalWidth){c.drawImage(cap,...CAP_RECTS[d],Math.round(x)-9.5,Math.round(y)-31,19,10);}
+export function drawPlayer(c,x,y,look={},frame=0,direction='down',walking=false,reduce=false,blink=false){
+ if(!ready)return false;const d=views[direction]??0,source=body(d,look),img=blink&&!reduce&&direction!=='up'?blinkImage(source,[0,0,216,366]):source;drawRig(c,img,[0,0,216,366],{direction,frame,layout,walking:walking&&!reduce},x,y);
+ if(look.hat===1&&cap?.complete&&cap.naturalWidth){const [hx,hy]=pixelAnchor(c,x,y);c.drawImage(cap,...CAP_RECTS[d],hx-9.5,hy-31,19,10);}
  return true;
 }

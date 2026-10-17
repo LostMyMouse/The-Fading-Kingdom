@@ -1,3 +1,4 @@
+import {initialEconomy,readEconomy,economyAction,settleVillageDay,fundHome,missingFlour} from './chapter-economy.js';
 import {chatLine} from './chapter-dialogue.js';
 // Chapter One rules. Every action is synchronous and saved after it commits.
 export const SAVE_KEY='the-fading-kingdom:chapter-one:v2';
@@ -7,7 +8,7 @@ export const DECOR=['planter','bench','lantern','path','fence'];
 export const TREES=Array.from({length:40},(_,i)=>({x:2+(i*13%52),y:i<18?3+i%3:31+i%7}));
 export const RESOURCES=Array.from({length:26},(_,i)=>({id:i,type:i<16?'wood':'stone',x:19+(i*7%23),y:19+Math.floor(i/6)*2+(i%2)}));
 export const FIXED={home:{x:11,y:12},kit:{x:13,y:13},store:{x:8,y:13},orin:{x:18,y:17},timber:{x:20,y:17},nursery:{x:45,y:10}};
-export function fresh(){return {version:2,day:1,room:'outside',player:{x:12,y:14,skin:1,hair:0,shirt:0,style:0,outfit:0,hat:0},inventory:{seed:6,carrot:0,wood:0,stone:0,bun:0,planter:4,bench:2,lantern:4,path:40,fence:12},carry:{wood:0,stone:0},plots:Array.from({length:9},(_,i)=>({x:8+i%3*2,y:16+Math.floor(i/3)*2,planted:false,watered:false,ripe:false})),gathered:[],house:null,decor:[],story:{arrival:0,wideCan:false,kit:false,harvest:false,met:false,invited:false,orin:false,basket:'none',late:false,timber:'untouched',timberNoticed:false,dependable:false,returned:false,lifted:false,herbs:false,cooking:0,cooked:false,shared:false,nursery:false},conversation:{mara:0,orin:0,movedDay:0,cookedDay:0},settings:{sound:true,music:false}};}
+export function fresh(){return {version:2,day:1,room:'outside',player:{x:12,y:14,skin:1,hair:0,shirt:0,style:0,outfit:0,hat:0},inventory:{seed:6,carrot:0,wood:0,stone:0,bun:0,berry:0,fruitbun:0,planter:4,bench:2,lantern:4,path:40,fence:12},carry:{wood:0,stone:0},plots:Array.from({length:9},(_,i)=>({x:8+i%3*2,y:16+Math.floor(i/3)*2,planted:false,watered:false,ripe:false})),gathered:[],house:null,decor:[],story:{arrival:0,wideCan:false,kit:false,harvest:false,met:false,invited:false,orin:false,basket:'none',late:false,timber:'untouched',timberNoticed:false,dependable:false,returned:false,lifted:false,herbs:false,cooking:0,cooked:false,shared:false,nursery:false},conversation:{mara:0,orin:0,movedDay:0,cookedDay:0},economy:initialEconomy(),settings:{sound:true,music:false}};}
 export function mara(s){if(!s.story.harvest)return null;if(s.room==='bakery')return {x:11,y:s.day%2?5:7};if(s.room!=='outside')return null;if(s.house?.stage===3)return {x:s.house.x+5,y:s.house.y+4};return {x:22,y:16};}
 const within=(x,y,a,b,c,d)=>x>=a&&x<=c&&y>=b&&y<=d;
 export function blocked(s,x,y,room=s.room,house=s.house,decor=s.decor){
@@ -17,6 +18,7 @@ export function blocked(s,x,y,room=s.room,house=s.house,decor=s.decor){
   if(room==='home'&&((x===3&&y>=4&&y<=6)||(x===13&&y===4)||(x===5&&y===4)))return true;
   if(room==='bakery'&&((y===4&&x>=3&&x<=13)||(within(x,y,7,7,9,8))))return true;
  }else{
+  if(s.economy?.projects.market&&within(x,y,5,15,7,16))return true;
   if(x<3||y<6||x>52||y>35||within(x,y,8,7,13,11)||within(x,y,46,20,52,28)||TREES.some(t=>t.x===x&&t.y===y))return true;
   if(house&&within(x,y,house.x,house.y,house.x+4,house.y+3))return true;
  }
@@ -66,18 +68,20 @@ export function goal(s){const e=s.story,h=s.house;
  }
  if(h.stage===2)return {title:'From the ground up',text:'Place the herb planter and choose the finishing touches.',target};
  if(!e.cooked)return {title:'Something in the oven',text:e.cooking?'Return to the kitchen to finish your batch.':'Enter Mara’s home and cook together.',target};
+ if(s.economy.flour.noticed&&missingFlour(s))return {title:'Morning orders',text:s.economy.flour.state==='used'?'Orin has a mill delivery. Two carrots for a replacement flour sack.':'Put the flour sack on the shelf in Mara’s kitchen for tomorrow’s orders.',target:s.economy.flour.state==='used'?FIXED.orin:target};
  if(!e.wideCan)return {title:'A hand on the farm',text:'Orin has a watering-can upgrade for you. Visit his cart when you like.',target:FIXED.orin};
- return {title:'A village begins',text:e.nursery?'Explore the old nursery, grow crops, or decorate.':'Talk to Mara about the old path, or make the village yours.',target:e.nursery?FIXED.nursery:target};
+ return {title:'A village that grows',text:s.economy.projects.nursery&&s.economy.projects.market?'Pick berries at the nursery, try Mara’s recipes, or make the village yours.':'Mara’s bakery contributes each morning. Open the village fund to choose our next project.',target:s.economy.projects.nursery?FIXED.nursery:{x:6,y:17}};
 }
 export function act(s,id,data={}){
  const e=s.story,h=s.house,i=s.inventory;
+ const economy=economyAction(s,id,data);if(economy!==null)return economy;
  switch(id){
  case 'arrivalNext':e.arrival=Math.min(3,e.arrival+1);return 'The road to Bramblewick.';
  case 'arrivalSkip':e.arrival=3;return 'You can read the letter again in your journal.';
  case 'upgradeCan':if(e.wideCan)return 'That wide spout’s already fitted. Go give it a try.';if(!canEarnWideCan(s))return 'Get Mara settled and make that first batch of buns. I’ll have something ready for your garden.';if(s.room!=='outside'||Math.abs(s.player.x-(data.npc?.x??FIXED.orin.x))+Math.abs(s.player.y-(data.npc?.y??FIXED.orin.y))>1)return 'Bring your can over to Orin’s cart.';if(e.timber==='taken'){e.timberNoticed=true;return 'I’ll need those mill boards back first. Then I can sort this spout for you.';}e.wideCan=true;return 'There. Wider spout. Try it on the middle of a row. Less walking, more time for lunch.';
  case 'kit':if(e.kit)return 'Your tools are ready.';e.kit=true;return 'Carrot seeds and a watering can. Let’s plant something.';
  case 'farm':{if(!e.kit)return 'Pick up your tools by the cottage first.';const p=s.plots[data.index];if(!p)return 'Choose a garden patch.';if(p.ripe){i.carrot++;p.planted=p.ripe=p.watered=false;e.harvest=true;return 'A carrot from your own garden. Someone has arrived by the road.';}if(data.tool==='water'){if(!p.planted)return 'Plant a seed here first.';const area=wateringArea(s,data.index).filter(q=>q.planted&&!q.ripe);for(const q of area)q.watered=true;return e.wideCan?`Watered ${area.length} plot${area.length===1?'':'s'} with your wide-spout can.`:'Watered. It will grow when you sleep in your cottage.';}if(data.tool!=='seed')return p.planted?'This carrot needs water and a night’s rest.':'Choose carrot seeds to plant here.';if(p.planted)return 'A carrot is already growing here.';if(i.seed<1)return 'Your cottage storage has free starter seeds.';i.seed--;p.planted=true;return 'Planted. Choose Water and give it a drink.';}
- case 'sleep':if(s.room!=='home')return 'Your bed is inside the cottage.';s.day++;for(const p of s.plots){if(p.planted&&p.watered)p.ripe=true;p.watered=false;}return 'A fresh morning. Your watered carrots have grown.';
+ case 'sleep':if(s.room!=='home')return 'Your bed is inside the cottage.';const contribution=settleVillageDay(s);s.day++;for(const p of s.plots){if(p.planted&&p.watered)p.ripe=true;p.watered=false;}return contribution?`A fresh morning. Mara’s bakery added ${contribution} G to the village fund.${s.economy.lastBatch==='small'?' A smaller batch: the order flour was missing.':''}`:'A fresh morning. Your watered carrots have grown.';
  case 'seeds':if(i.seed<6)i.seed=6;return 'Your starter seed tin is full again.';
  case 'meet':if(!e.harvest)return 'The road is quiet.';e.met=true;return 'I’m Mara. Baker, flour-covered traveller, owner of one very squeaky cart.';
  case 'invite':if(!e.met)return 'Say hello to Mara first.';e.invited=true;return 'An oven, somewhere to sleep… that’s about it. Herbs by the door would be nice.';
@@ -94,15 +98,17 @@ export function act(s,id,data={}){
  case 'deposit':i.wood+=s.carry.wood;i.stone+=s.carry.stone;s.carry={wood:0,stone:0};return `Materials stored: ${i.wood} wood, ${i.stone} stone.`;
  case 'build':if(!h)return 'Plan a house first.';if(!e.orin)return 'Meet Orin at his cart first.';if(h.stage===0){if(i.stone<6)return 'Six stones for this bit. Bring them over and we’ll get the base sorted.';i.stone-=6;h.stage=1;return 'There’s our first corner. Definitely looks more house-like than it did.';}if(h.stage===1){if(e.basket==='held'){e.late=true;return 'Ah, my basket. I need it for these tools. Bring it over, then we’ll get lifting.';}if(e.timber==='taken'){e.timberNoticed=true;return 'Hang on. Those boards in your bag are for the mill roof. I’ll need them back before we get this frame up.';}if(i.wood<8)return 'Eight bundles of loose wood should do it. Still a few short.';i.wood-=8;h.stage=2;e.lifted=true;return 'Together, you lift the frame into place.';}return h.stage===2?'Place the herb planter, then choose the finishing touches.':'Mara’s home is finished.';
  case 'herbs':if(h?.stage!==2)return 'The frame needs to be ready first.';e.herbs=true;return 'A little herb garden by the door.';
- case 'finish':if(h?.stage!==2||!e.herbs)return 'Set out the herb planter first.';h.trim=Number.isInteger(data.trim)?Math.max(0,Math.min(2,data.trim)):0;h.stage=3;s.conversation.movedDay=s.day;return 'The oven fits! The table… nearly fits. We’ll eat sideways. It’s fine.';
+ case 'finish':if(h?.stage!==2||!e.herbs)return 'Set out the herb planter first.';if(!fundHome(s))return 'The home needs 12 G from the village welcome fund for its finishing supplies.';h.trim=Number.isInteger(data.trim)?Math.max(0,Math.min(2,data.trim)):0;h.stage=3;s.conversation.movedDay=s.day;return 'The oven fits! The table… nearly fits. We’ll eat sideways. It’s fine.';
  case 'enterHome':s.room='home';s.player.x=8;s.player.y=11;return 'Your cottage';
  case 'enterBakery':if(h?.stage!==3)return 'The home isn’t ready yet.';s.room='bakery';s.player.x=8;s.player.y=11;return 'Mara’s kitchen';
  case 'exit':{const out=s.room==='bakery'&&h?{x:h.x+2,y:h.y+4}:FIXED.home;s.room='outside';Object.assign(s.player,out);return 'Back in the village';}
- case 'cook':if(s.room!=='bakery'||h?.stage!==3)return 'Visit Mara’s kitchen first.';if(e.cooking)return 'Your batch is already waiting.';if(i.carrot<1)return 'Got a carrot? Mine are all imaginary at the moment.';i.carrot--;e.cooking=1;return 'Flour’s in. Pop your carrot on the board.';
+ case 'cook':if(s.room!=='bakery'||h?.stage!==3)return 'Visit Mara’s kitchen first.';if(e.cooking)return 'Your batch is already waiting.';if(i.carrot<1)return 'Got a carrot? Mine are all imaginary at the moment.';if(data.recipe==='fruit'&&(!s.economy.recipe||i.berry<2))return 'Fruit buns need the recipe, two berries and a carrot.';s.economy.fruitBatch=data.recipe==='fruit';if(s.economy.fruitBatch)i.berry-=2;i.carrot--;e.cooking=1;return 'Flour’s in. Pop your carrot on the board.';
  case 'mix':if(e.cooking!==1||s.room!=='bakery')return 'Start a batch at the preparation counter.';e.cooking=2;return 'I’ll do this one. Your turn with the next. They don’t have to match.';
  case 'shape':if(e.cooking!==2||s.room!=='bakery')return 'Mix the batch first.';e.cooking=3;return 'Three buns, ready for the oven. Mara takes the tray.';
- case 'bake':if(e.cooking!==3||s.room!=='bakery')return 'Your tray isn’t ready yet.';e.cooking=0;if(!e.cooked)s.conversation.cookedDay=s.day;e.cooked=true;i.bun+=3;return 'Ooh, look at those. Careful. They’re still doing the hot-bun thing.';
+ case 'bake':if(e.cooking!==3||s.room!=='bakery')return 'Your tray isn’t ready yet.';e.cooking=0;if(!e.cooked)s.conversation.cookedDay=s.day;e.cooked=true;if(s.economy.fruitBatch){i.fruitbun+=3;s.economy.fruitBatch=false;return 'Berry juice on the counter. That’s how you know they’re good. Three fruit buns, ready to go.';}i.bun+=3;return 'Ooh, look at those. Careful. They’re still doing the hot-bun thing.';
  case 'share':if(!e.cooked||e.shared)return 'We’ve already shared our first batch.';if(i.bun<2)return 'We can share another batch later.';i.bun-=2;e.shared=true;return 'Ooh, yes please. Nothing beats a warm bun.';
+ case 'eatFruit':if(!i.fruitbun)return 'No fruit buns in your basket yet.';i.fruitbun--;return 'A warm fruit bun, with a little berry juice on your fingers.';
+ case 'eatBerry':if(!i.berry)return 'No berries in your basket yet.';i.berry--;return 'Sweet, a little sharp, and straight from the nursery.';
  case 'eat':if(!i.bun)return 'There are no buns in your basket.';i.bun--;return 'A warm vegetable bun. A quiet moment to enjoy what you made.';
  case 'nursery':if(!e.cooked)return 'Settle in with Mara first.';e.nursery=true;return 'Up the old path? There used to be a nursery. Little plants, not little people. Fancy a look?';
  case 'place':if(!validDecor(s,data.type,data.x,data.y,data.index??-1))return 'Leave doors, work areas, and walking routes clear.';if(Number.isInteger(data.index)&&s.decor[data.index]){Object.assign(s.decor[data.index],{x:data.x,y:data.y,rotation:data.rotation===1?1:0});return 'Moved.';}if(!i[data.type])return 'There are no more in storage.';i[data.type]--;s.decor.push({type:data.type,x:data.x,y:data.y,room:s.room,rotation:data.rotation===1?1:0});return 'Placed. Move it or put it back in storage any time.';
@@ -113,6 +119,8 @@ export function act(s,id,data={}){
 export function readSave(raw){
  const s=JSON.parse(raw),base=fresh(),int=(n,a,b)=>Number.isInteger(n)&&n>=a&&n<=b;
  if(!s||s.version!==2||!int(s.day,1,100000)||!['outside','home','bakery'].includes(s.room))throw Error('Invalid chapter save');
+ for(const k of ['berry','fruitbun'])if(s.inventory&&s.inventory[k]===undefined)s.inventory[k]=0;
+ const economy=readEconomy(s,int);
  for(const [k,n]of Object.entries(base.inventory))if(!int(s.inventory?.[k],0,1000000))throw Error('Invalid inventory');
  for(const k of ['wood','stone'])if(!int(s.carry?.[k],0,2))throw Error('Invalid carry');
  if(s.story&&s.story.arrival===undefined)s.story.arrival=3;
@@ -128,7 +136,7 @@ export function readSave(raw){
  if(s.house&&(!int(s.house.x,16,44)||!int(s.house.y,7,29)||!int(s.house.stage,0,3)||!int(s.house.style,0,2)||!int(s.house.trim,0,2)))throw Error('Invalid home');
  if(!Array.isArray(s.decor)||s.decor.length>200)throw Error('Invalid decoration');const checked={...s,decor:[]};for(const d of s.decor){if(!DECOR.includes(d.type)||!['outside','home','bakery'].includes(d.room)||!int(d.x,1,52)||!int(d.y,3,35)||!int(d.rotation,0,1)||checked.decor.some(o=>o.x===d.x&&o.y===d.y&&o.room===d.room))throw Error('Invalid item');checked.decor.push({type:d.type,x:d.x,y:d.y,room:d.room,rotation:d.rotation});}
  const conversation={...base.conversation};for(const k of Object.keys(conversation)){if(s.conversation?.[k]!==undefined){if(!int(s.conversation[k],0,k.endsWith('Day')?s.day:1000000))throw Error('Invalid conversation');conversation[k]=s.conversation[k];}}
- const clean={...base,conversation,day:s.day,room:s.room,player:Object.fromEntries(Object.keys(base.player).map(k=>[k,s.player[k]])),inventory:Object.fromEntries(Object.keys(base.inventory).map(k=>[k,s.inventory[k]])),carry:{wood:s.carry.wood,stone:s.carry.stone},plots:s.plots.map(p=>({x:p.x,y:p.y,planted:p.planted,watered:p.watered,ripe:p.ripe})),gathered:[...s.gathered],house:s.house?{x:s.house.x,y:s.house.y,stage:s.house.stage,style:s.house.style,trim:s.house.trim}:null,decor:checked.decor,story:Object.fromEntries(Object.keys(base.story).map(k=>[k,s.story[k]])),settings:{sound:typeof s.settings?.sound==='boolean'?s.settings.sound:true,music:typeof s.settings?.music==='boolean'?s.settings.music:false}};
+ const clean={...base,conversation,economy,day:s.day,room:s.room,player:Object.fromEntries(Object.keys(base.player).map(k=>[k,s.player[k]])),inventory:Object.fromEntries(Object.keys(base.inventory).map(k=>[k,s.inventory[k]])),carry:{wood:s.carry.wood,stone:s.carry.stone},plots:s.plots.map(p=>({x:p.x,y:p.y,planted:p.planted,watered:p.watered,ripe:p.ripe})),gathered:[...s.gathered],house:s.house?{x:s.house.x,y:s.house.y,stage:s.house.stage,style:s.house.style,trim:s.house.trim}:null,decor:checked.decor,story:Object.fromEntries(Object.keys(base.story).map(k=>[k,s.story[k]])),settings:{sound:typeof s.settings?.sound==='boolean'?s.settings.sound:true,music:typeof s.settings?.music==='boolean'?s.settings.music:false}};
  if(clean.house&&!validHouse({...clean,decor:[],player:{...clean.player,x:-99,y:-99}},clean.house.x,clean.house.y))throw Error('Blocked home');
  const items=clean.decor;clean.decor=[];for(const d of items){if(!validDecor({...clean,room:d.room,player:{...clean.player,x:-99,y:-99}},d.type,d.x,d.y))throw Error('Blocked decoration');clean.decor.push(d);}
  if(clean.room==='bakery'&&clean.house?.stage!==3)clean.room='outside';

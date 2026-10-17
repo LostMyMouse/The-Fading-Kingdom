@@ -1,7 +1,7 @@
 // One world-character contract: common height, foot baseline and textured limb regions.
 export const CHARACTER_HEIGHT=32;
 export const RIG={head:[0,0,1,.53],leftArm:[0,.51,.25,.80],rightArm:[.75,.51,1,.80],leftLeg:[.23,.84,.50,1],rightLeg:[.50,.84,.77,1]};
-export function gaitPose(frame=0){const phase=[0,1,0,-1][((frame%4)+4)%4];return {leftLeg:phase,rightLeg:-phase,leftArm:-phase,rightArm:phase};}
+export function gaitPose(frame=0){const cycle=((frame%4)+4)%4,index=Math.floor(cycle),t=cycle-index,ease=t*t*(3-2*t),keys=[0,1,0,-1,0],phase=keys[index]+(keys[index+1]-keys[index])*ease;return {leftLeg:phase,rightLeg:-phase,leftArm:-phase,rightArm:phase};}
 function piece(c,image,rect,box,x,y,w,h,dx=0,dy=0,dark=false){
  const [sx,sy,sw,sh]=rect,[l,t,r,b]=box;c.save();if(dark)c.filter='brightness(.78)';
  c.drawImage(image,sx+l*sw,sy+t*sh,(r-l)*sw,(b-t)*sh,x+l*w+dx,y+t*h+dy,(r-l)*w,(b-t)*h);c.restore();
@@ -11,9 +11,10 @@ function hinged(c,image,rect,box,x,y,w,h,angle,dark=false){
  c.translate(x+(l+r)*w/2,y+t*h);c.rotate(angle);
  c.drawImage(image,sx+l*sw,sy+t*sh,(r-l)*sw,(b-t)*sh,-(r-l)*w/2,0,(r-l)*w,(b-t)*h);c.restore();
 }
+export function pixelAnchor(c,x,y){const t=c.getTransform();return [(Math.round(x*t.a+t.e)-t.e)/t.a,(Math.round(y*t.d+t.f)-t.f)/t.d];}
 export function drawRig(c,image,rect,{direction='down',walking=false,frame=0,layout=null},x,y){
- const h=CHARACTER_HEIGHT,w=rect[2]/rect[3]*h;x=Math.round(x)-w/2;y=Math.round(y)-h+2;
- c.fillStyle='#304d3c40';c.fillRect(Math.round(x+w/2)-6,y+h-2,12,3);
+ const h=CHARACTER_HEIGHT,w=rect[2]/rect[3]*h;const anchor=pixelAnchor(c,x,y);x=anchor[0]-w/2;y=anchor[1]-h+2;
+ c.fillStyle='#304d3c40';c.fillRect(x+w/2-6,y+h-2,12,3);
  if(!walking){c.drawImage(image,...rect,x,y,w,h);return;}
  const p=gaitPose(frame),side=direction==='left'||direction==='right',sign=direction==='left'?-1:1,back=direction==='up'?-1:1;
  const sideArm=layout?.[direction]?.arm??(direction==='left'?[.66,.51,.96,.79]:[.04,.51,.34,.79]);
