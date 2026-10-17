@@ -7,7 +7,7 @@ export const DECOR=['planter','bench','lantern','path','fence'];
 export const TREES=Array.from({length:40},(_,i)=>({x:2+(i*13%52),y:i<18?3+i%3:31+i%7}));
 export const RESOURCES=Array.from({length:26},(_,i)=>({id:i,type:i<16?'wood':'stone',x:19+(i*7%23),y:19+Math.floor(i/6)*2+(i%2)}));
 export const FIXED={home:{x:11,y:12},kit:{x:13,y:13},store:{x:8,y:13},orin:{x:18,y:17},timber:{x:20,y:17},nursery:{x:45,y:10}};
-export function fresh(){return {version:2,day:1,room:'outside',player:{x:12,y:14,skin:1,hair:0,shirt:0,style:0},inventory:{seed:6,carrot:0,wood:0,stone:0,bun:0,planter:4,bench:2,lantern:4,path:40,fence:12},carry:{wood:0,stone:0},plots:Array.from({length:9},(_,i)=>({x:8+i%3*2,y:16+Math.floor(i/3)*2,planted:false,watered:false,ripe:false})),gathered:[],house:null,decor:[],story:{kit:false,harvest:false,met:false,invited:false,orin:false,basket:'none',late:false,timber:'untouched',timberNoticed:false,dependable:false,returned:false,lifted:false,herbs:false,cooking:0,cooked:false,shared:false,nursery:false},conversation:{mara:0,orin:0,movedDay:0,cookedDay:0},settings:{sound:true,music:false}};}
+export function fresh(){return {version:2,day:1,room:'outside',player:{x:12,y:14,skin:1,hair:0,shirt:0,style:0},inventory:{seed:6,carrot:0,wood:0,stone:0,bun:0,planter:4,bench:2,lantern:4,path:40,fence:12},carry:{wood:0,stone:0},plots:Array.from({length:9},(_,i)=>({x:8+i%3*2,y:16+Math.floor(i/3)*2,planted:false,watered:false,ripe:false})),gathered:[],house:null,decor:[],story:{arrival:0,wideCan:false,kit:false,harvest:false,met:false,invited:false,orin:false,basket:'none',late:false,timber:'untouched',timberNoticed:false,dependable:false,returned:false,lifted:false,herbs:false,cooking:0,cooked:false,shared:false,nursery:false},conversation:{mara:0,orin:0,movedDay:0,cookedDay:0},settings:{sound:true,music:false}};}
 export function mara(s){if(!s.story.harvest)return null;if(s.room==='bakery')return {x:11,y:s.day%2?5:7};if(s.room!=='outside')return null;if(s.house?.stage===3)return {x:s.house.x+5,y:s.house.y+4};return {x:22,y:16};}
 const within=(x,y,a,b,c,d)=>x>=a&&x<=c&&y>=b&&y<=d;
 export function blocked(s,x,y,room=s.room,house=s.house,decor=s.decor){
@@ -48,6 +48,8 @@ export function validDecor(s,type,x,y,ignore=-1){
  if(s.room!=='outside'&&(y===12||y===5||within(x,y,10,5,12,7)||s.room==='home'&&within(x,y,2,4,6,7)))return false;
  return reachable(s,s.room,s.house,[...decor,{type,x,y,room:s.room,rotation:0}]);
 }
+export function wateringArea(s,index){const p=s.plots[index];if(s.room!=='outside'||!p||!p.planted||p.ripe)return [];return s.plots.filter(q=>q.y===p.y&&Math.abs(q.x-p.x)<=(s.story.wideCan?2:0));}
+export function canEarnWideCan(s){return s.house?.stage===3&&s.story.cooked&&s.story.orin;}
 export function goal(s){const e=s.story,h=s.house;
  if(!e.kit)return {title:'A little ground',text:'Pick up the tools by your cottage door.',target:FIXED.kit};
  if(!e.harvest){const p=s.plots.find(p=>p.ripe)||s.plots.find(p=>p.planted&&!p.watered)||s.plots.find(p=>p.planted);return {title:'A little ground',text:!p?'Plant a carrot in a garden patch.':p.ripe?'Harvest your first carrot.':!p.watered?'Water your carrot.':'Enter your cottage and sleep in the bed.',target:!p?s.plots[0]:p.watered&&!p.ripe?FIXED.home:p};}
@@ -64,13 +66,17 @@ export function goal(s){const e=s.story,h=s.house;
  }
  if(h.stage===2)return {title:'From the ground up',text:'Place the herb planter and choose the finishing touches.',target};
  if(!e.cooked)return {title:'Something in the oven',text:e.cooking?'Return to the kitchen to finish your batch.':'Enter Mara’s home and cook together.',target};
+ if(!e.wideCan)return {title:'A hand on the farm',text:'Orin has a watering-can upgrade for you. Visit his cart when you like.',target:FIXED.orin};
  return {title:'A village begins',text:e.nursery?'Explore the old nursery, grow crops, or decorate.':'Talk to Mara about the old path, or make the village yours.',target:e.nursery?FIXED.nursery:target};
 }
 export function act(s,id,data={}){
  const e=s.story,h=s.house,i=s.inventory;
  switch(id){
+ case 'arrivalNext':e.arrival=Math.min(3,e.arrival+1);return 'The road to Bramblewick.';
+ case 'arrivalSkip':e.arrival=3;return 'You can read the letter again in your journal.';
+ case 'upgradeCan':if(e.wideCan)return 'That wide spout’s already fitted. Go give it a try.';if(!canEarnWideCan(s))return 'Get Mara settled and make that first batch of buns. I’ll have something ready for your garden.';if(s.room!=='outside'||Math.abs(s.player.x-FIXED.orin.x)+Math.abs(s.player.y-FIXED.orin.y)>1)return 'Bring your can over to Orin’s cart.';if(e.timber==='taken'){e.timberNoticed=true;return 'I’ll need those mill boards back first. Then I can sort this spout for you.';}e.wideCan=true;return 'There. Wider spout. Try it on the middle of a row. Less walking, more time for lunch.';
  case 'kit':if(e.kit)return 'Your tools are ready.';e.kit=true;return 'Carrot seeds and a watering can. Let’s plant something.';
- case 'farm':{if(!e.kit)return 'Pick up your tools by the cottage first.';const p=s.plots[data.index];if(!p)return 'Choose a garden patch.';if(p.ripe){i.carrot++;p.planted=p.ripe=p.watered=false;e.harvest=true;return 'A carrot from your own garden. Someone has arrived by the road.';}if(data.tool==='water'){if(!p.planted)return 'Plant a seed here first.';p.watered=true;return 'Watered. It will grow when you sleep in your cottage.';}if(data.tool!=='seed')return p.planted?'This carrot needs water and a night’s rest.':'Choose carrot seeds to plant here.';if(p.planted)return 'A carrot is already growing here.';if(i.seed<1)return 'Your cottage storage has free starter seeds.';i.seed--;p.planted=true;return 'Planted. Choose Water and give it a drink.';}
+ case 'farm':{if(!e.kit)return 'Pick up your tools by the cottage first.';const p=s.plots[data.index];if(!p)return 'Choose a garden patch.';if(p.ripe){i.carrot++;p.planted=p.ripe=p.watered=false;e.harvest=true;return 'A carrot from your own garden. Someone has arrived by the road.';}if(data.tool==='water'){if(!p.planted)return 'Plant a seed here first.';const area=wateringArea(s,data.index).filter(q=>q.planted&&!q.ripe);for(const q of area)q.watered=true;return e.wideCan?`Watered ${area.length} plot${area.length===1?'':'s'} with your wide-spout can.`:'Watered. It will grow when you sleep in your cottage.';}if(data.tool!=='seed')return p.planted?'This carrot needs water and a night’s rest.':'Choose carrot seeds to plant here.';if(p.planted)return 'A carrot is already growing here.';if(i.seed<1)return 'Your cottage storage has free starter seeds.';i.seed--;p.planted=true;return 'Planted. Choose Water and give it a drink.';}
  case 'sleep':if(s.room!=='home')return 'Your bed is inside the cottage.';s.day++;for(const p of s.plots){if(p.planted&&p.watered)p.ripe=true;p.watered=false;}return 'A fresh morning. Your watered carrots have grown.';
  case 'seeds':if(i.seed<6)i.seed=6;return 'Your starter seed tin is full again.';
  case 'meet':if(!e.harvest)return 'The road is quiet.';e.met=true;return 'I’m Mara. Baker, flour-covered traveller, owner of one very squeaky cart.';
@@ -109,8 +115,11 @@ export function readSave(raw){
  if(!s||s.version!==2||!int(s.day,1,100000)||!['outside','home','bakery'].includes(s.room))throw Error('Invalid chapter save');
  for(const [k,n]of Object.entries(base.inventory))if(!int(s.inventory?.[k],0,1000000))throw Error('Invalid inventory');
  for(const k of ['wood','stone'])if(!int(s.carry?.[k],0,2))throw Error('Invalid carry');
+ if(s.story&&s.story.arrival===undefined)s.story.arrival=3;
+ if(s.story&&s.story.wideCan===undefined)s.story.wideCan=false;
  if(s.story&&s.story.timberNoticed===undefined)s.story.timberNoticed=s.story.timber==='taken';
  for(const [k,v]of Object.entries(base.story))if(typeof v==='boolean'?typeof s.story?.[k]!=='boolean':typeof s.story?.[k]!==typeof v)throw Error('Invalid story');
+ if(!int(s.story.arrival,0,3))throw Error('Invalid arrival');
  if(!['none','held','returned'].includes(s.story.basket)||!['untouched','taken','returned'].includes(s.story.timber)||!int(s.story.cooking,0,3))throw Error('Invalid event');
  if(!s.player||!int(s.player.x,0,W)||!int(s.player.y,0,H)||!['skin','hair','shirt'].every(k=>int(s.player[k],0,5))||!int(s.player.style,0,2))throw Error('Invalid player');
  if(!Array.isArray(s.gathered)||new Set(s.gathered).size!==s.gathered.length||s.gathered.some(n=>!int(n,0,25)))throw Error('Invalid gathering');

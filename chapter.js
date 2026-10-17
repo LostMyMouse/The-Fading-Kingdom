@@ -1,8 +1,10 @@
-import {SAVE_KEY,W,H,STYLES,DECOR,RESOURCES,FIXED,fresh,mara,blocked,route,validHouse,validDecor,goal,act,readSave} from './chapter-model.js';
+import {ARRIVAL,EQUIPMENT} from './chapter-progression.js';
+import {SAVE_KEY,W,H,STYLES,DECOR,RESOURCES,FIXED,fresh,mara,blocked,route,validHouse,validDecor,goal,act,readSave,wateringArea,canEarnWideCan} from './chapter-model.js';
 import {draw} from './chapter-world.js';
 import {person,icon} from './world.js';
 import {SKINS,HAIRS,SHIRTS} from './model.js';
 const $=id=>document.getElementById(id),canvas=$('world'),ctx=canvas.getContext('2d'),dialog=$('dialog');
+let arrivalOpen=false,waterTarget=null;
 let s=fresh(),stored=null,playing=false,tool='hands',path=[],arrival=null,keys=new Set(),preview=null,guide=false,rotation=0,undo=null,width=480,height=280,camera={x:0,y:0},last=0,step=0,old={x:s.player.x,y:s.player.y},direction='down',saveTimer,toastTimer,saveError='',loadError='',audio=null,musicTimer=null,activity=null;
 const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
 try{const raw=localStorage.getItem(SAVE_KEY);if(raw)stored=readSave(raw);if(localStorage.getItem('the-fading-kingdom:save:v1'))$('legacy-note').textContent='Your earlier prototype save is kept separately.';}catch{loadError='This chapter save couldn’t be read. It has been kept; you can download it from the menu.';$('legacy-note').textContent=loadError;}
@@ -18,33 +20,68 @@ function music(){clearInterval(musicTimer);musicTimer=null;if(!playing||!s.setti
 function run(id,data){const text=act(s,id,data);save();sound(['farm','bake','finish','build'].includes(id)?'grow':id==='water'?'water':'tap');return text;}
 function reply(name,id,data,after){const text=run(id,data);show(name,text,[['All right',()=>{close();after?.();}]]);}
 function show(title,text,choices=[],tag='ROOM FOR ONE MORE'){
- stop();const body=$('dialog-content');body.replaceChildren();body.append(el('div',tag,'eyebrow'));
+ stop();const body=$('dialog-content');body.classList.remove('arrival-card');body.replaceChildren();body.append(el('div',tag,'eyebrow'));
  if(title==='Mara'||title==='Orin'){const row=el('div',null,'portrait-line'),p=el('canvas');p.width=24;p.height=30;person(p.getContext('2d'),12,29,title==='Mara'?{skin:2,hair:2,shirt:3,style:1}:{skin:3,hair:0,shirt:1,hat:'cap'});row.append(p,el('h2',title));row.lastChild.id='dialog-title';body.append(row);}else{const h=el('h2',title);h.id='dialog-title';body.append(h);}
  if(text)body.append(el('p',text));const row=el('div',null,'choices');for(const [label,fn,cls,disabled]of choices){const b=el('button',label,cls);b.disabled=!!disabled;b.onclick=fn;row.append(b);}body.append(row);if(!dialog.open)dialog.showModal();(row.querySelector('button')||$('close')).focus();
 }
-function close(){dialog.close();stop();canvas.focus({preventScroll:true});}
-$('close').onclick=close;dialog.addEventListener('close',stop);dialog.addEventListener('cancel',stop);
-function start(){playing=true;$('welcome').classList.add('hide');stop();resize();save();music();canvas.focus();toast('Welcome. Tap the ground to walk, or use the arrow keys.');}
+function close(){if(arrivalOpen)finishArrival();dialog.close();stop();canvas.focus({preventScroll:true});}
+$('close').onclick=close;dialog.addEventListener('cancel',()=>{if(arrivalOpen)finishArrival();stop();});
+function start(){playing=true;$('welcome').classList.add('hide');stop();resize();save();music();canvas.focus();toast('Welcome. Tap the ground to walk, or use the arrow keys.');if(s.story.arrival<ARRIVAL.length)arrivalSequence();}
 function newStory(){if(stored||loadError){show('Begin a new chapter?', 'Your current Chapter One save will be replaced. Earlier prototype progress stays separate.',[['Keep my story',close],['Download a backup',backup],['Begin again',()=>{s=fresh();undo=null;preview=null;activity=null;appearance(true);},'warning']]);}else{s=fresh();appearance(true);}}
 $('begin').onclick=newStory;$('continue').onclick=()=>{s=structuredClone(stored);start();};
+function finishArrival(){arrivalOpen=false;act(s,'arrivalSkip');$('close').textContent='Back to the world';save();}
+function arrivalSequence(replay=false,index=s.story.arrival){
+ if(index>=ARRIVAL.length){if(!replay)finishArrival();close();return;}
+ arrivalOpen=!replay;const beat=ARRIVAL[index];
+ const choices=[[beat.next,()=>{if(!replay)run('arrivalNext');arrivalSequence(replay,index+1);},'primary']];
+ if(replay)choices.push(['Back to my journal',()=>{close();journal();}]);
+ show(beat.title,beat.text,choices,replay?'YOUR ARRIVAL':'THE ROAD TO BRAMBLEWICK');
+ $('dialog-content').classList.add('arrival-card');$('close').textContent=replay?'Back to the world':'Skip introduction';
+}
+function equipmentMenu(){
+ show('Tools for the growing village','A few ways to make the everyday jobs a little easier.',[['Visit Orin’s cart',()=>{close();if(s.room==='outside')goTo(FIXED.orin,orinEquipment);else toast('Step outside and visit Orin’s cart by the road.');}]],'YOUR EQUIPMENT');
+ for(const [j,item]of EQUIPMENT.entries()){
+  const box=el('section',null,'journal-entry');let status=j===0?(s.story.wideCan?'Upgraded · wide spout fitted':s.story.kit?'In your tool basket':'Collect by your cottage'):j===1?(s.story.wideCan?'Earned · fitted to your can':canEarnWideCan(s)?'Ready · visit Orin':'After Mara’s home and first batch'):'Later chapter';
+  box.append(el('h3',item.name),el('div',status,'eyebrow'),el('p',item.benefit),el('p',item.availability,'note'));$('dialog-content').append(box);
+ }
+}
+function orinEquipment(){
+ if(s.story.timber==='taken'){woodConversation();return;}
+ if(s.story.wideCan){show('Orin','Wide spout still behaving? Aim for the middle of a row. Saves a fair bit of pottering.',[['See my equipment',equipmentMenu],['Cheers. See you later.',close]]);return;}
+ if(!canEarnWideCan(s)){show('Orin','Get Mara settled and try out that oven. I might have something useful for your garden after that.',[['See what I could earn',equipmentMenu],['I’ll pop back.',close]]);return;}
+ show('Orin','Mara’s got her place and the oven’s going, then. I’ve found a wider spout for your watering can. Want me to fit it?',[
+  ['Yes, let’s try it.',()=>{const before=s.story.wideCan,msg=run('upgradeCan');show('Orin',msg,[[s.story.wideCan?'Try it in my garden':'All right',()=>{close();if(s.story.wideCan){tool='water';waterTarget=null;goTo(s.plots[1],()=>toast('Plant a row, then water the middle plot to reach up to three at once.'));hud();}}]]);if(s.story.wideCan&&!before)celebrate();}],
+  ['What does it do?',()=>show('Orin','Spreads the water across a short row. Same can, fewer trips. Start in the middle.',[['Fit the new spout',()=>{reply('Orin','upgradeCan');}],['Maybe later.',close]])],
+  ['Another time.',close]
+ ]);
+}
+function waterPreview(){
+ if(tool!=='water'||s.room!=='outside'||dialog.open||preview||!playing)return [];
+ let index=waterTarget;if(!Number.isInteger(index)){index=s.plots.findIndex(p=>Math.abs(p.x-s.player.x)+Math.abs(p.y-s.player.y)<=1&&p.planted&&!p.ripe);}
+ return wateringArea(s,index);
+}
+canvas.addEventListener('pointermove',e=>{if(tool!=='water'||s.room!=='outside'||dialog.open||preview)return;const b=canvas.getBoundingClientRect(),x=Math.floor(((e.clientX-b.left)*width/b.width+camera.x)/16),y=Math.floor(((e.clientY-b.top)*height/b.height+camera.y)/16);const index=s.plots.findIndex(p=>p.x===x&&p.y===y);waterTarget=index>=0?index:null;});
+canvas.addEventListener('pointerleave',()=>{waterTarget=null;});
 function appearance(first=false){
  const draft={...s.player};show(first?'Make yourself at home':'The cottage mirror','Choose a look. You can change it again whenever you like.',[],'YOUR STORY');const body=$('dialog-content'),pic=el('canvas',null,'look-preview');pic.width=24;pic.height=36;body.insertBefore(pic,body.children[1]);const paint=()=>{const c=pic.getContext('2d');c.clearRect(0,0,24,36);person(c,12,31,draft);};
  for(const [key,name,cols]of [['skin','Skin tone',SKINS],['hair','Hair colour',HAIRS],['shirt','Clothes',SHIRTS]]){body.append(el('div',name));const row=el('div',null,'swatch-row');cols.forEach((col,i)=>{const b=el('button');b.style.background=col;b.setAttribute('aria-label',`${name} ${i+1}`);b.setAttribute('aria-pressed',i===draft[key]);b.onclick=()=>{draft[key]=i;row.querySelectorAll('button').forEach((v,j)=>v.setAttribute('aria-pressed',i===j));paint();};row.append(b);});body.append(row);}
  const label=el('label','Hairstyle '),select=el('select');for(const [i,name]of ['Tousled','Tied back','Soft curls'].entries())select.add(new Option(name,i));select.value=draft.style;select.onchange=()=>{draft.style=Number(select.value);paint();};label.append(select);body.append(label);const done=el('button',first?'Begin my story →':'Save my look','primary');done.style.display='block';done.style.marginTop='18px';done.onclick=()=>{Object.assign(s.player,draft);close();if(first)start();else save();};body.append(done);paint();
 }
 const toolList=[['hands','Hands','hands'],['seed','Seeds','carrot'],['water','Water','water'],['build','Build','fence'],['decor','Decorate','decorate']];
-for(const [id,name,img]of toolList){const b=el('button'),p=el('canvas');p.width=p.height=16;icon(p.getContext('2d'),img);b.dataset.tool=id;b.setAttribute('aria-label',name);b.append(p,el('span',name));b.onclick=()=>{if(!playing)return;cancelPlacement();tool=id;if(id==='build')buildMenu();if(id==='decor')decorMenu();hud();canvas.focus({preventScroll:true});};$('tools').append(b);}
+for(const [id,name,img]of toolList){const b=el('button'),p=el('canvas');p.width=p.height=16;icon(p.getContext('2d'),img);b.dataset.tool=id;b.setAttribute('aria-label',name);b.append(p,el('span',name));b.onclick=()=>{if(!playing)return;waterTarget=null;cancelPlacement();tool=id;if(id==='build')buildMenu();if(id==='decor')decorMenu();hud();canvas.focus({preventScroll:true});};$('tools').append(b);}
 function hud(){
+ for(const id of ['journal','menu','basket'])$(id).disabled=!playing;
  const g=goal(s);$('quest-title').textContent=g.title;$('quest-text').textContent=s.room==='home'&&g.text.includes('sleep in the bed')?'Walk to your bed and sleep until morning.':s.room==='home'&&g.text.includes('Harvest')?'Go outside and harvest your carrot.':s.room==='bakery'&&!s.story.cooked?'Use the kitchen counter to cook with Mara.':g.text;$('day').textContent=`Spring · Day ${s.day}${saveError?' · Unsaved':''}`;$('place-name').textContent=s.room==='home'?'YOUR COTTAGE':s.room==='bakery'?'MARA’S KITCHEN':'BRAMBLEWICK · SPRING';
  document.querySelectorAll('#tools button').forEach(b=>{b.setAttribute('aria-pressed',b.dataset.tool===tool);b.disabled=!playing||(b.dataset.tool==='seed'||b.dataset.tool==='water')&&!s.story.kit;});
- $('selection').textContent=preview?'Tap a spot · Arrows to adjust · Enter to place':s.carry.wood+s.carry.stone?`Carrying ${s.carry.wood} wood · ${s.carry.stone} stone`:s.story.basket==='held'?'Borrowed basket · 0/2 · return before the frame':tool==='seed'?`Carrot seeds · ${s.inventory.seed}`:tool==='water'?'Water · choose a planted carrot':'Hands · tap objects to explore';
+ $('selection').textContent=preview?'Tap a spot · Arrows to adjust · Enter to place':s.carry.wood+s.carry.stone?`Carrying ${s.carry.wood} wood · ${s.carry.stone} stone`:s.story.basket==='held'?'Borrowed basket · 0/2 · return before the frame':tool==='seed'?`Carrot seeds · ${s.inventory.seed}`:tool==='water'?(s.story.wideCan?'Wide-spout can · up to 3 plots in a row':'Water · one planted plot'):'Hands · tap objects to explore';
  $('objective').classList.toggle('hide',!!preview||!playing);$('movement').classList.toggle('hide',!!preview||!playing||!!activity);$('interact').classList.toggle('hide',!!preview||!playing||!!activity);$('placement').classList.toggle('hide',!preview);$('activity').classList.toggle('hide',!activity||!playing||!!preview);
+ const waterButton=$('tools').querySelector('[data-tool=water]');if(waterButton){const ic=waterButton.querySelector('canvas').getContext('2d');ic.clearRect(0,0,16,16);icon(ic,'water');if(s.story.wideCan){ic.fillStyle='#d4b76b';ic.fillRect(12,4,4,2);ic.fillRect(13,3,1,4);}waterButton.title=s.story.wideCan?'Wide-spout can: up to three plots':'Everyday watering can: one plot';}
  if(preview){const ok=preview.kind==='house'?validHouse(s,preview.x,preview.y):validDecor(s,preview.type,preview.x,preview.y,preview.index??-1);preview.valid=ok;$('placement-title').textContent=preview.kind==='house'?`${STYLES[preview.style]} Cottage`:`${preview.index>=0?'Move':'Place'} ${preview.type}`;$('placement-status').textContent=ok?'Clear site. Tap another spot or confirm here.':'Leave space for doors, resources, and walking routes.';$('placement-confirm').disabled=!ok;$('rotate').classList.toggle('hide',preview.kind==='house'||!['bench','fence'].includes(preview.type));}
  if(activity){$('activity-text').textContent=activity.text;$('activity-next').textContent=activity.label;}
 }
 function inventory(){show('Your basket','Food, materials, and a few bits for the village. Your carrots are saved for cooking.',s.inventory.bun?[['Eat one bun',()=>{toast(run('eat'));close();}]]:[]);const row=el('div',null,'inventory');for(const [key,name]of [['seed','Carrot seeds'],['carrot','Carrots'],['wood','Wood'],['stone','Stone'],['bun','Vegetable buns']])row.append(el('span',`${name}: ${s.inventory[key]}`));if(s.story.timber==='taken')row.append(el('span','Tied bundle of boards: 1'));$('dialog-content').append(row,el('p',`Carrying: ${s.carry.wood} wood, ${s.carry.stone} stone. Drop carried materials at your cottage storage or the building sign.`,'note'));}
 $('basket').onclick=()=>playing&&inventory();
-function journal(){if(!playing)return;const g=goal(s);show('Your journal',g.text,[['Show me the next place',()=>{guide=true;close();if(s.room!=='outside'&&s.story.cooking===0)toast('Your next outdoor destination is marked when you leave.');}]],g.title.toUpperCase());
+function journal(){if(!playing)return;const g=goal(s);show('Your journal',g.text,[['Show me the next place',()=>{guide=true;close();if(s.room!=='outside'&&s.story.cooking===0)toast('Your next outdoor destination is marked when you leave.');}],['Read the arrival letter',()=>arrivalSequence(true,0)],['My equipment',equipmentMenu]],g.title.toUpperCase());
  for(const [name,stage,note]of [['Mara · baker',s.story.cooked?'Growing friendship':'Getting to know you',!s.story.met?'A traveller may stop by after your first harvest.':s.house?.stage===3?'Mara has moved in. You can visit her kitchen and cook.':'Mara needs a kitchen and a little herb space. You choose her home’s style and location.'],['Orin · carpenter',s.story.dependable&&s.story.lifted?'Growing friendship':'Getting to know you',s.story.timber==='taken'&&s.story.timberNoticed?'Orin needs the boards for the mill roof. Bring the bundle back.':s.story.basket==='held'?'Return the carry basket before lifting the frame.':s.story.dependable?'You brought Orin’s basket back before he needed it.':s.story.returned?'The boards are back by Orin’s cart.':'Orin can help build. Loose branches and stones are free to gather.']]){const box=el('section',null,'journal-entry');box.append(el('h3',name),el('span',stage,'eyebrow'),el('p',note));$('dialog-content').append(box);}
  if(s.story.cooked)$('dialog-content').append(el('p',s.story.nursery?'Next: explore the old nursery. More restoration chapters are still to come.':'Grow crops, arrange your village, or ask Mara about the old path.','note'));
 }
@@ -70,7 +107,7 @@ function orin(){const e=s.story;
  if(e.timber==='taken'){woodConversation();return;}
  if(!e.orin){show('Orin',e.invited?'Building a house, eh? I’m Orin. Made a few of those. Most of them are still standing.':'Morning. I’m Orin. Carpenter. The pile of sawdust probably gave that away.',[['Could you give me a hand?',()=>reply('Orin','orin',{},orin)],['Just saying hello.',()=>smallTalk('orin')],['Catch you later.',close]]);return;}
  const options=[];if(e.basket==='held')options.push([e.late?'Oops. Here’s your basket.':'Here’s your basket. Cheers!',()=>reply('Orin','returnBasket')]);else if(e.basket==='none')options.push(['Can I borrow that basket?',()=>reply('Orin','borrow')]);
- options.push(['How’s it going?',()=>smallTalk('orin')],['Where should I look for supplies?',()=>show('Orin','Try south of the road. Branches, loose stones… plenty lying about. Saves me sweeping them up.',[['Got it.',close]])]);
+ options.push(['How’s it going?',()=>smallTalk('orin')],canEarnWideCan(s)?['About my watering can…',orinEquipment]:['Where should I look for supplies?',()=>show('Orin','Try south of the road. Branches, loose stones… plenty lying about. Saves me sweeping them up.',[['Got it.',close]])]);
  show('Orin',e.basket==='held'?'How’s the basket doing? More useful than my pockets, I bet.':s.house?.stage===3?'Mara’s got the oven going, then. Smells better than sawdust.':'Oh, hey. Just sorting these tools. They don’t sort themselves. I’ve checked.',options.slice(0,3));
 }
 function timber(){
@@ -84,7 +121,7 @@ function buildingSign(){const h=s.house;if(!h)return;if(h.stage===3){enter('ente
  if(h.stage<2)options.push([h.stage===0?'Lay foundations · 6 stone':'Lift the frame · 8 wood',()=>{const before=h.stage,msg=run('build');close();if(h.stage!==before){celebrate();toast(msg);activity={text:h.stage===1?'Foundations laid. Next: 8 wood for the frame.':'The frame’s up. Mara’s already measuring her oven.',label:'Continue',fn:()=>{activity=null;hud();}};hud();}else show('Orin',msg,[['All right',close]]);}]);
  else if(!s.story.herbs)options.push(['Set out the herb planter',()=>{close();activity={text:'Mara’s brought a planter. Set it by the door.',label:'Set out herbs',fn:()=>{toast(run('herbs'));activity=null;hud();}};hud();}]);else options.push(['Choose the finishing touches',()=>show('A front door for Mara','Pick a colour for the door.',['Honey','Sage','Heather'].map((name,trim)=>[name,()=>{toast(run('finish',{trim}));close();celebrate();show('Mara','The oven fits! The table… nearly fits. We’ll eat sideways. It’s fine.',[['Can I have a look inside?',()=>{close();enter('enterBakery');}],['I’ll pop back later.',close]]);}]))]);
  options.push(['Move or change the unfinished plan',buildMenu]);show('From the ground up',`Stage ${h.stage+1} of 3 · ${['Foundations','Frame','Finishing'][h.stage]}\nStored materials: ${s.inventory.wood} wood · ${s.inventory.stone} stone. Carried materials must be dropped here first.`,options.slice(0,3));}
-function enter(id){cancelPlacement();activity=null;stop();toast(run(id));stop();resize();canvas.focus({preventScroll:true});}
+function enter(id){waterTarget=null;cancelPlacement();activity=null;stop();toast(run(id));stop();resize();canvas.focus({preventScroll:true});}
 function cook(){if(s.room!=='bakery')return;const stage=s.story.cooking;if(!stage){show('Mara’s kitchen','Vegetable buns · 1 carrot + flour → 3 buns. Mara’s got the flour covered.',[['Start a batch',()=>{const msg=run('cook');close();if(s.story.cooking){toast(msg);cookingStep();}else show('Mara',msg);}],['Maybe later',close]]);return;}cookingStep();}
 function cookingStep(){const n=s.story.cooking;if(!n){activity=null;hud();return;}const text=['','Your carrot and Mara’s flour are on the counter.','Mara shapes one bun. Your turn with the next.','Ready for the oven. Mara picks up the tray.'][n],label=['','Mix the dough','Shape the buns','Bake with Mara'][n],id=['','mix','shape','bake'][n];activity={text,label,fn:()=>{const msg=run(id);sound('grow');if(id==='bake'){activity=null;celebrate();show('Mara',msg,[['Let’s have a bun each.',()=>{toast(run('share'));close();}],['I’m saving these for later.',()=>show('Mara','Yep, all yours. Save me a sniff, at least.')],['Anything interesting round here?',()=>reply('Mara','nursery')]]);}else{toast(msg);cookingStep();}hud();}};hud();}
 $('activity-next').onclick=()=>activity?.fn();
@@ -109,13 +146,13 @@ function nearby(){if(!playing||dialog.open)return;const d=s.decor.findIndex(d=>d
 $('interact').onclick=nearby;
 function goTo(target,fn){stop();const candidates=[{x:target.x,y:target.y+1},{x:target.x+1,y:target.y},{x:target.x-1,y:target.y},{x:target.x,y:target.y-1}].filter(p=>!blocked(s,p.x,p.y));let best=null;for(const p of candidates){const r=route(s,s.player,p);if(p.x===s.player.x&&p.y===s.player.y){fn();return;}if(r.length&&(!best||r.length<best.length))best=r;}if(!best){toast('There isn’t a clear route there. Try another side.');return;}path=best;arrival=fn;}
 canvas.addEventListener('pointerdown',e=>{if(!playing||dialog.open)return;sound();const b=canvas.getBoundingClientRect(),x=Math.floor(((e.clientX-b.left)*width/b.width+camera.x)/16),y=Math.floor(((e.clientY-b.top)*height/b.height+camera.y)/16);if(preview){preview.x=x;preview.y=y;hud();return;}
- const d=s.decor.findIndex(d=>d.room===s.room&&d.x===x&&d.y===y);if(d>=0){goTo({x,y},()=>editDecor(d));return;}const p=points().find(p=>p.x===x&&p.y===y)||points().find(p=>['mara','orin'].includes(p.id)&&p.x===x&&p.y-1===y);if(p){goTo(p,()=>interact(p));return;}
+ const d=s.decor.findIndex(d=>d.room===s.room&&d.x===x&&d.y===y);if(d>=0){goTo({x,y},()=>editDecor(d));return;}const p=points().find(p=>p.x===x&&p.y===y)||points().find(p=>['mara','orin'].includes(p.id)&&p.x===x&&p.y-1===y);if(p){if(p.id==='plot'&&tool==='water')waterTarget=p.index;goTo(p,()=>interact(p));return;}
  if(s.room==='outside'){if(x>=8&&x<=13&&y>=8&&y<=11){goTo(FIXED.home,()=>enter('enterHome'));return;}const h=s.house;if(h&&x>=h.x&&x<=h.x+4&&y>=h.y&&y<=h.y+3){goTo({x:h.x+2,y:h.y+4},buildingSign);return;}}
  if(s.room==='home'&&x===3&&y>=4&&y<=6){goTo({x:3,y:7},()=>interact({id:'bed'}));return;}
  if(s.room==='bakery'&&y===4&&x>=3&&x<=13){goTo({x:4,y:5},cook);return;}
  if(blocked(s,x,y))return;stop();path=route(s,s.player,{x,y});canvas.focus({preventScroll:true});});
 const dirs={ArrowUp:[0,-1],ArrowDown:[0,1],ArrowLeft:[-1,0],ArrowRight:[1,0],w:[0,-1],s:[0,1],a:[-1,0],d:[1,0]};
-document.addEventListener('keydown',e=>{if(!playing||dialog.open||e.ctrlKey||e.metaKey||e.altKey)return;const k=e.key.length===1?e.key.toLowerCase():e.key;if(dirs[k]){e.preventDefault();if(preview){const [dx,dy]=dirs[k];preview.x=Math.max(1,Math.min(52,preview.x+dx));preview.y=Math.max(3,Math.min(35,preview.y+dy));hud();}else{path=[];arrival=null;keys.add(k);}}else if(!e.repeat){if(k==='Escape'){e.preventDefault();if(preview)cancelPlacement();else if(activity){activity=null;hud();}else menu();}if(k==='Enter'&&preview){e.preventDefault();$('placement-confirm').click();}if(k==='r'&&preview&&!$('rotate').classList.contains('hide'))$('rotate').click();if((k==='e'||k===' ')&&!preview){e.preventDefault();if(activity)activity.fn();else nearby();}if(k==='j')journal();const n=Number(k)-1;if(n>=0&&n<toolList.length)$('tools').children[n].click();}});
+document.addEventListener('keydown',e=>{if(!playing||dialog.open||e.ctrlKey||e.metaKey||e.altKey)return;const k=e.key.length===1?e.key.toLowerCase():e.key;if(dirs[k]){e.preventDefault();if(preview){const [dx,dy]=dirs[k];preview.x=Math.max(1,Math.min(52,preview.x+dx));preview.y=Math.max(3,Math.min(35,preview.y+dy));hud();}else{waterTarget=null;path=[];arrival=null;keys.add(k);}}else if(!e.repeat){if(k==='Escape'){e.preventDefault();if(preview)cancelPlacement();else if(activity){activity=null;hud();}else menu();}if(k==='Enter'&&preview){e.preventDefault();$('placement-confirm').click();}if(k==='r'&&preview&&!$('rotate').classList.contains('hide'))$('rotate').click();if((k==='e'||k===' ')&&!preview){e.preventDefault();if(activity)activity.fn();else nearby();}if(k==='j')journal();const n=Number(k)-1;if(n>=0&&n<toolList.length)$('tools').children[n].click();}});
 document.addEventListener('keyup',e=>keys.delete(e.key.length===1?e.key.toLowerCase():e.key));
 for(const b of document.querySelectorAll('#movement button')){const k={up:'ArrowUp',down:'ArrowDown',left:'ArrowLeft',right:'ArrowRight'}[b.dataset.dir];b.onpointerdown=e=>{if(!playing||dialog.open)return;e.preventDefault();b.setPointerCapture(e.pointerId);path=[];arrival=null;keys.add(k);};for(const ev of ['pointerup','pointercancel','lostpointercapture'])b.addEventListener(ev,()=>keys.delete(k));}
 function backup(){try{const content=loadError?localStorage.getItem(SAVE_KEY):JSON.stringify(s,null,2);const url=URL.createObjectURL(new Blob([content||''],{type:'application/json'})),a=el('a');a.href=url;a.download='the-fading-kingdom-chapter-one.json';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);}catch{toast('The backup couldn’t be created.');}}
@@ -132,5 +169,5 @@ function tick(now){const dt=Math.min(50,now-last||16);last=now;if(playing&&!dial
  let tx=preview?preview.x*16+(preview.kind==='house'?40:8):px,ty=preview?preview.y*16+(preview.kind==='house'?32:8):py;
  const targetX=mw<width?(mw-width)/2:Math.max(0,Math.min(mw-width,tx-width/2));const targetY=mh<height?(mh-height)/2:Math.max(0,Math.min(mh-height,ty-height*(preview?.kind==='house'?.35:.48)));
  if(preview){camera.x+=(targetX-camera.x)*.12;camera.y+=(targetY-camera.y)*.12;}else{camera.x=targetX;camera.y=targetY;}camera.x=Math.round(camera.x);camera.y=Math.round(camera.y);
- draw(ctx,s,{width,height,camera,time:now,preview,guide:guide?guideTarget():null,px,py,frame:step>0?Math.floor(now/140):0,direction,reduce});requestAnimationFrame(tick);}
-window.addEventListener('error',()=>{$('fatal').classList.remove('hide');});resize();hud();requestAnimationFrame(tick);
+ draw(ctx,s,{width,height,camera,time:now,preview,guide:guide?guideTarget():null,waterArea:waterPreview(),px,py,frame:step>0?Math.floor(now/140):0,direction,reduce});requestAnimationFrame(tick);}
+window.addEventListener('error',()=>{$('fatal').classList.remove('hide');});resize();hud();$('begin').disabled=false;$('continue').disabled=!stored;requestAnimationFrame(tick);

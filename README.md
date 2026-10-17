@@ -6,12 +6,13 @@ A cosy browser farming and village-building adventure, designed for ages 7–11 
 
 [Play on JamesCube](https://james-lost-his-mouse.vercel.app/play?game=the-fading-kingdom).
 
-Grow a carrot, welcome a travelling baker, choose and place their home, gather materials, build in stages with a carpenter, enter the finished house, and cook together. Your own cottage is a walkable room with a bed, mirror and storage. Decorate inside and outside. Borrowing and taking owned wood have separate, repairable consequences.
+Answer a letter from Bramblewick, grow a carrot, welcome a travelling baker, choose and place their home, gather materials, build in stages with a carpenter, enter the finished house, and cook together. Your own cottage is a walkable room with a bed, mirror and storage. Decorate inside and outside. Borrowing and taking owned wood have separate, repairable consequences. Complete the home and first cooking batch, then visit Orin to earn a permanent can that waters up to three planted plots per action. The journal contains the arrival letter and equipment preview.
 
 This is an expanded prototype. Procedural pixel art, basic animation and a small cast establish the systems; production art, full resident schedules, further chapters and physical-device testing remain ahead. It is not a finished commercial release.
 
 ## Project documents
 
+- [Arrival and equipment release](docs/arrival-and-equipment-release.md): opening letter, the first earned watering upgrade and current verification.
 - [Next-version direction](docs/next-version-direction.md): arrival premise, practical equipment upgrades, expressive portraits and emotional animation.
 - [Dialogue and ownership](docs/dialogue-and-ownership.md): character voices, everyday chatter and the revised timber encounter.
 - [Game design](docs/game-design.md): agreed direction and open decisions.
@@ -22,9 +23,9 @@ This is an expanded prototype. Procedural pixel art, basic animation and a small
 
 ## Development
 
-Run `node tools/serve.mjs` and open `http://127.0.0.1:4175/`. No installs or build step. Run `node --test tests/*.test.mjs` for the twenty-nine rules and hosting tests.
+Run `node tools/serve.mjs` and open `http://127.0.0.1:4175/`. No installs or build step. Run `node --test tests/*.test.mjs` for the thirty-seven rules and hosting tests.
 
-Runtime files: `index.html`, `chapter.css`, `chapter.js`, `chapter-model.js`, `chapter-world.js`, `chapter-dialogue.js`, plus the reused `world.js` and `model.js` character/icon modules. Copy them together into the website's `games/the-fading-kingdom/` folder. The earlier `game.js` and `style.css` remain historical source.
+Runtime files: `index.html`, `chapter.css`, `chapter.js`, `chapter-model.js`, `chapter-world.js`, `chapter-dialogue.js`, `chapter-progression.js`, plus the reused `world.js` and `model.js` character/icon modules. Copy them together into the website's `games/the-fading-kingdom/` folder. The earlier `game.js` and `style.css` remain historical source.
 
 Controls: tap an object to walk to it; arrows/WASD to walk; E/Space to interact; J for journal; 1–5 for tools. Placement supports arrow keys, Enter, Escape, and R for supported rotation. Touch movement controls are provided. Show me guides you toward the current objective.
 

@@ -223,6 +223,10 @@ Build anticipation through new crops, relationship stories, creative options, an
 
 Avoid login streaks, offline deterioration, or time-limited rewards that punish absence. Optional challenges can add depth for older players without making the core experience hurried.
 
+## Implemented arrival and first equipment milestone
+
+New stories now open with an invitation to a cottage in Bramblewick and a request to get the fading kingdom growing again. The sender and cause of the fading remain open. Completing Mara’s home and first cooking batch earns a permanent wide-spout watering upgrade, fitted by Orin, with up to three planted plots watered per action. Sharing food is optional. Existing players can collect the reward without restarting. See [arrival and equipment release](arrival-and-equipment-release.md).
+
 ## Next-version requirements
 
 The opening must explain how the player arrived to help the kingdom. Earned equipment must make farming easier through practical upgrades. Dialogue needs dedicated expressive portraits, with later world-character animation responding to emotion. See [next-version direction](next-version-direction.md) for the proposed arrival premise, equipment examples, portrait reference interpretation, and acceptance criteria. These requirements extend beyond the current dialogue release.

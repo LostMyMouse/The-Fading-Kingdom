@@ -1,12 +1,12 @@
 # Next version: arrival, useful equipment and expressive characters
 
-Recorded from the user's direction · 17 October 2026. These are upcoming design requirements; the current dialogue release does not claim they are implemented.
+Recorded from the user’s direction · 17 October 2026. Update: the opening invitation and first permanent wide-spout can are now implemented; see arrival-and-equipment-release.md. Further tool tiers, dedicated expressive portraits and emotion-driven world animation remain upcoming requirements.
 
 ## An early reason to arrive
 
 The opening needs to establish why the player came to Bramblewick and chose to help the kingdom. It should do that before the farming instructions, in a few short, skippable exchanges the player can read at their own pace.
 
-**Proposed premise:** the player answers an invitation offering an unused cottage and a patch of land in Bramblewick. The settlement has grown quiet: homes are empty, paths are overgrown and the wider kingdom is losing its magic. The invitation asks whether the player would like to settle there and help get things growing again. The player arrives with a small bag, meets people, and gradually chooses what sort of village to build.
+**Implemented opening premise:** the player answers an invitation offering an unused cottage and a patch of land in Bramblewick. The settlement has grown quiet: homes are empty, paths are overgrown and the wider kingdom is losing its magic. The invitation asks whether the player would like to settle there and help get things growing again. The player arrives with a small bag, meets people, and gradually chooses what sort of village to build.
 
 Working letter:
 
@@ -36,7 +36,7 @@ Proposed progression, with quantities to tune:
 
 Keep basic tools permanently usable. Show the upgraded area before acting, with the same result on touch and keyboard. Avoid precision charge timing as the only way to use an upgrade; a plain area-size control can offer an accessible alternative. Equipment can come from crafting, discovery and community projects, with relationships opening additional routes. Do not make fundamental tool access depend on guessing one exact polite response. Never remove an earned farming upgrade as an unrelated punishment for a social mistake.
 
-The economy, costs, order and exact first upgrade need a focused implementation pass. The current borrowed basket already changes carrying capacity, but it is not a complete permanent equipment progression system.
+The first permanent wide-spout can is now earned from Orin after completing Mara’s home and first cooking batch, without an extra material cost. Later equipment tiers, economy, costs and order remain to be designed. The borrowed carry basket remains a separate useful loan.
 
 ## Portraits and emotions
 
