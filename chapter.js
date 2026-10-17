@@ -1,3 +1,5 @@
+import {createActors} from './chapter-actors.js';
+import {prepareCharacters} from './chapter-characters.js';
 import {portraitFor} from './chapter-portraits.js';
 import {ARRIVAL,EQUIPMENT} from './chapter-progression.js';
 import {SAVE_KEY,W,H,STYLES,DECOR,RESOURCES,FIXED,fresh,mara,blocked,route,validHouse,validDecor,goal,act,readSave,wateringArea,canEarnWideCan} from './chapter-model.js';
@@ -5,6 +7,7 @@ import {draw} from './chapter-world.js';
 import {person,icon} from './world.js';
 import {SKINS,HAIRS,SHIRTS} from './model.js';
 const $=id=>document.getElementById(id),canvas=$('world'),ctx=canvas.getContext('2d'),dialog=$('dialog');
+const actors=createActors();let npcViews=[],npcCue=null;prepareCharacters();
 let arrivalOpen=false,waterTarget=null;
 let s=fresh(),stored=null,playing=false,tool='hands',path=[],arrival=null,keys=new Set(),preview=null,guide=false,rotation=0,undo=null,width=480,height=280,camera={x:0,y:0},last=0,step=0,old={x:s.player.x,y:s.player.y},direction='down',saveTimer,toastTimer,saveError='',loadError='',audio=null,musicTimer=null,activity=null;
 const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -22,7 +25,7 @@ function run(id,data){const text=act(s,id,data);save();sound(['farm','bake','fin
 function reply(name,id,data,after){const text=run(id,data);show(name,text,[['All right',()=>{close();after?.();}]]);}
 function show(title,text,choices=[],tag='ROOM FOR ONE MORE'){
  stop();const body=$('dialog-content');body.classList.remove('arrival-card');body.replaceChildren();body.append(el('div',tag,'eyebrow'));
- const portrait=portraitFor(title,text);dialog.classList.toggle('character-dialogue',!!portrait);
+ const portrait=portraitFor(title,text);npcCue=portrait?{speaker:portrait.name,emotion:portrait.expression,talking:true,until:Infinity}:null;dialog.classList.toggle('character-dialogue',!!portrait);
  if(portrait){
   const scene=el('div',null,'dialogue-scene'),frame=el('div',null,'character-portrait');
   frame.style.backgroundImage='url("'+portrait.src+'")';frame.style.backgroundPosition=portrait.position;
@@ -33,9 +36,10 @@ function show(title,text,choices=[],tag='ROOM FOR ONE MORE'){
  }else{const h=el('h2',title);h.id='dialog-title';body.append(h);if(text)body.append(el('p',text));}
  const row=el('div',null,'choices');for(const [label,fn,cls,disabled]of choices){const b=el('button',label,cls);b.disabled=!!disabled;b.onclick=fn;row.append(b);}body.append(row);if(!dialog.open)dialog.showModal();(row.querySelector('button')||$('close')).focus();
 }
-function close(){if(arrivalOpen)finishArrival();dialog.close();stop();canvas.focus({preventScroll:true});}
-$('close').onclick=close;dialog.addEventListener('cancel',()=>{if(arrivalOpen)finishArrival();stop();});
-function start(){playing=true;$('welcome').classList.add('hide');stop();resize();save();music();canvas.focus();toast('Welcome. Tap the ground to walk, or use the arrow keys.');if(s.story.arrival<ARRIVAL.length)arrivalSequence();}
+function endNpcTalk(){if(npcCue){npcCue.talking=false;npcCue.until=performance.now()+1400;}}
+function close(){endNpcTalk();if(arrivalOpen)finishArrival();dialog.close();stop();canvas.focus({preventScroll:true});}
+$('close').onclick=close;dialog.addEventListener('cancel',()=>{endNpcTalk();if(arrivalOpen)finishArrival();stop();});
+function start(){actors.reset();playing=true;$('welcome').classList.add('hide');stop();resize();save();music();canvas.focus();toast('Welcome. Tap the ground to walk, or use the arrow keys.');if(s.story.arrival<ARRIVAL.length)arrivalSequence();}
 function newStory(){if(stored||loadError){show('Begin a new chapter?', 'Your current Chapter One save will be replaced. Earlier prototype progress stays separate.',[['Keep my story',close],['Download a backup',backup],['Begin again',()=>{s=fresh();undo=null;preview=null;activity=null;appearance(true);},'warning']]);}else{s=fresh();appearance(true);}}
 $('begin').onclick=newStory;$('continue').onclick=()=>{s=structuredClone(stored);start();};
 function finishArrival(){arrivalOpen=false;act(s,'arrivalSkip');$('close').textContent='Back to the world';save();}
@@ -155,7 +159,7 @@ function nearby(){if(!playing||dialog.open)return;const d=s.decor.findIndex(d=>d
 $('interact').onclick=nearby;
 function goTo(target,fn){stop();const candidates=[{x:target.x,y:target.y+1},{x:target.x+1,y:target.y},{x:target.x-1,y:target.y},{x:target.x,y:target.y-1}].filter(p=>!blocked(s,p.x,p.y));let best=null;for(const p of candidates){const r=route(s,s.player,p);if(p.x===s.player.x&&p.y===s.player.y){fn();return;}if(r.length&&(!best||r.length<best.length))best=r;}if(!best){toast('There isn’t a clear route there. Try another side.');return;}path=best;arrival=fn;}
 canvas.addEventListener('pointerdown',e=>{if(!playing||dialog.open)return;sound();const b=canvas.getBoundingClientRect(),x=Math.floor(((e.clientX-b.left)*width/b.width+camera.x)/16),y=Math.floor(((e.clientY-b.top)*height/b.height+camera.y)/16);if(preview){preview.x=x;preview.y=y;hud();return;}
- const d=s.decor.findIndex(d=>d.room===s.room&&d.x===x&&d.y===y);if(d>=0){goTo({x,y},()=>editDecor(d));return;}const p=points().find(p=>p.x===x&&p.y===y)||points().find(p=>['mara','orin'].includes(p.id)&&p.x===x&&p.y-1===y);if(p){if(p.id==='plot'&&tool==='water')waterTarget=p.index;goTo(p,()=>interact(p));return;}
+ const d=s.decor.findIndex(d=>d.room===s.room&&d.x===x&&d.y===y);if(d>=0){goTo({x,y},()=>editDecor(d));return;}const npcHit=npcViews.find(n=>Math.abs((x+.5)-(n.x+.5))<.7&&y>=Math.floor(n.y)-1&&y<=Math.round(n.y));const p=npcHit?points().find(p=>p.id===npcHit.name):points().find(p=>p.x===x&&p.y===y);if(p){if(p.id==='plot'&&tool==='water')waterTarget=p.index;goTo(p,()=>interact(p));return;}
  if(s.room==='outside'){if(x>=8&&x<=13&&y>=8&&y<=11){goTo(FIXED.home,()=>enter('enterHome'));return;}const h=s.house;if(h&&x>=h.x&&x<=h.x+4&&y>=h.y&&y<=h.y+3){goTo({x:h.x+2,y:h.y+4},buildingSign);return;}}
  if(s.room==='home'&&x===3&&y>=4&&y<=6){goTo({x:3,y:7},()=>interact({id:'bed'}));return;}
  if(s.room==='bakery'&&y===4&&x>=3&&x<=13){goTo({x:4,y:5},cook);return;}
@@ -178,5 +182,8 @@ function tick(now){const dt=Math.min(50,now-last||16);last=now;if(playing&&!dial
  let tx=preview?preview.x*16+(preview.kind==='house'?40:8):px,ty=preview?preview.y*16+(preview.kind==='house'?32:8):py;
  const targetX=mw<width?(mw-width)/2:Math.max(0,Math.min(mw-width,tx-width/2));const targetY=mh<height?(mh-height)/2:Math.max(0,Math.min(mh-height,ty-height*(preview?.kind==='house'?.35:.48)));
  if(preview){camera.x+=(targetX-camera.x)*.12;camera.y+=(targetY-camera.y)*.12;}else{camera.x=targetX;camera.y=targetY;}camera.x=Math.round(camera.x);camera.y=Math.round(camera.y);
- draw(ctx,s,{width,height,camera,time:now,preview,guide:guide?guideTarget():null,waterArea:waterPreview(),px,py,frame:step>0?Math.floor(now/140):0,direction,reduce});requestAnimationFrame(tick);}
+ if(npcCue&&npcCue.until<now)npcCue=null;
+ npcViews=actors.update(s,dt,{paused:!playing||dialog.open||!!preview||document.hidden,reduce,cue:npcCue});
+ canvas.dataset.npcAnimation=npcViews.map(n=>n.name+':'+(n.walking?'walk-'+n.direction:n.talking?'talk':n.work?'work':n.emotion!=='neutral'?n.emotion:'idle')+':'+n.frame).join(' ');
+ draw(ctx,s,{npcs:npcViews,width,height,camera,time:now,preview,guide:guide?guideTarget():null,waterArea:waterPreview(),px,py,frame:step>0?Math.floor(now/140):0,direction,reduce});requestAnimationFrame(tick);}
 window.addEventListener('error',()=>{$('fatal').classList.remove('hide');});resize();hud();$('begin').disabled=false;$('continue').disabled=!stored;requestAnimationFrame(tick);

@@ -1,3 +1,4 @@
+import {drawCharacter} from './chapter-characters.js';
 import {person,icon} from './world.js';
 import {W,H,TREES,RESOURCES,FIXED,mara,validHouse,validDecor} from './chapter-model.js';
 export const T=16;
@@ -55,9 +56,9 @@ export function draw(c,s,v){
  if(preview){const valid=preview.valid;c.globalAlpha=.55;if(preview.kind==='house')building(c,{...preview,stage:3,trim:0},null);else icon(c,preview.type,preview.x*16,preview.y*16,preview.rotation);c.globalAlpha=1;c.strokeStyle=valid?'#fff1ba':'#a44035';c.lineWidth=1;c.strokeRect(preview.x*16+.5,preview.y*16+.5,preview.kind==='house'?79:15,preview.kind==='house'?63:15);}
  if(guide){const g=guide;c.strokeStyle='#fff1ac';c.lineWidth=1;const bounce=reduce?0:Math.floor(Math.sin(time/250)*2);c.beginPath();c.moveTo(g.x*16+4,g.y*16-9+bounce);c.lineTo(g.x*16+8,g.y*16-5+bounce);c.lineTo(g.x*16+12,g.y*16-9+bounce);c.stroke();}
  const people=[{x:px,y:py,look:s.player,name:'',frame,dir:direction}];
- if(out)people.push({x:18*16+8,y:17*16+12,look:{skin:3,hair:0,shirt:1,hat:'cap'},name:'Orin'});
- const m=mara(s);if(m)people.push({x:m.x*16+8,y:m.y*16+12,look:{skin:2,hair:2,shirt:3,style:1},name:'Mara'});
- const layers=people.map(p=>({y:p.y,draw:()=>{person(c,p.x,p.y,p.look,p.frame||0,p.dir||'down');if(p.name)label(c,p.x,p.y-27,p.name);if(!p.name&&(s.carry.wood+s.carry.stone||s.story.basket==='held')){r(c,p.x-8,p.y-2,7,6,'#bd9b65');r(c,p.x-8,p.y-3,7,1,'#ead09a');if(s.story.basket==='held'){r(c,p.x-8,p.y-6,1,4,'#ead09a');r(c,p.x-2,p.y-6,1,4,'#ead09a');r(c,p.x-7,p.y-7,5,1,'#ead09a');}}}}));
+ for(const actor of v.npcs||[]){people.push({x:actor.x*16+8,y:actor.y*16+12,actor,name:actor.name==='mara'?'Mara':'Orin',look:actor.name==='mara'?{skin:2,hair:2,shirt:3,style:1}:{skin:3,hair:0,shirt:1,hat:'cap'}});}
+ const layers=people.map(p=>({y:p.y,draw:()=>{if(!p.actor||!drawCharacter(c,p.actor,p.x,p.y))person(c,p.x,p.y,p.look,p.frame||0,p.dir||'down');if(p.name)label(c,p.x,p.y-32,p.name);if(!p.name&&(s.carry.wood+s.carry.stone||s.story.basket==='held')){r(c,p.x-8,p.y-2,7,6,'#bd9b65');r(c,p.x-8,p.y-3,7,1,'#ead09a');if(s.story.basket==='held'){r(c,p.x-8,p.y-6,1,4,'#ead09a');r(c,p.x-2,p.y-6,1,4,'#ead09a');r(c,p.x-7,p.y-7,5,1,'#ead09a');}}}}));
+
  if(out)for(let j=0;j<TREES.length;j++){const t=TREES[j];layers.push({y:t.y*16+12,draw:()=>tree(c,t.x,t.y,j)});}layers.sort((a,b)=>a.y-b.y).forEach(p=>p.draw());
  c.restore();
 }
