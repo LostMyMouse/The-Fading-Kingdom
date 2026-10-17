@@ -25,3 +25,11 @@ The suite now has 37 passing checks: 29 previous regressions and eight for arriv
 The dialogue-close handler also avoids cancelling a new walk started by a dialogue choice. The first equipment handover uses that path to guide the player toward the garden.
 
 Live browser observations are recorded after the release is exercised. Real touch hardware and child playtesting remain separate checks.
+
+## Live browser observations
+
+Verified a new story through normal character creation, all three opening beats, a reload resuming the second beat, journal replay, and Escape skipping an unfinished opening. At 320×740 the letter dialog fits the game viewport without horizontal overflow. An initial asynchronous close-event bug was found and corrected; the previous appearance dialog can no longer silently skip the opening. Controls are disabled until their handlers are ready.
+
+Using a valid prepared save whose home and cooking milestones were completed through the rules, verified Orin’s handover, the dialogue button’s walk to the garden, watering three planted crops with one interaction, and the earned tool surviving reload and appearing in the equipment page. The equipment preview labels remaining tiers as later-chapter content. This is not a claim of physical touch-device testing.
+
+The pre-test browser save was backed up through the visible text export, restored through the file-import UI, re-exported, and compared exactly with the original. Test rewards were not left in the player’s story.
