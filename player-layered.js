@@ -7,12 +7,14 @@ export const PLAYER_RECTS=[
  [[38,584,209,361],[288,584,217,363],[519,584,218,363],[777,584,209,361]],
  [[35,988,217,366],[287,988,218,369],[519,988,218,369],[773,988,213,366]]
 ];
+export const HAIRSTYLES=[[0,'Tousled'],[1,'Tied back'],[3,'Rounded bob'],[4,'Twin puffs']];
+export const HAIR_RECTS=[[[34,131,273,433],[349,134,254,433],[652,134,253,432],[946,131,274,433]],[[37,649,281,458],[349,647,262,464],[642,647,260,464],[931,647,285,460]]];
 const views={down:0,left:1,right:2,up:3};
 // The same joints/timeline as the NPCs, fitted to this character's hair and sleeve silhouette.
 const layout={left:{arm:[.51,.53,.73,.80],torso:[.24,.53,.67,.88]},right:{arm:[.27,.53,.49,.80],torso:[.33,.53,.76,.88]}};
 export function playerPose(frame=0,walking=false,reduce=false){return gaitPose(walking&&!reduce?frame:0);}
-let atlas=null,cap=null,ready=false,failed=false,loading=null;const cache=new Map();
-export function preparePlayer(){if(loading)return loading;loading=Promise.all([['atlas','./assets/player/coherent-template.png'],['cap','./assets/player/parts.png']].map(([name,url])=>new Promise(resolve=>{const img=new Image();img.onload=()=>resolve(true);img.onerror=()=>resolve(false);if(name==='atlas')atlas=img;else cap=img;img.src=new URL(url,import.meta.url).href;}))).then(([body])=>{ready=body;failed=!body;return body;});return loading;}
+let atlas=null,hairAtlas=null,cap=null,ready=false,failed=false,loading=null;const cache=new Map();
+export function preparePlayer(){if(loading)return loading;loading=Promise.all([['atlas','./assets/player/coherent-template.png'],['cap','./assets/player/parts.png'],['hair','./assets/player/hairstyles.png']].map(([name,url])=>new Promise(resolve=>{const img=new Image();img.onload=()=>resolve(true);img.onerror=()=>resolve(false);if(name==='atlas')atlas=img;else if(name==='hair')hairAtlas=img;else cap=img;img.src=new URL(url,import.meta.url).href;}))).then(([body])=>{ready=body;failed=!body;return body;});return loading;}
 export function playerArtStatus(){return failed?'unavailable':ready?'ready':'loading';}
 const rgb=hex=>[1,3,5].map(i=>parseInt(hex.slice(i,i+2),16));
 const mix=(a,b,t)=>a.map((v,i)=>Math.round(v*(1-t)+b[i]*t));
@@ -27,10 +29,10 @@ export function sourceMaterial(r,g,b,y){
  return null;
 }
 function body(d,look){
- const key=[d,look.style===1?1:0,look.outfit??0,look.skin??1,look.hair??0,look.shirt??0].join(':');
+ const key=[d,look.style??0,look.outfit??0,look.skin??1,look.hair??0,look.shirt??0].join(':');
  if(cache.has(key))return cache.get(key);
  const out=document.createElement('canvas');out.width=216;out.height=366;const c=out.getContext('2d',{willReadFrequently:true});c.imageSmoothingEnabled=false;
- c.drawImage(atlas,...PLAYER_RECTS[look.style===1?1:0][d],0,0,216,366);
+ if(look.style>=3&&hairAtlas?.complete&&hairAtlas.naturalWidth)c.drawImage(hairAtlas,...HAIR_RECTS[look.style-3][d],0,0,216,366);else c.drawImage(atlas,...PLAYER_RECTS[look.style===1?1:0][d],0,0,216,366);
  const original=c.getImageData(0,0,216,366);
  if(look.outfit===1){const r=PLAYER_RECTS[2][d];c.clearRect(0,183,216,117);c.drawImage(atlas,r[0],r[1]+r[3]*.5,r[2],r[3]*.32,0,183,216,117);
   // Preserve tied hair in front of a new shirt, including the low ponytail in profile/back views.

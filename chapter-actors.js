@@ -1,8 +1,10 @@
+import {rowan} from './chapter-gardener.js';
 import {createBakeryVisitor} from './chapter-visits.js';
 import {blinkAt} from './chapter-motion.js';
 import {blocked,mara,FIXED,route} from './chapter-model.js';
 // Scene actors are transient presentation state; they never change saves or rewards.
 export const SPRITE_RECTS={
+ rowan:[[80,16,148,231],[321,16,148,234],[560,16,147,231],[802,16,147,233],[80,254,144,226],[320,254,145,226],[560,254,145,226],[801,257,145,223],[80,487,149,228],[319,487,149,228],[560,487,149,228],[799,488,149,227],[80,723,147,224],[320,724,147,223],[560,723,146,224],[802,724,146,223],[79,960,151,243],[320,960,151,243],[559,960,151,243],[801,959,157,244],[71,1215,161,272],[317,1215,157,272],[552,1215,160,272],[798,1215,159,272]],
  mara:[[78,21,147,227],[320,21,147,230],[552,21,146,227],[793,21,150,230],[94,258,139,223],[337,261,134,219],[572,261,136,219],[812,261,139,219],[85,491,142,223],[332,492,141,222],[561,491,143,223],[808,492,141,222],[93,723,130,221],[339,723,129,223],[568,723,129,222],[812,723,127,223],[84,964,145,237],[323,964,145,237],[559,964,146,237],[793,962,150,239],[76,1217,154,274],[314,1217,159,274],[547,1216,175,275],[793,1217,161,274]],
  orin:[[89,25,136,223],[337,24,135,227],[569,24,135,224],[822,24,137,227],[94,260,126,225],[337,261,128,222],[579,261,125,224],[825,260,126,223],[93,496,132,227],[345,496,131,224],[575,496,133,227],[827,496,132,227],[97,730,122,225],[340,729,121,224],[578,730,124,225],[826,730,121,226],[79,964,142,239],[330,965,139,242],[571,965,140,239],[820,964,154,238],[74,1216,160,242],[332,1216,150,243],[551,1216,169,242],[819,1216,140,242]]
 };
@@ -17,6 +19,7 @@ export function animationFrame({direction='down',walking=false,work=false,emotio
  return (rows[direction]??0)*4;
 }
 export function routineFor(s,name,anchor){
+ if(name==='rowan')return s.room==='garden'?[{...anchor,hold:10000,work:true,face:'down',activity:'Sorting seeds'},{x:10,y:6,hold:6000,face:'left',activity:'Checking seedlings'},{x:11,y:7,hold:7000,face:'down',activity:'Taking a break'}]:[{...anchor,hold:11000,work:true,face:'down',activity:'Tending the nursery'},{x:44,y:12,hold:6500,face:'up',activity:'Checking the berry pots'},{x:42,y:12,hold:6500,face:'right',activity:'Taking a break'}];
  if(s.room==='bakery')return [
   {x:11,y:5,hold:11000,work:true,face:'down',activity:'Baking'},
   {x:10,y:6,hold:6000,face:'left',activity:'Tidying the kitchen'},
@@ -42,7 +45,7 @@ export function routineFor(s,name,anchor){
 export function createActors(){
  const actors=new Map(),visitor=createBakeryVisitor();
  return {reset(){actors.clear();visitor.reset();},location(name){return name==='orin'?visitor.location():null;},update(s,dt,{paused=false,reduce=false,cue=null}={}){
-  const visit=visitor.update(s,dt,{paused,reduce,cue});const delta=Math.max(0,Math.min(dt,50)),anchors=[];if(s.room==='outside'&&!visit)anchors.push(['orin',FIXED.orin]);const m=mara(s);if(m)anchors.push(['mara',m]);
+  const visit=visitor.update(s,dt,{paused,reduce,cue});const delta=Math.max(0,Math.min(dt,50)),anchors=[];if(s.room==='outside'&&!visit)anchors.push(['orin',FIXED.orin]);const m=mara(s);if(m)anchors.push(['mara',m]);const r=rowan(s);if(r)anchors.push(['rowan',r]);
   const visible=new Set(anchors.map(([name])=>name));for(const name of actors.keys())if(!visible.has(name))actors.delete(name);
   const views=anchors.map(([name,anchor])=>{
    const key=s.room+':'+anchor.x+','+anchor.y;let a=actors.get(name);
@@ -71,7 +74,7 @@ export function createActors(){
    if(speaking&&cue.talking){const dx=s.player.x-a.x,dy=s.player.y-a.y;a.direction=Math.abs(dx)>Math.abs(dy)?dx>0?'right':'left':dy>0?'down':'up';}
    const work=!speaking&&!walking&&!a.next&&!a.path.length&&!!stops[a.index].work;
    const emotion=speaking?cue.emotion:'neutral',talking=!!(speaking&&cue.talking);
-   return {blink:blinkAt(a.clock,name==='mara'?1:4,reduce),gait:a.clock/150,name,anchor:{...anchor},x:a.x,y:a.y,tileX:Math.round(a.x),tileY:Math.round(a.y),direction:a.direction,walking,work,emotion,talking,activity:stops[a.index].activity,clock:a.clock,frame:animationFrame({direction:a.direction,walking,work,emotion,talking,clock:a.clock,reduce})};
+   return {blink:blinkAt(a.clock,name==='mara'?1:name==='rowan'?3:4,reduce),gait:a.clock/150,name,anchor:{...anchor},x:a.x,y:a.y,tileX:Math.round(a.x),tileY:Math.round(a.y),direction:a.direction,walking,work,emotion,talking,activity:stops[a.index].activity,clock:a.clock,frame:animationFrame({direction:a.direction,walking,work,emotion,talking,clock:a.clock,reduce})};
   });if(visit&&visit.room===s.room){visit.frame=animationFrame({...visit,reduce});views.push(visit);}return views;
  }};
 }

@@ -1,3 +1,4 @@
+import {settleGardener} from './chapter-gardener.js';
 import {initialBakery,bakeryAction,settleLunch,readBakery} from './chapter-bakery.js';
 // Village cooperation, expressed through work and supplies rather than a morality score.
 export const PROJECTS={nursery:{name:'Restore the nursery',gold:18,wood:4,stone:2,benefit:'Pick fresh berries each day, starting tomorrow.'},market:{name:'Open the market stall',gold:24,wood:4,stone:2,benefit:'A place for breakfast and passing trade. Bakery contributions grow by 4 G a day.'}};
@@ -11,7 +12,7 @@ export function record(s,kind,amount){s.economy.ledger.push({day:s.day,kind,amou
 export function fundHome(s){if(s.economy.homeFunded)return true;if(s.economy.gold<12)return false;s.economy.gold-=12;s.economy.homeFunded=true;record(s,'home',-12);return true;}
 export function settleVillageDay(s){const v=s.economy;if(v.lastDay>=s.day)return 0;v.lastDay=s.day;v.lastIncome=0;v.lastBatch='closed';if(!bakeryOpen(s))return 0;
  const short=missingFlour(s);v.lastBatch=short?'small':'full';if(short)v.flour.noticed=true;else v.fullDays++;
- const lunch=settleLunch(s);const income=(short?4:10)+(v.projects.market?4:0)+lunch;v.gold+=income;v.lastIncome=income;record(s,'bakery',income-lunch);if(lunch)record(s,'lunch',lunch);return income;
+ const lunch=settleLunch(s),seeds=settleGardener(s);const income=(short?4:10)+(v.projects.market?4:0)+lunch+seeds;v.gold+=income;v.lastIncome=income;record(s,'bakery',income-lunch-seeds);if(seeds)record(s,'seedstall',seeds);if(lunch)record(s,'lunch',lunch);return income;
 }
 const near=(s,p)=>Math.abs(s.player.x-p.x)+Math.abs(s.player.y-p.y)<=1;
 const shelf=s=>s.room==='bakery'&&near(s,{x:3,y:10});
@@ -33,9 +34,9 @@ export function economyAction(s,id,data={}){const v=s.economy,i=s.inventory;
  }
 }
 export function readEconomy(s,int){const v=s.economy===undefined?initialEconomy(s.day,s.house?.stage===3):s.economy;
- if(!v||!int(v.gold,0,1000000000)||!int(v.lastDay,0,s.day)||!int(v.lastIncome,0,18)||!int(v.fullDays,0,s.day)||!['closed','full','small'].includes(v.lastBatch)||!int(v.berryDay,0,s.day)||['homeFunded','recipe','fruitBatch'].some(k=>typeof v[k]!=='boolean'))throw Error('Invalid village fund');
+ if(!v||!int(v.gold,0,1000000000)||!int(v.lastDay,0,s.day)||!int(v.lastIncome,0,24)||!int(v.fullDays,0,s.day)||!['closed','full','small'].includes(v.lastBatch)||!int(v.berryDay,0,s.day)||['homeFunded','recipe','fruitBatch'].some(k=>typeof v[k]!=='boolean'))throw Error('Invalid village fund');
  if(!v.projects||['nursery','market'].some(k=>typeof v.projects[k]!=='boolean'))throw Error('Invalid village project');
  if(!v.flour||!['shelf','held','used','replacement','returned','replaced'].includes(v.flour.state)||typeof v.flour.noticed!=='boolean'||!int(v.flour.takenDay,0,s.day)||!int(v.flour.repairedDay,0,s.day))throw Error('Invalid flour supply');
- if(!Array.isArray(v.ledger)||v.ledger.length>8||v.ledger.some(e=>!e||!int(e.day,1,s.day)||!['welcome','home','bakery','nursery','market','lunch','porch'].includes(e.kind)||!int(e.amount,-1000,1000)))throw Error('Invalid village ledger');
+ if(!Array.isArray(v.ledger)||v.ledger.length>8||v.ledger.some(e=>!e||!int(e.day,1,s.day)||!['welcome','home','bakery','nursery','market','lunch','porch','gardenhome','seedstall'].includes(e.kind)||!int(e.amount,-1000,1000)))throw Error('Invalid village ledger');
  return {bakery:readBakery(v.bakery,s.day,int),gold:v.gold,homeFunded:v.homeFunded,lastDay:v.lastDay,lastIncome:v.lastIncome,lastBatch:v.lastBatch,fullDays:v.fullDays,projects:{nursery:v.projects.nursery,market:v.projects.market},berryDay:v.berryDay,recipe:v.recipe,fruitBatch:v.fruitBatch,flour:{state:v.flour.state,noticed:v.flour.noticed,takenDay:v.flour.takenDay,repairedDay:v.flour.repairedDay},ledger:v.ledger.map(e=>({day:e.day,kind:e.kind,amount:e.amount}))};
 }

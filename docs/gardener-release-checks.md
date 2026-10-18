@@ -1,0 +1,13 @@
+# Gardener and hairstyle release checks · 0.9.0
+
+19 October 2026. All 99 automated checks pass, alongside changed-runtime syntax checks. New regressions cover invitation gating, freely placed second-home stages and relocation, independent doors and interiors, separate daily income, repeat-safe seed gifts, paid trades, two-watered-night crops, missed watering and mid-growth reload, the row sower, parcel discovery/repair, independent Rowan routines, save migration, hairstyle IDs and guided routing around unrelated thresholds.
+
+Manual playthrough used a separate gardener-review save. Restored an arrival fixture at the nursery, met and invited Rowan, moved the home preview, placed a Timber cottage at 18,8, walked to the sign, funded all three stages (100 G to 60 G), entered the separate interior, collected seeds, planted two marigolds and one turnip, watered and slept twice through actual controls. Each morning added bakery 10 G plus seed shop 6 G. Harvested two marigolds and one turnip, spoke to Rowan and earned the row sower. Exported save confirmed the completed house, crops consumed once, tool and 92 G.
+
+Art checks used production renderers. Reviewed Rowan beside Mara, Orin and the player at common height/baseline, in front, both profiles and back, gameplay and close-up sizes, contact poses and closed eyes. Reviewed all eight new hairstyle × shirt × cap assemblies in four directions at both opposite contact poses. Reviewed all six skin, six hair and six clothing palettes separately on each new style. This is not a claim that every Cartesian product of all palette colours was inspected. All six Rowan dialogue expressions were compared with both canonical atlases at dialogue size. No original character or portrait PNG was changed.
+
+The actual creator/mirror offers the new styles. Saved twin puffs, darkest skin, light hair and vest, reloaded and reopened the mirror: choices persisted. Inspected the phone creator and Rowan dialogue at 320×740, and dialogue at tablet 768×1024; document width matched viewport width. Screenshots are in outputs/gardener-and-hair.
+
+The playthrough found and corrected guided paths entering the bakery en route to another building. Further refinements clarify combined business income, put the garden-room guide at the seed counter, improve flower readability and show the tagged parcel/reduced seed stock.
+
+Limits: device-size browser emulation, not physical touch-device performance. Shared world animation remains the cutout prototype; Mara/Rowan routines remain room-local. Basket/hand attachment and additional gathering equipment remain deferred. Production save progress was not used for playtesting or replaced.

@@ -37,3 +37,7 @@ The shared village treasury now supports Mara’s first home, daily bakery contr
 
 ### 0.8.0 · A lived-in bakery
 Orin visits the kitchen for breakfast, a shared lunch job creates remembered dialogue and a one-time village contribution, and the completed job unlocks flowering windows and warm bakery lights. See docs/bakery-life.md for scope and save compatibility.
+
+
+### 0.9.0 · Rowan and new hairstyles
+Invite a gardener, freely place a second home, visit its seed shop and grow turnips or marigolds. Flowers for the village earn a row sower. Rounded bob and twin-puff hairstyles join the creator. See docs/gardener-and-hairstyles.md.

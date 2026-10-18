@@ -93,3 +93,7 @@ Implemented the village treasury, once-per-day bakery contributions, physical fl
 
 ## Bakery life · 0.8.0
 Persistent cross-room breakfast visits, a remembered workshop lunch, and an earned bakery window-box/light improvement are implemented. The sideways basket/hand attachment bug is recorded for the later animation polish pass, alongside all carried tools in every direction.
+
+
+## Rowan and hairstyles · 0.9.0
+Implemented the nursery visitor, optional invitation, a freely placed second home with enterable seed shop, turnips and marigolds, a flower favour earning a row sower, local parcel consequences and separate business contributions. Added rounded-bob and twin-puff creator styles and matched Rowan copper-curl art. The basket attachment issue remains deferred.

@@ -1,3 +1,4 @@
+import {ROWAN_LINES} from './chapter-gardener.js';
 import {BAKERY_LINES} from './chapter-bakery.js';
 // Authored line expressions; no sentiment analysis or morality score.
 export const EXPRESSIONS=['neutral','happy','amused','thoughtful','surprised','concerned'];
@@ -68,9 +69,10 @@ groups.happy.push('There we go. A full batch tomorrow. Thanks for sorting that o
 groups.happy.push(BAKERY_LINES.accept,BAKERY_LINES.delivered,BAKERY_LINES.ready,BAKERY_LINES.done,BAKERY_LINES.built);
 groups.thoughtful.push(BAKERY_LINES.ask,BAKERY_LINES.waiting,BAKERY_LINES.late,BAKERY_LINES.porch);
 groups.amused.push(BAKERY_LINES.decline,'Caught myself watering the window boxes before breakfast. Nearly watered my toast as well.','Remember that tray we made for Orin? He brought it back so clean I nearly put it straight in the cupboard.','Those carrot buns you and Mara made? Didn’t get much carpentry done until they were gone.');
+groups.happy.push(ROWAN_LINES.hello,ROWAN_LINES.settled,ROWAN_LINES.thanks,ROWAN_LINES.repaired);groups.thoughtful.push(ROWAN_LINES.invite,ROWAN_LINES.help);groups.concerned.push(ROWAN_LINES.missing);groups.amused.push(ROWAN_LINES.chatter);
 const authored=new Map(Object.entries(groups).flatMap(([expression,lines])=>lines.map(text=>[text,expression])));
 export function portraitFor(speaker,text,expression=authored.get(text)||'neutral'){
- const name=speaker.toLowerCase();if(!['mara','orin'].includes(name))return null;
+ const name=speaker.toLowerCase();if(!['mara','orin','rowan'].includes(name))return null;
  const frame=Math.max(0,EXPRESSIONS.indexOf(expression));
  return {name,expression:EXPRESSIONS[frame],src:'./assets/portraits/'+name+'-expressions.png',position:(frame%3*50)+'% '+(Math.floor(frame/3)*100)+'%'};
 }

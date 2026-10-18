@@ -14,5 +14,6 @@ export function blinkAt(clock=0,seed=0,reduce=false){if(reduce)return false;cons
 export function doorAt(s,p=s.player){
  if(s.room!=='outside')return p.x===8&&p.y===12?'exit':null;
  if(p.x===11&&p.y===12)return 'enterHome';
+ const g=s.gardener?.house;if(g?.stage===3&&p.x===g.x+2&&p.y===g.y+4)return 'enterGarden';
  const h=s.house;return h?.stage===3&&p.x===h.x+2&&p.y===h.y+4?'enterBakery':null;
 }
