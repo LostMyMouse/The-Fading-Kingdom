@@ -1,3 +1,4 @@
+import {carryCapacity,canEarnCarryBasket,BASKET_LINES} from './chapter-hauling.js';
 import {ROWAN_LINES,GARDEN_COSTS,CROPS,gardenerHere,rowan,validGardenHouse} from './chapter-gardener.js';
 import {BAKERY_LINES,PORCH_COST,orderAvailable} from './chapter-bakery.js';
 import {advanceWalk,STEP_MS,blinkAt,doorAt} from './chapter-motion.js';
@@ -5,14 +6,14 @@ import {PROJECTS,MARKET,bakeryOpen,missingFlour,hasFlour,canOfferRecipe} from '.
 import {preparePlayer,drawPlayer,HAIRSTYLES} from './player-layered.js';
 import {createActors} from './chapter-actors.js';
 import {prepareCharacters} from './chapter-characters.js';
-import {portraitFor} from './chapter-portraits.js';
+import {portraitFor,preparePortraits} from './chapter-portraits.js';
 import {ARRIVAL,EQUIPMENT} from './chapter-progression.js';
 import {SAVE_KEY,W,H,STYLES,DECOR,RESOURCES,FIXED,fresh,mara,blocked,route,walkingRoute,validHouse,validDecor,goal,act,readSave,wateringArea,canEarnWideCan} from './chapter-model.js';
 import {draw} from './chapter-world.js';
 import {person,icon} from './world.js';
 import {SKINS,HAIRS,SHIRTS} from './model.js';
 const $=id=>document.getElementById(id),canvas=$('world'),ctx=canvas.getContext('2d'),dialog=$('dialog');
-const actors=createActors();let npcViews=[],npcCue=null;prepareCharacters();preparePlayer();
+const actors=createActors();let npcViews=[],npcCue=null;
 let cropChoice='carrot';
 let arrivalOpen=false,waterTarget=null,afterDoor=null;
 let s=fresh(),stored=null,playing=false,tool='hands',path=[],arrival=null,keys=new Set(),preview=null,guide=false,rotation=0,undo=null,width=480,height=280,camera={x:0,y:0},last=0,step=0,walkClock=0,walking=false,old={x:s.player.x,y:s.player.y},direction='down',saveTimer,toastTimer,saveError='',loadError='',audio=null,musicTimer=null,activity=null;
@@ -27,7 +28,7 @@ function sound(kind='tap'){
  if(!s.settings.sound&&!s.settings.music)return;try{audio??=new AudioContext();if(audio.state==='suspended')audio.resume();if(!s.settings.sound)return;const osc=audio.createOscillator(),gain=audio.createGain();osc.type='sine';osc.frequency.setValueAtTime(kind==='grow'?659:kind==='water'?420:330,audio.currentTime);osc.frequency.exponentialRampToValueAtTime(kind==='grow'?880:220,audio.currentTime+.12);gain.gain.setValueAtTime(.045,audio.currentTime);gain.gain.exponentialRampToValueAtTime(.001,audio.currentTime+.2);osc.connect(gain).connect(audio.destination);osc.start();osc.stop(audio.currentTime+.22);}catch{ /* Audio is optional. */ }
 }
 function music(){clearInterval(musicTimer);musicTimer=null;if(!playing||!s.settings.music||document.hidden)return;try{audio??=new AudioContext();audio.resume();let n=0;const notes=[261.63,329.63,392,329.63,293.66,349.23,440,349.23,261.63,329.63,392,523.25,440,392,329.63,293.66];musicTimer=setInterval(()=>{if(audio.state!=='running')return;const o=audio.createOscillator(),g=audio.createGain(),now=audio.currentTime;o.type='sine';o.frequency.value=notes[n++%notes.length];g.gain.setValueAtTime(0,now);g.gain.linearRampToValueAtTime(.018,now+.07);g.gain.exponentialRampToValueAtTime(.001,now+.85);o.connect(g).connect(audio.destination);o.start();o.stop(now+.9);},750);}catch{toast('Music is unavailable in this browser.');}}
-function run(id,data){const text=act(s,id,['upgradeCan','tradeFlour','giveFlowers'].includes(id)?{...data,npc:npcTarget(id==='giveFlowers'?'rowan':'orin')}:data);save();sound(['farm','bake','finish','build'].includes(id)?'grow':id==='water'?'water':'tap');return text;}
+function run(id,data){const text=act(s,id,['upgradeCan','claimBasket','tradeFlour','giveFlowers'].includes(id)?{...data,npc:npcTarget(id==='giveFlowers'?'rowan':'orin')}:data);save();sound(['farm','bake','finish','build'].includes(id)?'grow':id==='water'?'water':'tap');return text;}
 function reply(name,id,data,after){const text=run(id,data);show(name,text,[['All right',()=>{close();after?.();}]]);}
 function show(title,text,choices=[],tag='ROOM FOR ONE MORE'){
  stop();const body=$('dialog-content');body.classList.remove('arrival-card');body.replaceChildren();body.append(el('div',tag,'eyebrow'));
@@ -61,11 +62,13 @@ function equipmentMenu(){
  show('Tools for the growing village','A few ways to make the everyday jobs a little easier.',[['Find Orin',()=>{close();if(s.room==='outside')approachNpc('orin',orinEquipment);else toast('Step outside and look for Orin near his cart or supplies.');}]],'YOUR EQUIPMENT');
  if(s.gardener.house?.stage===3){const box=el('section',null,'journal-entry');box.append(el('h3','Row seed sower'),el('div',s.gardener.sower?'Earned · fitted to your seed basket':'Grow two marigolds for Rowan','eyebrow'),el('p','Plants up to three empty patches in a row, using one seed per patch. Choose a crop with Seeds.'));$('dialog-content').append(box);}
  for(const [j,item]of EQUIPMENT.entries()){
-  const box=el('section',null,'journal-entry');let status=j===0?(s.story.wideCan?'Upgraded · wide spout fitted':s.story.kit?'In your tool basket':'Collect by your cottage'):j===1?(s.story.wideCan?'Earned · fitted to your can':canEarnWideCan(s)?'Ready · visit Orin':'After Mara’s home and first batch'):'Later chapter';
+  const box=el('section',null,'journal-entry');let status=j===0?(s.story.wideCan?'Upgraded · wide spout fitted':s.story.kit?'In your tool basket':'Collect by your cottage'):j===1?(s.story.wideCan?'Earned · fitted to your can':canEarnWideCan(s)?'Ready · visit Orin':'After Mara’s home and first batch'):j===2?(s.story.carryBasket?'Earned · yours to keep':canEarnCarryBasket(s)?'Ready · visit Orin':'After Rowan’s home'):'Later chapter';
   box.append(el('h3',item.name),el('div',status,'eyebrow'),el('p',item.benefit),el('p',item.availability,'note'));$('dialog-content').append(box);
  }
 }
+function carryBasketGift(){show('Orin',BASKET_LINES.ask,[['A basket of my own?',()=>{const before=s.story.carryBasket;reply('Orin','claimBasket',{},()=>{if(s.story.carryBasket&&!before){celebrate();toast('Roomy basket earned · carry four materials per trip.');}});}],['I’ll pop back.',close]]);}
 function orinEquipment(){
+ if(canEarnCarryBasket(s)){carryBasketGift();return;}
  if(s.story.timber==='taken'){woodConversation();return;}
  if(s.story.wideCan){show('Orin','Wide spout still behaving? Aim for the middle of a row. Saves a fair bit of pottering.',[['See my equipment',equipmentMenu],['Cheers. See you later.',close]]);return;}
  if(!canEarnWideCan(s)){show('Orin','Get Mara settled and try out that oven. I might have something useful for your garden after that.',[['See what I could earn',equipmentMenu],['I’ll pop back.',close]]);return;}
@@ -105,7 +108,7 @@ function hud(){
  if(preview){const ok=preview.kind==='house'?(preview.owner==='rowan'?validGardenHouse(s,preview.x,preview.y):validHouse(s,preview.x,preview.y)):validDecor(s,preview.type,preview.x,preview.y,preview.index??-1);preview.valid=ok;$('placement-title').textContent=preview.kind==='house'?`${preview.owner==='rowan'?'Rowan · ':''}${STYLES[preview.style]} Cottage`:`${preview.index>=0?'Move':'Place'} ${preview.type}`;$('placement-status').textContent=ok?'Clear site. Tap another spot or confirm here.':'Leave space for doors, resources, and walking routes.';$('placement-confirm').disabled=!ok;$('rotate').classList.toggle('hide',preview.kind==='house'||!['bench','fence'].includes(preview.type));}
  if(activity){$('activity-text').textContent=activity.text;$('activity-next').textContent=activity.label;}
 }
-function inventory(){show('Your basket','Food, materials, and a few bits for the village. Your carrots are saved for cooking.',[...(s.inventory.bun?[['Eat one bun',()=>{toast(run('eat'));close();}]]:[]),...(s.inventory.fruitbun?[['Eat a fruit bun',()=>{toast(run('eatFruit'));close();}]]:[]),...(s.inventory.berry?[['Eat a berry',()=>{toast(run('eatBerry'));close();}]]:[])]);const row=el('div',null,'inventory');for(const [key,name]of [['seed','Carrot seeds'],['carrot','Carrots'],['wood','Wood'],['stone','Stone'],['bun','Vegetable buns'],['berry','Berries'],['fruitbun','Fruit buns'],['turnipSeed','Turnip seeds'],['flowerSeed','Marigold seeds'],['turnip','Turnips'],['marigold','Marigolds']])row.append(el('span',`${name}: ${s.inventory[key]}`));if(s.gardener.parcel==='held')row.append(el('span','Seed parcel: 1'));if(s.gardener.parcel==='used')row.append(el('span','Empty seed wrapper'));if(hasFlour(s))row.append(el('span','Flour sack: 1'));if(s.economy.flour.state==='used')row.append(el('span','Empty flour sack'));if(s.story.timber==='taken')row.append(el('span','Tied bundle of boards: 1'));$('dialog-content').append(row,el('p',`Carrying: ${s.carry.wood} wood, ${s.carry.stone} stone. Drop carried materials at your cottage storage or the building sign.`,'note'));}
+function inventory(){show('Your basket','Food, materials, and a few bits for the village. Your carrots are saved for cooking.',[...(s.inventory.bun?[['Eat one bun',()=>{toast(run('eat'));close();}]]:[]),...(s.inventory.fruitbun?[['Eat a fruit bun',()=>{toast(run('eatFruit'));close();}]]:[]),...(s.inventory.berry?[['Eat a berry',()=>{toast(run('eatBerry'));close();}]]:[])]);const row=el('div',null,'inventory');for(const [key,name]of [['seed','Carrot seeds'],['carrot','Carrots'],['wood','Wood'],['stone','Stone'],['bun','Vegetable buns'],['berry','Berries'],['fruitbun','Fruit buns'],['turnipSeed','Turnip seeds'],['flowerSeed','Marigold seeds'],['turnip','Turnips'],['marigold','Marigolds']])row.append(el('span',`${name}: ${s.inventory[key]}`));if(s.gardener.parcel==='held')row.append(el('span','Seed parcel: 1'));if(s.gardener.parcel==='used')row.append(el('span','Empty seed wrapper'));if(hasFlour(s))row.append(el('span','Flour sack: 1'));if(s.economy.flour.state==='used')row.append(el('span','Empty flour sack'));if(s.story.timber==='taken')row.append(el('span','Tied bundle of boards: 1'));$('dialog-content').append(row,el('p',`Carrying: ${s.carry.wood} wood, ${s.carry.stone} stone · ${s.carry.wood+s.carry.stone}/${carryCapacity(s)} spaces. Drop carried materials at your cottage storage or the building sign.`,'note'));}
 $('basket').onclick=()=>playing&&inventory();
 function journal(){if(!playing)return;const g=goal(s);show('Your journal',g.text,[['Show me the next place',()=>{guide=true;close();if(s.room!=='outside'&&s.story.cooking===0)toast('Your next outdoor destination is marked when you leave.');}],['Read the arrival letter',()=>arrivalSequence(true,0)],['My equipment',equipmentMenu],['Village fund & projects',villageFund]],g.title.toUpperCase());
  for(const [name,stage,note]of [['Mara · baker',missingFlour(s)&&s.economy.flour.noticed?'Morning orders delayed':s.story.cooked?'Growing friendship':'Getting to know you',missingFlour(s)&&s.economy.flour.noticed?'Mara’s order flour is missing. Return the sack, or replace it through Orin and put it on her shelf.':canOfferRecipe(s)?'Mara has a fruit-bun recipe to share. Drop in for a chat.':s.economy.recipe?'Mara shared her fruit-bun recipe: two berries and a carrot. Try it at her kitchen counter.':!s.story.met?'A traveller may stop by after your first harvest.':s.house?.stage===3?'Mara has moved in. You can visit her kitchen and cook.':'Mara needs a kitchen and a little herb space. You choose her home’s style and location.'],['Orin · carpenter',s.story.dependable&&s.story.lifted?'Growing friendship':'Getting to know you',s.story.timber==='taken'&&s.story.timberNoticed?'Orin needs the boards for the mill roof. Bring the bundle back.':s.story.basket==='held'?(s.house?.stage===3?'Orin lent you his basket. Bring it back when you’re finished hauling.':'Return the carry basket before lifting the frame.'):s.story.dependable?'You brought Orin’s basket back before he needed it.':s.story.returned?'The boards are back by Orin’s cart.':'Orin can help build. Loose branches and stones are free to gather.']]){const box=el('section',null,'journal-entry');box.append(el('h3',name),el('span',stage,'eyebrow'),el('p',note));$('dialog-content').append(box);}
@@ -135,7 +138,7 @@ function woodConversation(){
 function orin(){const e=s.story;
  if(e.timber==='taken'){woodConversation();return;}
  if(!e.orin){show('Orin',e.invited?'Building a house, eh? I’m Orin. Made a few of those. Most of them are still standing.':'Morning. I’m Orin. Carpenter. The pile of sawdust probably gave that away.',[['Could you give me a hand?',()=>reply('Orin','orin',{},orin)],['Just saying hello.',()=>smallTalk('orin')],['Catch you later.',close]]);return;}
- const options=[];if(s.economy.flour.state==='used')options.push(['A sack from the mill · 2 carrots',()=>reply('Orin','tradeFlour')]);if(e.basket==='held')options.push([e.late?'Oops. Here’s your basket.':'Here’s your basket. Cheers!',()=>reply('Orin','returnBasket')]);else if(e.basket==='none')options.push(['Can I borrow that basket?',()=>reply('Orin','borrow')]);
+ const options=[];if(canEarnCarryBasket(s))options.push(['A basket of my own?',carryBasketGift]);if(s.economy.flour.state==='used')options.push(['A sack from the mill · 2 carrots',()=>reply('Orin','tradeFlour')]);if(e.basket==='held')options.push([e.late?'Oops. Here’s your basket.':'Here’s your basket. Cheers!',()=>reply('Orin','returnBasket')]);else if(e.basket==='none'&&!e.carryBasket)options.push(['Can I borrow that basket?',()=>reply('Orin','borrow')]);
  options.push(['How’s it going?',()=>smallTalk('orin')],canEarnWideCan(s)?['About my watering can…',orinEquipment]:['Where should I look for supplies?',()=>show('Orin','Try south of the road. Branches, loose stones… plenty lying about. Saves me sweeping them up.',[['Got it.',close]])]);
  show('Orin',e.basket==='held'?'How’s the basket doing? More useful than my pockets, I bet.':s.house?.stage===3?'Mara’s got the oven going, then. Smells better than sawdust.':'Oh, hey. Just sorting these tools. They don’t sort themselves. I’ve checked.',options);
 }
@@ -217,7 +220,15 @@ function tick(now){const dt=Math.min(50,now-last||16);last=now;if(playing&&!dial
  ctx.setTransform(canvas.width/width,0,0,canvas.height/height,0,0);
  const moment=npcViews.find(n=>n.speech);const words=moment&&!dialog.open?moment.speechSpeaker+': '+moment.speech:'';if($('village-moment').textContent!==words)$('village-moment').textContent=words;
  draw(ctx,s,{dialogOpen:dialog.open,npcs:npcViews,width,height,camera,time:now,preview,guide:guide?guideTarget():null,waterArea:waterPreview(),px,py,walking:walking&&!dialog.open&&!preview,frame:walking?walkClock/STEP_MS:0,blink:playing&&!dialog.open&&blinkAt(now,2,reduce),direction,reduce});requestAnimationFrame(tick);}
-window.addEventListener('error',()=>{$('fatal').classList.remove('hide');});resize();hud();$('begin').disabled=false;$('continue').disabled=!stored;requestAnimationFrame(tick);
+window.addEventListener('error',()=>{$('fatal').classList.remove('hide');});resize();hud();requestAnimationFrame(tick);
+async function loadArtwork(){
+ $('begin').disabled=true;$('continue').disabled=true;$('art-retry').classList.add('hide');$('art-status').textContent='Unpacking the village artwork…';
+ const results=await Promise.all([preparePlayer(),prepareCharacters(),preparePortraits()]).catch(()=>[false]);
+ const ready=results.length===3&&results.every(Boolean);$('begin').disabled=!ready;$('continue').disabled=!ready||!stored;
+ $('art-status').textContent=ready?'Ready when you are.':'Some artwork couldn’t load. Your story is safe. Try loading it again.';
+ $('art-retry').classList.toggle('hide',ready);
+}
+$('art-retry').onclick=loadArtwork;loadArtwork();
 
 function villageFund(){
  const v=s.economy,ready=bakeryOpen(s);let news=!v.homeFunded?'The 12 G welcome fund helps finish our first neighbour’s home.':!ready?'Mara has her home. Cook your first batch together to get the bakery going.':v.lastIncome?`Last morning: village businesses +${v.lastIncome} G. ${v.lastBatch==='small'?'A smaller batch: the order flour was missing.':'Bread for the neighbours and passing travellers.'}`:'The oven’s going. The first bakery contribution arrives when you sleep until morning.';

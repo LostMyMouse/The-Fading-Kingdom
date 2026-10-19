@@ -97,3 +97,7 @@ Persistent cross-room breakfast visits, a remembered workshop lunch, and an earn
 
 ## Rowan and hairstyles · 0.9.0
 Implemented the nursery visitor, optional invitation, a freely placed second home with enterable seed shop, turnips and marigolds, a flower favour earning a row sower, local parcel consequences and separate business contributions. Added rounded-bob and twin-puff creator styles and matched Rowan copper-curl art. The basket attachment issue remains deferred.
+
+
+## Art audit and hauling · 0.9.1
+The previously deferred basket attachment issue is corrected using the shared hand pivot. NPC action head scale and shirt/hair overlap are corrected, and all required artwork loads before play. Orin now makes a permanent four-material carry basket after the two homes and first bakery batch. See art-audit-and-hauling.md for the exact visual checks, gameplay verification and remaining device limits. Chopping/mining and the arrival cutscene remain future work.

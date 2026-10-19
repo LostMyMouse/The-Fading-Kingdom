@@ -7,7 +7,7 @@ export const ARRIVAL=[
 export const EQUIPMENT=[
  {name:'Everyday watering can',benefit:'Waters one planted plot at a time.',availability:'In your starting tool basket.'},
  {name:'Wide-spout watering can',benefit:'Waters up to three planted plots across a row with one action.',availability:'Orin can fit the new spout after Mara has moved in and you’ve cooked your first batch together.'},
- {name:'Roomy carry basket',benefit:'A permanent basket for carrying more supplies.',availability:'Planned for a later chapter. The borrowed basket is available now.'},
+ {name:'Roomy carry basket',benefit:'Carry four wood or stone bundles per trip, instead of one. Yours to keep.',availability:'Orin makes one after Mara’s bakery is open and Rowan’s home is finished. Return his loan basket first.'},
  {name:'Row-making hoe',benefit:'Prepare several squares of soil in one action.',availability:'Planned for a later chapter.'},
  {name:'Garden irrigation',benefit:'Keep a chosen growing patch watered.',availability:'Planned for a later chapter.'}
 ];

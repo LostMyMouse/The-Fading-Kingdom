@@ -1,4 +1,6 @@
 import {drawPlayer} from './player-layered.js';
+import {drawCarryBasket} from './character-attachments.js';
+import {handAnchor} from './character-rig.js';
 import {drawCharacter} from './chapter-characters.js';
 import {person,icon} from './world.js';
 import {W,H,TREES,RESOURCES,FIXED,mara,validHouse,validDecor} from './chapter-model.js';
@@ -64,7 +66,7 @@ export function draw(c,s,v){
  if(guide){const g=guide;c.strokeStyle='#fff1ac';c.lineWidth=1;const bounce=reduce?0:Math.floor(Math.sin(time/250)*2);c.beginPath();c.moveTo(g.x*16+4,g.y*16-9+bounce);c.lineTo(g.x*16+8,g.y*16-5+bounce);c.lineTo(g.x*16+12,g.y*16-9+bounce);c.stroke();}
  const people=[{x:px,y:py,look:s.player,name:'',frame,dir:direction}];
  for(const actor of v.npcs||[]){people.push({x:actor.x*16+8,y:actor.y*16+12,actor,name:actor.name==='mara'?'Mara':actor.name==='rowan'?'Rowan':'Orin',look:actor.name==='mara'?{skin:2,hair:2,shirt:3,style:1}:{skin:3,hair:0,shirt:1,hat:'cap'}});}
- const layers=people.map(p=>({y:p.y,draw:()=>{if(p.actor){if(!drawCharacter(c,p.actor,p.x,p.y))person(c,p.x,p.y,p.look);}else if(!drawPlayer(c,p.x,p.y,p.look,p.frame||0,p.dir||'down',v.walking,reduce,v.blink))person(c,p.x,p.y,p.look,p.frame||0,p.dir||'down');if(p.name)label(c,p.x,p.y-36,p.name);if(!p.name&&(s.carry.wood+s.carry.stone||s.story.basket==='held')){r(c,p.x-8,p.y-2,7,6,'#bd9b65');r(c,p.x-8,p.y-3,7,1,'#ead09a');if(s.story.basket==='held'){r(c,p.x-8,p.y-6,1,4,'#ead09a');r(c,p.x-2,p.y-6,1,4,'#ead09a');r(c,p.x-7,p.y-7,5,1,'#ead09a');}}}}));
+ const layers=people.map(p=>({y:p.y,draw:()=>{const pose={direction:p.dir||'down',frame:p.frame||0,walking:v.walking,reduce},carry=!p.name&&(s.carry.wood+s.carry.stone||s.story.basket==='held'),behind=handAnchor(pose).behind,handles=s.story.basket==='held'||s.story.carryBasket;if(carry&&behind)drawCarryBasket(c,p.x,p.y,pose,handles);if(p.actor){if(!drawCharacter(c,p.actor,p.x,p.y))person(c,p.x,p.y,p.look);}else if(!drawPlayer(c,p.x,p.y,p.look,p.frame||0,p.dir||'down',v.walking,reduce,v.blink))person(c,p.x,p.y,p.look,p.frame||0,p.dir||'down');if(carry&&!behind)drawCarryBasket(c,p.x,p.y,pose,handles);if(p.name)label(c,p.x,p.y-36,p.name);}}));
 
  if(out)for(let j=0;j<TREES.length;j++){const t=TREES[j];layers.push({y:t.y*16+12,draw:()=>tree(c,t.x,t.y,j)});}layers.sort((a,b)=>a.y-b.y).forEach(p=>p.draw());
  if(!v.dialogOpen){const voice=(v.npcs||[]).find(n=>n.speech);if(voice){const speaker=voice.speechSpeaker==='Mara'?(v.npcs||[]).find(n=>n.name==='mara'):voice;if(speaker){const sx=speaker.x*16+8,sy=speaker.y*16-34;if(sx>camera.x&&sx<camera.x+width&&sy>camera.y&&sy<camera.y+height){const words=voice.speech.split(' '),lines=[''];for(const word of words){if((lines.at(-1)+' '+word).trim().length>23)lines.push(word);else lines[lines.length-1]=(lines.at(-1)+' '+word).trim();}c.font='7px system-ui';c.textAlign='center';const bw=Math.max(...lines.map(line=>c.measureText(line).width))+12,bh=lines.length*10+8,bx=Math.max(camera.x+3,Math.min(camera.x+width-bw-3,sx-bw/2)),by=Math.max(camera.y+3,sy-bh);r(c,bx-1,by-1,bw+2,bh+2,'#6f593f');r(c,bx,by,bw,bh,'#fff0cd');c.fillStyle='#503f30';lines.forEach((line,j)=>c.fillText(line,bx+bw/2,by+11+j*10));}}}}

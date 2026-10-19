@@ -11,3 +11,7 @@ cast-review.html now has Close eyes / Open eyes controls for exact before-and-af
 Automated motion checks cover 30/60/120 Hz travel invariance, tile remainder, blocked/completed travel, continuous opposing gait and brief/staggered/reduced-motion blink timing. Hardware frame rates and real touch devices still require device testing; these logic checks are not a promise of zero frame drops on every device.
 
 Walking into the cottage or a completed bakery threshold enters automatically. Walking onto the interior exit leaves automatically. Touch destinations and guided errands route through those doors too. Triggers occur on arrival, so spawning on an outdoor threshold does not bounce back inside. Existing saves standing on a doorway can walk towards it to transition. Unfinished building signs and other object interactions keep their existing controls.
+
+
+## Art audit and hauling · 0.9.1
+The previously deferred basket attachment issue is corrected using the shared hand pivot. NPC action head scale and shirt/hair overlap are corrected, and all required artwork loads before play. Orin now makes a permanent four-material carry basket after the two homes and first bakery batch. See art-audit-and-hauling.md for the exact visual checks, gameplay verification and remaining device limits. Chopping/mining and the arrival cutscene remain future work.

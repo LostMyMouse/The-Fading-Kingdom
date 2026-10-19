@@ -1,5 +1,5 @@
 import test from 'node:test';import assert from 'node:assert/strict';
-import {fresh,readSave} from '../chapter-model.js';import {PLAYER_RECTS,materialRamp,sourceMaterial,playerPose} from '../player-layered.js';
+import {fresh,readSave} from '../chapter-model.js';import {PLAYER_RECTS,materialRamp,sourceMaterial,playerPose,tiedHairOverlap} from '../player-layered.js';
 test('legacy chapter appearance migrates safely while new wardrobe choices persist',()=>{
  const old=fresh();delete old.player.outfit;delete old.player.hat;old.player.style=2;old.player.skin=5;
  const migrated=readSave(JSON.stringify(old));assert.equal(migrated.player.outfit,0);assert.equal(migrated.player.hat,0);assert.equal(migrated.player.style,2);assert.equal(migrated.player.skin,5);
@@ -24,3 +24,5 @@ test('measured olive shirt pixels remain clothing rather than skin or hair',()=>
  for(const rgb of [[142,129,75],[139,127,74],[123,110,62],[137,124,75]])assert.equal(sourceMaterial(...rgb,.62),'shirt');
  assert.equal(sourceMaterial(244,143,69,.35),'skin');assert.equal(sourceMaterial(77,47,35,.15),'hair');assert.equal(sourceMaterial(30,15,8,.35),null);assert.equal(sourceMaterial(250,224,179,.62),null);
 });
+
+test('shirt swaps preserve tied hair rather than old sleeve and skin pixels',()=>{for(const style of [0,2,3,4])for(const d of [0,1,2,3])assert.equal(tiedHairOverlap(style,d,.5,.58),false);assert.equal(tiedHairOverlap(1,1,.8,.58),true);assert.equal(tiedHairOverlap(1,1,.2,.58),false);assert.equal(tiedHairOverlap(1,2,.2,.58),true);assert.equal(tiedHairOverlap(1,2,.8,.58),false);assert.equal(tiedHairOverlap(1,3,.5,.58),true);assert.equal(tiedHairOverlap(1,3,.9,.58),false);});

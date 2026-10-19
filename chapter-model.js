@@ -1,3 +1,4 @@
+import {carryCapacity,claimCarryBasket} from './chapter-hauling.js';
 import {initialGardener,readGardener,gardenerAction,rowan,validGardenHouse,CROPS,growCrops,farm} from './chapter-gardener.js';
 import {initialEconomy,readEconomy,economyAction,settleVillageDay,fundHome,missingFlour} from './chapter-economy.js';
 import {chatLine} from './chapter-dialogue.js';
@@ -9,7 +10,7 @@ export const DECOR=['planter','bench','lantern','path','fence'];
 export const TREES=Array.from({length:40},(_,i)=>({x:2+(i*13%52),y:i<18?3+i%3:31+i%7}));
 export const RESOURCES=Array.from({length:26},(_,i)=>({id:i,type:i<16?'wood':'stone',x:19+(i*7%23),y:19+Math.floor(i/6)*2+(i%2)}));
 export const FIXED={home:{x:11,y:12},kit:{x:13,y:13},store:{x:8,y:13},orin:{x:18,y:17},timber:{x:20,y:17},nursery:{x:45,y:10}};
-export function fresh(){return {gardener:initialGardener(),version:2,day:1,room:'outside',player:{x:12,y:14,skin:1,hair:0,shirt:0,style:0,outfit:0,hat:0},inventory:{seed:6,carrot:0,wood:0,stone:0,bun:0,berry:0,fruitbun:0,turnipSeed:0,flowerSeed:0,turnip:0,marigold:0,planter:4,bench:2,lantern:4,path:40,fence:12},carry:{wood:0,stone:0},plots:Array.from({length:9},(_,i)=>({x:8+i%3*2,y:16+Math.floor(i/3)*2,planted:false,watered:false,ripe:false,crop:'carrot',growth:0})),gathered:[],house:null,decor:[],story:{arrival:0,wideCan:false,kit:false,harvest:false,met:false,invited:false,orin:false,basket:'none',late:false,timber:'untouched',timberNoticed:false,dependable:false,returned:false,lifted:false,herbs:false,cooking:0,cooked:false,shared:false,nursery:false},conversation:{mara:0,orin:0,movedDay:0,cookedDay:0},economy:initialEconomy(),settings:{sound:true,music:false}};}
+export function fresh(){return {gardener:initialGardener(),version:2,day:1,room:'outside',player:{x:12,y:14,skin:1,hair:0,shirt:0,style:0,outfit:0,hat:0},inventory:{seed:6,carrot:0,wood:0,stone:0,bun:0,berry:0,fruitbun:0,turnipSeed:0,flowerSeed:0,turnip:0,marigold:0,planter:4,bench:2,lantern:4,path:40,fence:12},carry:{wood:0,stone:0},plots:Array.from({length:9},(_,i)=>({x:8+i%3*2,y:16+Math.floor(i/3)*2,planted:false,watered:false,ripe:false,crop:'carrot',growth:0})),gathered:[],house:null,decor:[],story:{arrival:0,wideCan:false,carryBasket:false,kit:false,harvest:false,met:false,invited:false,orin:false,basket:'none',late:false,timber:'untouched',timberNoticed:false,dependable:false,returned:false,lifted:false,herbs:false,cooking:0,cooked:false,shared:false,nursery:false},conversation:{mara:0,orin:0,movedDay:0,cookedDay:0},economy:initialEconomy(),settings:{sound:true,music:false}};}
 export function mara(s){if(!s.story.harvest)return null;if(s.room==='bakery')return {x:11,y:s.day%2?5:7};if(s.room!=='outside')return null;if(s.house?.stage===3)return {x:s.house.x+5,y:s.house.y+4};return {x:22,y:16};}
 const within=(x,y,a,b,c,d)=>x>=a&&x<=c&&y>=b&&y<=d;
 export function blocked(s,x,y,room=s.room,house=s.house,decor=s.decor){
@@ -64,7 +65,7 @@ export function goal(s){const e=s.story,h=s.house;
  if(!h)return {title:'A place to call home',text:'Choose Build to plan Mara’s home.',target:{x:30,y:10}};
  const target={x:h.x+2,y:h.y+4};
  if(h.stage<2){
-  const type=h.stage===0?'stone':'wood',needed=h.stage===0?6:8,total=s.inventory[type]+s.carry[type],cap=e.basket==='held'?2:1;
+  const type=h.stage===0?'stone':'wood',needed=h.stage===0?6:8,total=s.inventory[type]+s.carry[type],cap=carryCapacity(s);
   if(s.carry.wood+s.carry.stone&&(s.carry.wood+s.carry.stone>=cap||total>=needed))return {title:'Gather and lend a hand',text:'Drop your carried materials at the building sign.',target};
   if(total<needed){const node=RESOURCES.filter(n=>n.type===type&&!s.gathered.includes(n.id)).sort((a,b)=>Math.abs(a.x-s.player.x)+Math.abs(a.y-s.player.y)-Math.abs(b.x-s.player.x)-Math.abs(b.y-s.player.y))[0];if(node)return {title:'Gather and lend a hand',text:`Gather loose ${type} · ${total}/${needed}. Drop it at the building sign.`,target:node};}
   if(h.stage===1&&e.timber==='taken')return {title:e.timberNoticed?'Boards for the mill':'The house frame',text:e.timberNoticed?'Orin needs the boards for the mill roof. Bring the bundle back.':'Talk to Orin about lifting the frame.',target:e.timberNoticed?FIXED.timber:FIXED.orin};
@@ -86,6 +87,7 @@ export function act(s,id,data={}){
  switch(id){
  case 'arrivalNext':e.arrival=Math.min(3,e.arrival+1);return 'The road to Bramblewick.';
  case 'arrivalSkip':e.arrival=3;return 'You can read the letter again in your journal.';
+ case 'claimBasket':return claimCarryBasket(s,data.npc);
  case 'upgradeCan':if(e.wideCan)return 'That wide spout’s already fitted. Go give it a try.';if(!canEarnWideCan(s))return 'Get Mara settled and make that first batch of buns. I’ll have something ready for your garden.';if((s.room!=='outside'&&data.npc?.room!==s.room)||Math.abs(s.player.x-(data.npc?.x??FIXED.orin.x))+Math.abs(s.player.y-(data.npc?.y??FIXED.orin.y))>1)return 'Bring your can over to Orin’s cart.';if(e.timber==='taken'){e.timberNoticed=true;return 'I’ll need those mill boards back first. Then I can sort this spout for you.';}e.wideCan=true;return 'There. Wider spout. Try it on the middle of a row. Less walking, more time for lunch.';
  case 'kit':if(e.kit)return 'Your tools are ready.';e.kit=true;return 'Carrot seeds and a watering can. Let’s plant something.';
  case 'farm':return farm(s,data);
@@ -102,7 +104,7 @@ export function act(s,id,data={}){
  case 'askWood':return e.timber==='taken'?'Not that bundle. It’s cut to fit the mill roof. There’s loose wood by the path you can use, though.':'Those boards are for the mill roof. Try the loose branches by the path.';
  case 'chat':{if(!['mara','orin'].includes(data.who))return '';const line=chatLine(s,data.who);s.conversation[data.who]++;return line;}
  case 'returnWood':if(e.timber!=='taken')return 'Boards are back on the cart.';e.timber='returned';e.returned=true;return e.timberNoticed?'Cheers. I’d have had a very draughty mill to explain.':'Bundle put back on the stack.';
- case 'gather':{if(s.room!=='outside')return 'The loose materials are outside.';const node=RESOURCES.find(n=>n.id===data.id);if(!node||s.gathered.includes(node.id))return 'You’ve gathered this already.';const cap=e.basket==='held'?2:1;if(s.carry.wood+s.carry.stone>=cap)return 'Your bag is full. Drop these at storage or the building sign.';s.gathered.push(node.id);s.carry[node.type]++;return `Collected ${node.type}. Carrying ${s.carry.wood+s.carry.stone}/${cap}.`;}
+ case 'gather':{if(s.room!=='outside')return 'The loose materials are outside.';const node=RESOURCES.find(n=>n.id===data.id);if(!node||s.gathered.includes(node.id))return 'You’ve gathered this already.';const cap=carryCapacity(s);if(s.carry.wood+s.carry.stone>=cap)return 'Your bag is full. Drop these at storage or the building sign.';s.gathered.push(node.id);s.carry[node.type]++;return `Collected ${node.type}. Carrying ${s.carry.wood+s.carry.stone}/${cap}.`;}
  case 'deposit':i.wood+=s.carry.wood;i.stone+=s.carry.stone;s.carry={wood:0,stone:0};return `Materials stored: ${i.wood} wood, ${i.stone} stone.`;
  case 'build':if(!h)return 'Plan a house first.';if(!e.orin)return 'Meet Orin at his cart first.';if(h.stage===0){if(i.stone<6)return 'Six stones for this bit. Bring them over and we’ll get the base sorted.';i.stone-=6;h.stage=1;return 'There’s our first corner. Definitely looks more house-like than it did.';}if(h.stage===1){if(e.basket==='held'){e.late=true;return 'Ah, my basket. I need it for these tools. Bring it over, then we’ll get lifting.';}if(e.timber==='taken'){e.timberNoticed=true;return 'Hang on. Those boards in your bag are for the mill roof. I’ll need them back before we get this frame up.';}if(i.wood<8)return 'Eight bundles of loose wood should do it. Still a few short.';i.wood-=8;h.stage=2;e.lifted=true;return 'Together, you lift the frame into place.';}return h.stage===2?'Place the herb planter, then choose the finishing touches.':'Mara’s home is finished.';
  case 'herbs':if(h?.stage!==2)return 'The frame needs to be ready first.';e.herbs=true;return 'A little herb garden by the door.';
@@ -130,9 +132,11 @@ export function readSave(raw){
  for(const k of ['berry','fruitbun','turnipSeed','flowerSeed','turnip','marigold'])if(s.inventory&&s.inventory[k]===undefined)s.inventory[k]=0;
  const economy=readEconomy(s,int),gardener=readGardener(s.gardener,int,s.day);
  for(const [k,n]of Object.entries(base.inventory))if(!int(s.inventory?.[k],0,1000000))throw Error('Invalid inventory');
- for(const k of ['wood','stone'])if(!int(s.carry?.[k],0,2))throw Error('Invalid carry');
+ for(const k of ['wood','stone'])if(!int(s.carry?.[k],0,4))throw Error('Invalid carry');
  if(s.story&&s.story.arrival===undefined)s.story.arrival=3;
  if(s.story&&s.story.wideCan===undefined)s.story.wideCan=false;
+ if(s.story&&s.story.carryBasket===undefined)s.story.carryBasket=false;
+ if(s.carry.wood+s.carry.stone>carryCapacity(s))throw Error('Overfilled carry basket');
  if(s.story&&s.story.timberNoticed===undefined)s.story.timberNoticed=s.story.timber==='taken';
  for(const [k,v]of Object.entries(base.story))if(typeof v==='boolean'?typeof s.story?.[k]!=='boolean':typeof s.story?.[k]!==typeof v)throw Error('Invalid story');
  if(!int(s.story.arrival,0,3))throw Error('Invalid arrival');

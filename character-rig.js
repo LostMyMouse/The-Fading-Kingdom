@@ -12,6 +12,16 @@ function hinged(c,image,rect,box,x,y,w,h,angle,dark=false){
  c.drawImage(image,sx+l*sw,sy+t*sh,(r-l)*sw,(b-t)*sh,-(r-l)*w/2,0,(r-l)*w,(b-t)*h);c.restore();
 }
 export function pixelAnchor(c,x,y){const t=c.getTransform();return [(Math.round(x*t.a+t.e)-t.e)/t.a,(Math.round(y*t.d+t.f)-t.f)/t.d];}
+// Attachments use the same shoulder pivot and gait as the visible sleeve.
+export function handAnchor({direction='down',walking=false,frame=0,reduce=false}={}){
+ const w=216/366*CHARACTER_HEIGHT,h=CHARACTER_HEIGHT,p=gaitPose(walking&&!reduce?frame:0);
+ if(direction==='left'||direction==='right'){
+  const left=direction==='left',arm=left?[.51,.53,.73,.80]:[.27,.53,.49,.80];
+  const angle=p.leftArm*(left?-1:1)*-.18,length=(arm[3]-arm[1])*h;
+  return {x:((arm[0]+arm[2])/2-.5)*w-Math.sin(angle)*length,y:-h+2+arm[1]*h+Math.cos(angle)*length,behind:false};
+ }
+ return {x:-.375*w,y:-h+2+.80*h+p.leftArm*(direction==='up'?-1:1)*1.5,behind:direction==='up'};
+}
 export function drawRig(c,image,rect,{direction='down',walking=false,frame=0,layout=null},x,y){
  const h=CHARACTER_HEIGHT,w=rect[2]/rect[3]*h;const anchor=pixelAnchor(c,x,y);x=anchor[0]-w/2;y=anchor[1]-h+2;
  c.fillStyle='#304d3c40';c.fillRect(x+w/2-6,y+h-2,12,3);

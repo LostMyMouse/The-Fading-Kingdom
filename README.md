@@ -23,7 +23,7 @@ This is an expanded prototype. Procedural pixel art, basic animation and a small
 
 ## Development
 
-Run `node tools/serve.mjs` and open `http://127.0.0.1:4175/`. No installs or build step. Run `node --test tests/*.test.mjs` for the thirty-seven rules and hosting tests.
+Run `node tools/serve.mjs` and open `http://127.0.0.1:4175/`. No installs or build step. Run `node --test tests/*.test.mjs` for the rules and hosting tests. Run `node tools/check-syntax.mjs` to check runtime and inline scripts.
 
 Runtime files: `index.html`, `chapter.css`, `chapter.js`, `chapter-model.js`, `chapter-world.js`, `chapter-dialogue.js`, `chapter-progression.js`, plus the reused `world.js` and `model.js` character/icon modules. Copy them together into the website's `games/the-fading-kingdom/` folder. The earlier `game.js` and `style.css` remain historical source.
 
@@ -41,3 +41,7 @@ Orin visits the kitchen for breakfast, a shared lunch job creates remembered dia
 
 ### 0.9.0 · Rowan and new hairstyles
 Invite a gardener, freely place a second home, visit its seed shop and grow turnips or marigolds. Flowers for the village earn a row sower. Rounded bob and twin-puff hairstyles join the creator. See docs/gardener-and-hairstyles.md.
+
+
+### 0.9.1 · Art audit and a basket of your own
+Fixed carried-basket hand attachment, action-pose head scale, shirt/hair overlap and partial-art loading. After the two homes and first cooking batch, visit Orin for a permanent basket carrying four materials per trip. See docs/art-audit-and-hauling.md for visual coverage and remaining device limits. 110 checks pass.

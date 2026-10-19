@@ -19,7 +19,7 @@ Mara and Orin's dialogue portraits remain the explicitly approved canonical styl
 
 ## Review surfaces
 player-preview.html allows switching appearance, pausing, stepping and comparing directions.
-player-quality.html shows all eight wardrobe combinations and six representative palette checks; each view compares the two opposite contact poses.
+player-quality.html shows all sixteen wardrobe combinations and six representative palette checks; each view compares the two opposite contact poses.
 Both use the same player renderer as the game and do not write story progress.
 
 ## NPC behaviour
@@ -29,3 +29,5 @@ Residents follow their own authored work, errand and rest routines. Player proxi
 A player-only matrix is insufficient. For every sprite change, render the player between Mara and Orin at exactly the same height, foot baseline and camera zoom in front, left, right and back views. Inspect passing and both contact poses. Compare head/body ratios, shoulder width, hand shape, outlines, shading contrast and apparent pixel density. Review close-up AND gameplay size. If any direction has detached or cropped limbs, the candidate fails even if the front view looks good. Record the actual result; automated tests and successful generation are not visual approval.
 
 Shared world contract: character-rig.js. Cast comparison: cast-review.html. Both existing NPCs remain references, and portrait approval remains separately governed by portrait-art-direction.md.
+
+The cast review now also steps work and dialogue frames exactly and can show the carried basket. Review these attachments and action head scale before accepting equipment changes. The 0.9.1 audit and its limits are recorded in art-audit-and-hauling.md.

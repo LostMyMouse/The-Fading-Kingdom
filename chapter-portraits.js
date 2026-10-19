@@ -1,7 +1,10 @@
 import {ROWAN_LINES} from './chapter-gardener.js';
+import {BASKET_LINES} from './chapter-hauling.js';
 import {BAKERY_LINES} from './chapter-bakery.js';
 // Authored line expressions; no sentiment analysis or morality score.
 export const EXPRESSIONS=['neutral','happy','amused','thoughtful','surprised','concerned'];
+let portraitLoading=null;
+export function preparePortraits(){if(portraitLoading)return portraitLoading;portraitLoading=Promise.all(['mara','orin','rowan'].map(name=>new Promise(resolve=>{const image=new Image();image.onload=()=>resolve(true);image.onerror=()=>resolve(false);image.src=new URL('./assets/portraits/'+name+'-expressions.png',import.meta.url).href;}))).then(results=>{const ready=results.every(Boolean);if(!ready)portraitLoading=null;return ready;});return portraitLoading;}
 const groups={
  surprised:['Oh, hello! Is this your place? I’ve got flour in my boots and a wheel that squeaks.'],
  happy:[
@@ -71,6 +74,7 @@ groups.thoughtful.push(BAKERY_LINES.ask,BAKERY_LINES.waiting,BAKERY_LINES.late,B
 groups.amused.push(BAKERY_LINES.decline,'Caught myself watering the window boxes before breakfast. Nearly watered my toast as well.','Remember that tray we made for Orin? He brought it back so clean I nearly put it straight in the cupboard.','Those carrot buns you and Mara made? Didn’t get much carpentry done until they were gone.');
 groups.happy.push(ROWAN_LINES.hello,ROWAN_LINES.settled,ROWAN_LINES.thanks,ROWAN_LINES.repaired);groups.thoughtful.push(ROWAN_LINES.invite,ROWAN_LINES.help);groups.concerned.push(ROWAN_LINES.missing);groups.amused.push(ROWAN_LINES.chatter);
 const authored=new Map(Object.entries(groups).flatMap(([expression,lines])=>lines.map(text=>[text,expression])));
+authored.set(BASKET_LINES.ask,'happy');authored.set(BASKET_LINES.gift,'amused');
 export function portraitFor(speaker,text,expression=authored.get(text)||'neutral'){
  const name=speaker.toLowerCase();if(!['mara','orin','rowan'].includes(name))return null;
  const frame=Math.max(0,EXPRESSIONS.indexOf(expression));

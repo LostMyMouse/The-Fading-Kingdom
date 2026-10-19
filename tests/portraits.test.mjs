@@ -1,3 +1,4 @@
+import {BASKET_LINES} from '../chapter-hauling.js';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {portraitFor,EXPRESSIONS} from '../chapter-portraits.js';
@@ -22,3 +23,5 @@ test('happy cooking and thoughtful explanation have distinct authored expression
  assert.equal(portraitFor('Mara','Ooh, look at those. Careful. They’re still doing the hot-bun thing.').expression,'happy');
  assert.equal(portraitFor('Orin','Spreads the water across a short row. Same can, fewer trips. Start in the middle.').expression,'thoughtful');
 });
+
+test('the earned basket has authored warm expressions',()=>{assert.equal(portraitFor('Orin',BASKET_LINES.ask).expression,'happy');assert.equal(portraitFor('Orin',BASKET_LINES.gift).expression,'amused');});
