@@ -1,4 +1,4 @@
-import {initialSquare,readSquare,squareAction,settleSquare,squareAvailable,SQUARE} from './chapter-square.js';
+import {initialSquare,readSquare,squareAction,settleSquare,squareAvailable,squareActive,squareDelay,SQUARE} from './chapter-square.js';
 import {initialGathering,readGathering,gatheringAction,WORKSHOP,replenishLoose} from './chapter-gathering.js';
 import {carryCapacity,claimCarryBasket} from './chapter-hauling.js';
 import {initialGardener,readGardener,gardenerAction,rowan,validGardenHouse,CROPS,growCrops,farm} from './chapter-gardener.js';
@@ -51,6 +51,7 @@ export function validHouse(s,x,y){
  return reachable(s,'outside',h,s.decor);
 }
 export function validDecor(s,type,x,y,ignore=-1){
+ if(ignore<0&&s.decor.length>=200)return false;
  if(!DECOR.includes(type)||!Number.isInteger(x)||!Number.isInteger(y))return false;
  const decor=s.decor.filter((_,i)=>i!==ignore);
  if(s.room==='outside'&&s.gathering?.job==='done'&&x===WORKSHOP.x&&y===WORKSHOP.y)return false;
@@ -90,6 +91,7 @@ export function act(s,id,data={}){
  const gathering=gatheringAction(s,id,data);if(gathering!==null)return gathering;
  const garden=gardenerAction(s,id,data);if(garden!==null)return garden;
  const economy=economyAction(s,id,data);if(economy!==null)return economy;
+ if(['cook','mix','shape','bake'].includes(id)&&squareActive(s)&&!squareDelay(s,'mara'))return 'Mara’s at the square today. Your ingredients and unfinished batch can wait until she’s back.';
  switch(id){
  case 'arrivalNext':e.arrival=Math.min(3,e.arrival+1);return 'The road to Bramblewick.';
  case 'arrivalSkip':e.arrival=3;return 'You can read the letter again in your journal.';
@@ -127,7 +129,7 @@ export function act(s,id,data={}){
  case 'eatBerry':if(!i.berry)return 'No berries in your basket yet.';i.berry--;return 'Sweet, a little sharp, and straight from the nursery.';
  case 'eat':if(!i.bun)return 'There are no buns in your basket.';i.bun--;return 'A warm vegetable bun. A quiet moment to enjoy what you made.';
  case 'nursery':if(!e.cooked)return 'Settle in with Mara first.';e.nursery=true;return 'Up the old path? There used to be a nursery. Little plants, not little people. Fancy a look?';
- case 'place':if(!validDecor(s,data.type,data.x,data.y,data.index??-1))return 'Leave doors, work areas, and walking routes clear.';if(Number.isInteger(data.index)&&s.decor[data.index]){Object.assign(s.decor[data.index],{x:data.x,y:data.y,rotation:data.rotation===1?1:0});return 'Moved.';}if(!i[data.type])return 'There are no more in storage.';i[data.type]--;s.decor.push({type:data.type,x:data.x,y:data.y,room:s.room,rotation:data.rotation===1?1:0});return 'Placed. Move it or put it back in storage any time.';
+ case 'place':if(!(Number.isInteger(data.index)&&data.index>=0)&&s.decor.length>=200)return 'You’ve placed 200 decorations. Store one to make room; nothing has been used.';if(!validDecor(s,data.type,data.x,data.y,data.index??-1))return 'Leave doors, work areas, and walking routes clear.';if(Number.isInteger(data.index)&&s.decor[data.index]){Object.assign(s.decor[data.index],{x:data.x,y:data.y,rotation:data.rotation===1?1:0});return 'Moved.';}if(!i[data.type])return 'There are no more in storage.';i[data.type]--;s.decor.push({type:data.type,x:data.x,y:data.y,room:s.room,rotation:data.rotation===1?1:0});return 'Placed. Move it or put it back in storage any time.';
  case 'store':{const d=s.decor[data.index];if(!d||d.room!==s.room)return 'Choose a placed decoration.';i[d.type]++;s.decor.splice(data.index,1);return 'Back in storage.';}
  default:return 'Take your time. The village will be here.';
  }

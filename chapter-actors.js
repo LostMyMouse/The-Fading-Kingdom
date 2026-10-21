@@ -45,9 +45,10 @@ export function routineFor(s,name,anchor){
  ];
 }
 export function createActors(){
- const actors=new Map(),visitor=createBakeryVisitor();
- return {reset(){actors.clear();visitor.reset();},location(name){return name==='orin'?visitor.location():null;},update(s,dt,{paused=false,reduce=false,cue=null}={}){
+ const actors=new Map(),visitor=createBakeryVisitor(),marketLocations=new Map();
+ return {reset(){actors.clear();visitor.reset();marketLocations.clear();},location(name){return marketLocations.get(name)||(name==='orin'?visitor.location():null);},update(s,dt,{paused=false,reduce=false,cue=null}={}){
   const market=squareActive(s),visit=market?null:visitor.update(s,dt,{paused,reduce,cue});const delta=Math.max(0,Math.min(dt,50)),anchors=[];if(s.room==='outside'&&!visit)anchors.push(['orin',FIXED.orin]);const m=mara(s);if(m)anchors.push(['mara',m]);const r=rowan(s);if(r)anchors.push(['rowan',r]);
+  if(market){for(const name of ['orin','mara','rowan']){if(squareDelay(s,name)){marketLocations.delete(name);if(name==='orin')marketLocations.set(name,{room:'outside',...FIXED.orin});}else{const last=marketLocations.get(name),a=actors.get(name),p=a||last||squareStops(s,name)[0];marketLocations.set(name,{room:'outside',x:Math.round(p.x),y:Math.round(p.y)});}}}else marketLocations.clear();
   if(market){for(let j=anchors.length-1;j>=0;j--)if(!squareDelay(s,anchors[j][0]))anchors.splice(j,1);if(s.room==='outside')for(const name of ['orin','mara','rowan'])if(!squareDelay(s,name))anchors.push([name,squareStops(s,name)[0]]);}
   const visible=new Set(anchors.map(([name])=>name));for(const name of actors.keys())if(!visible.has(name))actors.delete(name);
   const views=anchors.map(([name,anchor])=>{
@@ -78,7 +79,7 @@ export function createActors(){
    const work=!speaking&&!walking&&!a.next&&!a.path.length&&!!stops[a.index].work;
    const emotion=speaking?cue.emotion:'neutral',talking=!!(speaking&&cue.talking);
    return {blink:blinkAt(a.clock,name==='mara'?1:name==='rowan'?3:4,reduce),gait:a.clock/150,name,anchor:{...anchor},x:a.x,y:a.y,tileX:Math.round(a.x),tileY:Math.round(a.y),direction:a.direction,walking,work,emotion,talking,activity:stops[a.index].activity,...(market&&!speaking&&!walking&&!a.path.length&&a.wait>6500?{speech:name==='mara'?'Tray’s here. Mind the warm ones!':name==='orin'?'Built this bench. Very thorough testing.':"That plant’s enjoying the company.",speechSpeaker:name==='mara'?'Mara':name==='orin'?'Orin':'Rowan'}:{}),clock:a.clock,frame:animationFrame({direction:a.direction,walking,work,emotion,talking,clock:a.clock,reduce})};
-  });if(visit&&visit.room===s.room){visit.frame=animationFrame({...visit,reduce});views.push(visit);}return views;
+  });if(market&&s.room==='outside')for(const n of views)marketLocations.set(n.name,{room:'outside',x:n.tileX,y:n.tileY});if(visit&&visit.room===s.room){visit.frame=animationFrame({...visit,reduce});views.push(visit);}return views;
  }};
 }
 

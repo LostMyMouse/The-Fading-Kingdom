@@ -19,3 +19,7 @@ This remains a prototype: residents join at authored gathering positions rather 
 The release adds 16 rule tests (142 total), covering migration, physical/cost gates, single-use contributions, local supply repair, placement, repeat-safe market income, combined 30 G daily settlement, reloads, malformed state, independent routines and spaced/cached destinations. All 35 runtime/inline scripts pass syntax checks.
 
 An isolated square-review save was used for browser testing, preserving the production save. Playthrough: migrate a completed 0.10 story, restore the ground, ask all three neighbours, deliver carrots, freely place the bench/planter/lantern, open the market and reload it. A visual check caught crowded resting labels and a square label behind crops; both were corrected before release. Desktop, 320×740 phone and 768×1024 tablet viewport checks (both with zero horizontal overflow), a second market costing two carrots, and a separate +6 G morning ledger entry are recorded in the task’s outputs/square folder. These viewport checks do not replace physical-device or child playtesting. No new exhaustive wardrobe matrix is claimed because character drawing code and assets were unchanged.
+
+
+## Regression follow-up · 0.11.1
+The deeper test pass fixes market NPC location lookup across rooms, pauses cooking while Mara is away and prevents placement exceeding the save format’s 200-item limit. See regression-run-0.11.1.md for reproduced failures, the fresh-story route and seeded long-run coverage.

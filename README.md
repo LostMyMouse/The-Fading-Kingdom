@@ -53,3 +53,7 @@ Earn an axe and pickaxe from Orin after the first harvest. Chop fallen logs, min
 
 ### 0.11.0 · Our village square
 Restore a neglected square, gather contributions from Orin, Mara and Rowan, and freely arrange its bench, plants and lights. Host a market gathering that adds up to 6 G to the village fund the next morning. Missing work supplies delay only the affected helper and can be repaired. See [village square](docs/village-square.md) for exact scope and limits. 142 checks pass.
+
+
+### 0.11.1 · Regression testing
+Added a fresh-story journey, 80 simulated days of seeded stress tests and automatic checks for pushes and pull requests. Fixed market NPC locations across rooms, cooking while Mara is away, and the decoration/save capacity mismatch. Run `npm run check` (147 checks) or `npm run test:journey`. See [regression report](docs/regression-run-0.11.1.md) for scope and limits.
