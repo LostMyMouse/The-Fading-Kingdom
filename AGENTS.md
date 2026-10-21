@@ -7,3 +7,5 @@ The arrival cutscene is deferred. World character animation is a prototype under
 Before changing player or NPC sprites, follow docs/sprite-quality-standard.md. Use the actual assembly and gameplay-size review, not only the generated sheet or unit tests. Preserve independent NPC routines; proximity must not make residents face or follow the player.
 
 Use character-rig.js for player/NPC height, baseline and opposing walk timing. Preserve cast consistency through cast-review.html before accepting new layers; the 0.6.0 player-only matrix missed an actual mismatch. New body parts must fit measured whole-character landmarks.
+
+Before expanding the environment, map or interface, read docs/village-visual-direction.md and review design-review/index.html. The scene and UI are proposals awaiting James's visual review, not approved production tiles or permission to replace the live map. Preserve the almost-empty opening, free home placement, actual interiors, automatic doorways and current saved village during future integration.

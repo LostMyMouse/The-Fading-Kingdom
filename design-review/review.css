@@ -173,4 +173,6 @@ h1{font-size:39px}
 }
 
 .hint button{min-width:44px}
+/* Preserve the concept's proportions when a short phone viewport crops it. */
+@media(max-width:520px){.world{height:auto;width:975px}.landscape{height:auto;width:100%}}
 
