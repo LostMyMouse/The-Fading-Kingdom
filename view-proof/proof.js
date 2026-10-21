@@ -29,7 +29,7 @@ function ground(){
 function draw(){
  const box=canvas.getBoundingClientRect(),dpr=devicePixelRatio||1,width=Math.round(box.width*dpr),height=Math.round(box.height*dpr);
  if(canvas.width!==width||canvas.height!==height){canvas.width=width;canvas.height=height;}
- const camera={x:Math.round(160-box.width/(2*zoom)),y:Math.round((zoom===4?140:107)-box.height/(2*zoom))};
+ const camera={x:Math.round(160-box.width/(2*zoom)),y:Math.round((zoom===4?140:103)-box.height/(2*zoom))};
  c.setTransform(dpr*zoom,0,0,dpr*zoom,0,0);c.imageSmoothingEnabled=false;c.translate(-camera.x,-camera.y);ground();
  if(building&&crop){const w=128,h=Math.round(w*crop[3]/crop[2]);rect(100,133,120,5,'#4a593b35');c.drawImage(cottage,...crop,96,136-h,w,h);}
  if(grid){c.strokeStyle='#fff3c34d';c.lineWidth=1/zoom;c.beginPath();for(let x=Math.floor(camera.x/16)*16;x<camera.x+box.width/zoom;x+=16){c.moveTo(x,camera.y);c.lineTo(x,camera.y+box.height/zoom);}for(let y=Math.floor(camera.y/16)*16;y<camera.y+box.height/zoom;y+=16){c.moveTo(camera.x,y);c.lineTo(camera.x+box.width/zoom,y);}c.stroke();}
