@@ -101,3 +101,7 @@ Implemented the nursery visitor, optional invitation, a freely placed second hom
 
 ## Art audit and hauling · 0.9.1
 The previously deferred basket attachment issue is corrected using the shared hand pivot. NPC action head scale and shirt/hair overlap are corrected, and all required artwork loads before play. Orin now makes a permanent four-material carry basket after the two homes and first bakery batch. See art-audit-and-hauling.md for the exact visual checks, gameplay verification and remaining device limits. Chopping/mining and the arrival cutscene remain future work.
+
+
+## Gathering and workshop · 0.10.0
+The first earned axe/pickaxe, renewable fallen-log/small-rock patches, physical workshop crafting and two-swing fittings are implemented. See gathering-and-workshop.md. Ore, mature-tree cutting/replanting, additional tiers and the arrival cutscene remain future work.

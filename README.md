@@ -45,3 +45,7 @@ Invite a gardener, freely place a second home, visit its seed shop and grow turn
 
 ### 0.9.1 · Art audit and a basket of your own
 Fixed carried-basket hand attachment, action-pose head scale, shirt/hair overlap and partial-art loading. After the two homes and first cooking batch, visit Orin for a permanent basket carrying four materials per trip. See docs/art-audit-and-hauling.md for visual coverage and remaining device limits. 110 checks pass.
+
+
+### 0.10.0 · Gathering and workshop
+Earn an axe and pickaxe from Orin after the first harvest. Chop fallen logs, mine small rocks, craft freely placed decorations and earn fittings that reduce each patch from three swings to two. Existing saves migrate without granting tools. See [gathering and workshop](docs/gathering-and-workshop.md) for costs, verification and limits. 126 checks pass.

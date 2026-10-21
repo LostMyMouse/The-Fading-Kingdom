@@ -15,3 +15,7 @@ Walking into the cottage or a completed bakery threshold enters automatically. W
 
 ## Art audit and hauling · 0.9.1
 The previously deferred basket attachment issue is corrected using the shared hand pivot. NPC action head scale and shirt/hair overlap are corrected, and all required artwork loads before play. Orin now makes a permanent four-material carry basket after the two homes and first bakery batch. See art-audit-and-hauling.md for the exact visual checks, gameplay verification and remaining device limits. Chopping/mining and the arrival cutscene remain future work.
+
+
+## Gathering tool motion · 0.10.0
+A 420 ms eased swing uses the existing textured arm and a shared shoulder/hand pivot. Axe and pickaxe render behind the body in the back view and ahead in the other views; the basket is temporarily stowed. Movement or menus cancel presentation without repeating a committed strike. Reduced motion holds the strike pose. See gathering-and-workshop.md for the visual matrix and remaining production-animation limits.

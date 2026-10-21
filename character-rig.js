@@ -12,6 +12,8 @@ function hinged(c,image,rect,box,x,y,w,h,angle,dark=false){
  c.drawImage(image,sx+l*sw,sy+t*sh,(r-l)*sw,(b-t)*sh,-(r-l)*w/2,0,(r-l)*w,(b-t)*h);c.restore();
 }
 export function pixelAnchor(c,x,y){const t=c.getTransform();return [(Math.round(x*t.a+t.e)-t.e)/t.a,(Math.round(y*t.d+t.f)-t.f)/t.d];}
+export function swingAngle(direction,progress=0){const t=Math.max(0,Math.min(1,progress)),keys=direction==='left'?[0,-.45,1.3,0]:direction==='right'?[0,.45,-1.3,0]:direction==='up'?[0,.8,.1,0]:[0,-1.5,-.1,0],times=[0,.28,.62,1];const i=t<.28?0:t<.62?1:2,u=(t-times[i])/(times[i+1]-times[i]),e=u*u*(3-2*u);return keys[i]+(keys[i+1]-keys[i])*e;}
+export function toolHand(direction,progress=0){const w=216/366*CHARACTER_HEIGHT,arm=direction==='left'?[.51,.53,.73,.80]:direction==='right'?[.27,.53,.49,.80]:RIG.leftArm,angle=swingAngle(direction,progress),length=(arm[3]-arm[1])*CHARACTER_HEIGHT;return {x:((arm[0]+arm[2])/2-.5)*w-Math.sin(angle)*length,y:-CHARACTER_HEIGHT+2+arm[1]*CHARACTER_HEIGHT+Math.cos(angle)*length,angle,behind:direction==='up'};}
 // Attachments use the same shoulder pivot and gait as the visible sleeve.
 export function handAnchor({direction='down',walking=false,frame=0,reduce=false}={}){
  const w=216/366*CHARACTER_HEIGHT,h=CHARACTER_HEIGHT,p=gaitPose(walking&&!reduce?frame:0);
@@ -22,11 +24,11 @@ export function handAnchor({direction='down',walking=false,frame=0,reduce=false}
  }
  return {x:-.375*w,y:-h+2+.80*h+p.leftArm*(direction==='up'?-1:1)*1.5,behind:direction==='up'};
 }
-export function drawRig(c,image,rect,{direction='down',walking=false,frame=0,layout=null},x,y){
+export function drawRig(c,image,rect,{direction='down',walking=false,frame=0,layout=null,action=null},x,y){
  const h=CHARACTER_HEIGHT,w=rect[2]/rect[3]*h;const anchor=pixelAnchor(c,x,y);x=anchor[0]-w/2;y=anchor[1]-h+2;
  c.fillStyle='#304d3c40';c.fillRect(x+w/2-6,y+h-2,12,3);
- if(!walking){c.drawImage(image,...rect,x,y,w,h);return;}
- const p=gaitPose(frame),side=direction==='left'||direction==='right',sign=direction==='left'?-1:1,back=direction==='up'?-1:1;
+ if(!walking&&!action){c.drawImage(image,...rect,x,y,w,h);return;}
+ const p=gaitPose(action?0:frame),side=direction==='left'||direction==='right',sign=direction==='left'?-1:1,back=direction==='up'?-1:1;
  const sideArm=layout?.[direction]?.arm??(direction==='left'?[.66,.51,.96,.79]:[.04,.51,.34,.79]);
  const torso=layout?.[direction]?.torso??(direction==='left'?[.15,.53,.66,.88]:direction==='right'?[.34,.53,.85,.88]:[.25,.53,.75,.88]);
  if(side){hinged(c,image,rect,RIG.leftLeg,x,y,w,h,p.leftLeg*sign*-.34,true);hinged(c,image,rect,RIG.rightLeg,x,y,w,h,p.rightLeg*sign*-.34);}
@@ -39,7 +41,7 @@ export function drawRig(c,image,rect,{direction='down',walking=false,frame=0,lay
   if(t>.53)piece(c,image,rect,[l,.53,r,t],x,y,w,h);
   if(b<.84)piece(c,image,rect,[l,b,r,.84],x,y,w,h);
  }
- else{piece(c,image,rect,RIG.leftArm,x,y,w,h,0,p.leftArm*back*1.5);piece(c,image,rect,RIG.rightArm,x,y,w,h,0,p.rightArm*back*1.5);}
+ else{if(action)hinged(c,image,rect,RIG.leftArm,x,y,w,h,swingAngle(direction,action.progress));else piece(c,image,rect,RIG.leftArm,x,y,w,h,0,p.leftArm*back*1.5);piece(c,image,rect,RIG.rightArm,x,y,w,h,0,p.rightArm*back*1.5);}
  piece(c,image,rect,RIG.head,x,y,w,h);if(!side)piece(c,image,rect,torso,x,y,w,h);
- if(side)hinged(c,image,rect,sideArm,x,y,w,h,p.leftArm*sign*-.18);
+ if(side)hinged(c,image,rect,sideArm,x,y,w,h,action?swingAngle(direction,action.progress):p.leftArm*sign*-.18);
 }
