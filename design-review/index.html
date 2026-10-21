@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"><meta name="theme-color" content="#293e31"><title>The Fading Kingdom · Village design study</title><link rel="stylesheet" href="review.css"></head>
+<body>
+<header class="review-bar"><a href="../">The Fading Kingdom</a><span>VILLAGE & INTERFACE STUDY · 01</span><button id="about">About this scene</button></header>
+<main>
+ <section class="game" aria-label="Interactive visual design study">
+  <div class="hud">
+   <div class="date panel"><span class="sun" aria-hidden="true">☀</span><div><strong>Spring, day 8</strong><small>A quiet morning</small></div></div>
+   <div class="funds panel"><span><small>Your purse</small><strong>38 gold</strong></span><span><small>Village fund</small><strong>24 gold</strong></span></div>
+   <nav aria-label="Village pages"><button id="map">Map</button><button id="journal">Journal</button></nav>
+  </div>
+  <div class="view" id="view" tabindex="0" aria-label="Village picture. Swipe or scroll sideways to explore on small screens.">
+   <div class="world" id="world">
+    <img class="landscape" src="village-corner.png" width="1536" height="1024" alt="A moss-roof cottage and terracotta-roof bakery beside a winding path, a carrot garden, an old well and a stream. Open meadow leaves room for future homes.">
+    <button class="place cottage" data-place="cottage">Your cottage <span>↗</span></button>
+    <button class="place bakery" id="talk">Mara’s bakery <span>…</span></button>
+    <button class="place woods" data-place="woods">To the woods ↑</button>
+    <button class="place bridge" data-place="hills">Hills →</button>
+    <div class="build-grid" id="grid" hidden></div>
+    <button id="ghost" class="ghost" hidden aria-label="Move the proposed home">New home<small>Move with arrow keys</small></button>
+   </div>
+  </div>
+  <aside class="hint panel" id="hint"><small>A LITTLE ROOM TO GROW</small><p>Mara’s settling in. There’s still a whole meadow to make your own.</p><button id="hide-hint" aria-label="Hide journal hint">−</button></aside>
+  <div class="placement panel" id="placement" hidden><div><strong>Try a home here</strong><span id="validity" role="status">Clear space · doorway faces the path</span></div><div><button id="place-home">Keep this spot</button><button id="cancel-build">Cancel</button></div><small>Click open meadow to move. Arrow keys nudge. This is a layout sketch.</small></div>
+  <div class="scene-note"><span>AFTER MARA MOVES IN</span><span class="pan-note">Swipe the scene to look around ↔</span></div>
+  <footer class="tool-dock panel"><div><small id="tool-label" aria-live="polite">Hands · explore</small><nav id="tools" aria-label="Quick tools"></nav></div><button id="bag">Your bag</button><button id="build">Build</button></footer>
+ </section>
+ <section class="design-notes" aria-labelledby="direction-title"><div><span class="eyebrow">THE DIRECTION</span><h1 id="direction-title">A little ground.<br>A place to belong.</h1><p>One continuous village, shaped by you. Footpaths lead to the woods and hills; front doors lead into homes worth visiting.</p></div><div class="notes-grid"><article><span>01 / THE WORLD</span><h2>Leave room for your village</h2><p>A few old landmarks give the kingdom its history. Where the new homes, gardens and gathering places go is your choice.</p></article><article><span>02 / THE INTERFACE</span><h2>Let the world breathe</h2><p>Quiet parchment panels, clear text and a handful of useful tools. Your journal is there when you need a nudge.</p></article><article><span>03 / THE CHARACTERS</span><h2>Keep the familiar faces</h2><p>The approved portraits stay. Expressions follow the conversation; friendship shows up in everyday village life.</p></article></div><p class="honest-note">This is an interactive art and UI proposal. The scenery is a concept image, not a walkable map or finished tile set. Try the map, bag, bakery conversation and building preview. Nothing here touches your game save.</p><a href="../docs/village-visual-direction.md">Read the map and UI design brief →</a></section>
+</main>
+<dialog id="sheet" aria-labelledby="sheet-title"><div class="sheet-head"><span class="eyebrow" id="sheet-kicker">THE VILLAGE</span><button id="close" aria-label="Close panel">✕</button></div><div id="sheet-content"></div></dialog>
+<div id="toast" role="status" aria-live="polite"></div>
+<script src="review.js" defer></script>
+</body></html>
