@@ -2,6 +2,8 @@
 
 Status: proposed visual standard and interactive design study. This is not a new playable chapter, approved production environment, tile atlas or replacement for the current world. Review this before extending the map or commissioning more environment assets. The canonical Mara and Orin dialogue portraits remain unchanged.
 
+Follow-up: James questioned the first concept's view and its fit with the sprites. Its perspective is under revision. See [camera and cast proof](camera-and-cast-proof.md) and `../view-proof/index.html` before using the earlier scene as an art target. General village freedom and UI goals remain applicable; no final environment/sprite treatment has been accepted.
+
 ## The place
 
 A forgotten storybook village slowly becoming somebody's home. One continuous village and neighbouring countryside; paths lead into separate woodland, hills/mines and later kingdom areas. Buildings have actual walkable interiors. Doors enter and exit automatically. No travel menu is required to cross the village.

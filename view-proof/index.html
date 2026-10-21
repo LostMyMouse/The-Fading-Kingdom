@@ -1,0 +1,20 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#2d4434"><title>The Fading Kingdom · Camera and cast proof</title><link rel="stylesheet" href="proof.css"></head>
+<body><main>
+<header><div><p class="eyebrow">THE FADING KINGDOM · VISUAL PROOF 02</p><h1>One cottage. The actual cast.</h1></div><a href="../design-review/">Earlier concept</a></header>
+<p class="intro">A straight-on building, overhead ground and the existing game characters on one shared scale. This tests the view; it does not replace the current sprites.</p>
+<section class="review" aria-label="Camera and character comparison">
+ <div class="scene"><canvas id="scene" tabindex="0" aria-label="Cottage and ground tiles with Mara, the player and Orin at a shared foot baseline. Use the controls below to compare directions and walking poses."></canvas><div id="names" aria-hidden="true"><span>Mara</span><span>You</span><span>Orin</span></div><span id="loading" role="status">Loading the actual game artwork…</span></div>
+ <div class="readout"><strong id="status" role="status">Front · standing · 2×</strong><span>16px ground tiles · 32-unit character height</span></div>
+ <div class="controls">
+  <fieldset><legend>Look at the cast</legend><div class="buttons" id="directions"><button data-direction="down" aria-pressed="true">Front</button><button data-direction="left" aria-pressed="false">Left</button><button data-direction="right" aria-pressed="false">Right</button><button data-direction="up" aria-pressed="false">Back</button></div></fieldset>
+  <fieldset><legend>Check movement</legend><div class="buttons"><button id="walk" aria-pressed="false">Play walking</button><button id="step">Next pose</button><button id="reset">Standing pose</button></div></fieldset>
+  <fieldset><legend>Camera size</legend><div class="buttons" id="zoom"><button data-zoom="2" aria-pressed="true">2×</button><button data-zoom="3" aria-pressed="false">3×</button><button data-zoom="4" aria-pressed="false">4×</button></div></fieldset>
+  <fieldset><legend>Compare alignment</legend><div class="buttons"><button id="grid" aria-pressed="false">Show ground grid</button><button id="baseline" aria-pressed="false">Show foot line</button><button id="building" aria-pressed="true">Hide cottage</button></div></fieldset>
+ </div>
+</section>
+<section class="findings"><article><p class="eyebrow">WHAT THIS CHANGES</p><h2>A consistent view</h2><p>The cottage faces directly forward. The ground uses horizontal and vertical tiles. The cast is drawn by the same character code as the game, at the same height and foot line.</p></article><article><p class="eyebrow">WHAT STILL NEEDS WORK</p><h2>The sprite style is still a separate decision</h2><p>These are the existing, softly shaded character assets. Changing the camera cannot turn them into a purpose-built low-resolution pixel sprite set. Inspect the front, profiles and back before accepting either the view or the character treatment.</p></article></section>
+<p class="note">This isolated review reads no story save and writes no progress. Walking here animates in place for comparison. The cottage is a generated asset candidate and the ground is a small code-drawn tile trial. Building interiors, moving around the map and a final animation set are outside this proof. The approved dialogue portraits stay unchanged.</p>
+<p class="note">On a narrow screen the camera shows a smaller part of the scene. Start at 2× to see all three characters together. Keyboard: 1–4 changes direction; Space pauses or plays when the canvas has focus.</p>
+<a class="brief" href="../docs/camera-and-cast-proof.md">Read the comparison notes →</a>
+</main><script type="module" src="proof.js"></script></body></html>
