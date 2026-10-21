@@ -105,3 +105,7 @@ The previously deferred basket attachment issue is corrected using the shared ha
 
 ## Gathering and workshop · 0.10.0
 The first earned axe/pickaxe, renewable fallen-log/small-rock patches, physical workshop crafting and two-swing fittings are implemented. See gathering-and-workshop.md. Ore, mature-tree cutting/replanting, additional tiers and the arrival cutscene remain future work.
+
+
+## Our village square · 0.11.0
+One complete public project connects earned materials, remembered neighbour contributions, free furnishing placement, independent market-day routines and additional shared income. Missing work supplies have local, repairable effects on help and trade. See village-square.md. Bespoke sitting, full commutes, more visitors and the arrival cutscene remain later work.

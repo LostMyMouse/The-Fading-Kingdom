@@ -1,3 +1,5 @@
+import {SQUARE_LINES} from './chapter-square.js';
+import {TOOL_LINES} from './chapter-gathering.js';
 import {ROWAN_LINES} from './chapter-gardener.js';
 import {BASKET_LINES} from './chapter-hauling.js';
 import {BAKERY_LINES} from './chapter-bakery.js';
@@ -74,9 +76,12 @@ groups.thoughtful.push(BAKERY_LINES.ask,BAKERY_LINES.waiting,BAKERY_LINES.late,B
 groups.amused.push(BAKERY_LINES.decline,'Caught myself watering the window boxes before breakfast. Nearly watered my toast as well.','Remember that tray we made for Orin? He brought it back so clean I nearly put it straight in the cupboard.','Those carrot buns you and Mara made? Didn’t get much carpentry done until they were gone.');
 groups.happy.push(ROWAN_LINES.hello,ROWAN_LINES.settled,ROWAN_LINES.thanks,ROWAN_LINES.repaired);groups.thoughtful.push(ROWAN_LINES.invite,ROWAN_LINES.help);groups.concerned.push(ROWAN_LINES.missing);groups.amused.push(ROWAN_LINES.chatter);
 const authored=new Map(Object.entries(groups).flatMap(([expression,lines])=>lines.map(text=>[text,expression])));
+authored.set(TOOL_LINES.ask,'thoughtful');authored.set(TOOL_LINES.accept,'happy');authored.set(TOOL_LINES.gift,'happy');authored.set(TOOL_LINES.upgrade,'amused');
 authored.set(BASKET_LINES.ask,'happy');authored.set(BASKET_LINES.gift,'amused');
 export function portraitFor(speaker,text,expression=authored.get(text)||'neutral'){
  const name=speaker.toLowerCase();if(!['mara','orin','rowan'].includes(name))return null;
  const frame=Math.max(0,EXPRESSIONS.indexOf(expression));
  return {name,expression:EXPRESSIONS[frame],src:'./assets/portraits/'+name+'-expressions.png',position:(frame%3*50)+'% '+(Math.floor(frame/3)*100)+'%'};
 }
+
+for(const name of ['orin','mara','rowan']){authored.set(SQUARE_LINES[name],'happy');authored.set(SQUARE_LINES[name+'Wait'],'concerned');}

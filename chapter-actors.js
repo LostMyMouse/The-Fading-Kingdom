@@ -1,3 +1,4 @@
+import {squareActive,squareDelay,squareStops} from './chapter-square.js';
 import {rowan} from './chapter-gardener.js';
 import {createBakeryVisitor} from './chapter-visits.js';
 import {blinkAt} from './chapter-motion.js';
@@ -19,6 +20,7 @@ export function animationFrame({direction='down',walking=false,work=false,emotio
  return (rows[direction]??0)*4;
 }
 export function routineFor(s,name,anchor){
+ if(squareActive(s)&&s.room==='outside'&&!squareDelay(s,name))return squareStops(s,name);
  if(name==='rowan')return s.room==='garden'?[{...anchor,hold:10000,work:true,face:'down',activity:'Sorting seeds'},{x:10,y:6,hold:6000,face:'left',activity:'Checking seedlings'},{x:11,y:7,hold:7000,face:'down',activity:'Taking a break'}]:[{...anchor,hold:11000,work:true,face:'down',activity:'Tending the nursery'},{x:44,y:12,hold:6500,face:'up',activity:'Checking the berry pots'},{x:42,y:12,hold:6500,face:'right',activity:'Taking a break'}];
  if(s.room==='bakery')return [
   {x:11,y:5,hold:11000,work:true,face:'down',activity:'Baking'},
@@ -45,10 +47,11 @@ export function routineFor(s,name,anchor){
 export function createActors(){
  const actors=new Map(),visitor=createBakeryVisitor();
  return {reset(){actors.clear();visitor.reset();},location(name){return name==='orin'?visitor.location():null;},update(s,dt,{paused=false,reduce=false,cue=null}={}){
-  const visit=visitor.update(s,dt,{paused,reduce,cue});const delta=Math.max(0,Math.min(dt,50)),anchors=[];if(s.room==='outside'&&!visit)anchors.push(['orin',FIXED.orin]);const m=mara(s);if(m)anchors.push(['mara',m]);const r=rowan(s);if(r)anchors.push(['rowan',r]);
+  const market=squareActive(s),visit=market?null:visitor.update(s,dt,{paused,reduce,cue});const delta=Math.max(0,Math.min(dt,50)),anchors=[];if(s.room==='outside'&&!visit)anchors.push(['orin',FIXED.orin]);const m=mara(s);if(m)anchors.push(['mara',m]);const r=rowan(s);if(r)anchors.push(['rowan',r]);
+  if(market){for(let j=anchors.length-1;j>=0;j--)if(!squareDelay(s,anchors[j][0]))anchors.splice(j,1);if(s.room==='outside')for(const name of ['orin','mara','rowan'])if(!squareDelay(s,name))anchors.push([name,squareStops(s,name)[0]]);}
   const visible=new Set(anchors.map(([name])=>name));for(const name of actors.keys())if(!visible.has(name))actors.delete(name);
   const views=anchors.map(([name,anchor])=>{
-   const key=s.room+':'+anchor.x+','+anchor.y;let a=actors.get(name);
+   const key=s.room+':'+anchor.x+','+anchor.y+':'+(market?s.day+':'+JSON.stringify(s.decor):'ordinary');let a=actors.get(name);
    const stops=routineFor(s,name,anchor);
    if(!a||a.key!==key){const initial=Math.max(0,stops.findIndex(p=>p.x===anchor.x&&p.y===anchor.y));a={key,node:{...anchor},x:anchor.x,y:anchor.y,next:null,progress:0,path:[],index:initial,wait:stops[initial].hold,direction:stops[initial].face,clock:0};actors.set(name,a);}
    const speaking=cue?.speaker===name;if(!paused||speaking)a.clock+=delta;
@@ -74,7 +77,7 @@ export function createActors(){
    if(speaking&&cue.talking){const dx=s.player.x-a.x,dy=s.player.y-a.y;a.direction=Math.abs(dx)>Math.abs(dy)?dx>0?'right':'left':dy>0?'down':'up';}
    const work=!speaking&&!walking&&!a.next&&!a.path.length&&!!stops[a.index].work;
    const emotion=speaking?cue.emotion:'neutral',talking=!!(speaking&&cue.talking);
-   return {blink:blinkAt(a.clock,name==='mara'?1:name==='rowan'?3:4,reduce),gait:a.clock/150,name,anchor:{...anchor},x:a.x,y:a.y,tileX:Math.round(a.x),tileY:Math.round(a.y),direction:a.direction,walking,work,emotion,talking,activity:stops[a.index].activity,clock:a.clock,frame:animationFrame({direction:a.direction,walking,work,emotion,talking,clock:a.clock,reduce})};
+   return {blink:blinkAt(a.clock,name==='mara'?1:name==='rowan'?3:4,reduce),gait:a.clock/150,name,anchor:{...anchor},x:a.x,y:a.y,tileX:Math.round(a.x),tileY:Math.round(a.y),direction:a.direction,walking,work,emotion,talking,activity:stops[a.index].activity,...(market&&!speaking&&!walking&&!a.path.length&&a.wait>6500?{speech:name==='mara'?'Tray’s here. Mind the warm ones!':name==='orin'?'Built this bench. Very thorough testing.':"That plant’s enjoying the company.",speechSpeaker:name==='mara'?'Mara':name==='orin'?'Orin':'Rowan'}:{}),clock:a.clock,frame:animationFrame({direction:a.direction,walking,work,emotion,talking,clock:a.clock,reduce})};
   });if(visit&&visit.room===s.room){visit.frame=animationFrame({...visit,reduce});views.push(visit);}return views;
  }};
 }

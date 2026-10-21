@@ -49,3 +49,7 @@ Fixed carried-basket hand attachment, action-pose head scale, shirt/hair overlap
 
 ### 0.10.0 · Gathering and workshop
 Earn an axe and pickaxe from Orin after the first harvest. Chop fallen logs, mine small rocks, craft freely placed decorations and earn fittings that reduce each patch from three swings to two. Existing saves migrate without granting tools. See [gathering and workshop](docs/gathering-and-workshop.md) for costs, verification and limits. 126 checks pass.
+
+
+### 0.11.0 · Our village square
+Restore a neglected square, gather contributions from Orin, Mara and Rowan, and freely arrange its bench, plants and lights. Host a market gathering that adds up to 6 G to the village fund the next morning. Missing work supplies delay only the affected helper and can be repaired. See [village square](docs/village-square.md) for exact scope and limits. 142 checks pass.

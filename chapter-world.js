@@ -1,3 +1,4 @@
+import {drawSquare} from './square-art.js';
 import {drawGatheringSites,drawGatheringTool} from './gathering-art.js';
 import {drawPlayer} from './player-layered.js';
 import {drawCarryBasket} from './character-attachments.js';
@@ -34,6 +35,7 @@ export function draw(c,s,v){
  c.imageSmoothingEnabled=false;r(c,0,0,width,height,out?'#8da16b':'#263e38');c.save();c.translate(-camera.x,-camera.y);
  if(out){
   for(let y=0;y<H;y++)for(let x=0;x<W;x++){const n=noise(x,y)%100;r(c,x*16,y*16,16,16,n>70?'#91a970':n>35?'#8ca56a':'#88a166');if(n>78){r(c,x*16+4,y*16+7,1,3,'#6f8f55');r(c,x*16+6,y*16+8,1,3,'#719357');r(c,x*16+5,y*16+11,3,1,'#b1bd7c');}if(y===17||x===11&&y>=12&&y<=17||x===45&&y>=10&&y<17){r(c,x*16,y*16,16,16,'#cabd91');r(c,x*16+3,y*16+4,7,2,'#daceaa');r(c,x*16+11,y*16+12,3,1,'#b4a77e');}}
+  drawSquare(c,s);
   for(let y=20;y<29;y++)for(let x=46;x<53;x++){r(c,x*16,y*16,16,16,'#679b94');if((x+y)%3===0)r(c,x*16+(reduce?3:Math.floor(time/750)%4),y*16+7,10,1,'#a9c7ae');}for(let y=20;y<29;y++)r(c,46*16-3,y*16,3,16,'#b5b88d');
   if(s.economy.projects.market){r(c,5*16,15*16,48,32,'#b7a37b');r(c,5*16+2,15*16-6,3,31,'#826243');r(c,8*16-5,15*16-6,3,31,'#826243');for(let j=0;j<6;j++)r(c,5*16+j*8,15*16-13,8,12,j%2?'#e5cea0':'#879e71');r(c,5*16,16*16-4,48,9,'#a87f50');for(let j=0;j<(s.economy.lastBatch==='small'?2:5);j++){r(c,5*16+5+j*7,16*16-8,5,4,'#d8a565');r(c,5*16+6+j*7,16*16-8,2,1,'#f0ce91');}label(c,6*16+8,15*16-18,'Village market');}else{r(c,6*16+2,16*16,13,10,'#d2b27b');r(c,6*16+7,16*16+9,2,9,'#8b6847');}
   for(let j=0;j<70;j++){const x=4+j*17%47,y=8+j*11%24;if((x<15||y>28)&&!s.plots.some(p=>p.x===x&&p.y===y))plant(c,x*16+5,y*16+10,j%3?'#e9d9a1':'#d7a6a0');}
