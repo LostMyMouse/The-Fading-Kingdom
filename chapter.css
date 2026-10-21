@@ -19,3 +19,5 @@ dialog.character-dialogue{width:min(700px,calc(100% - 24px))}
 #treasury{position:absolute;right:18px;top:18px;z-index:1;min-height:44px;padding:8px 12px;background:#fff1d7f2;border:1px solid #ac996a;box-shadow:0 3px #38523522;font-size:13px;font-weight:650;max-width:150px}.ledger-line{font-size:13px;border-bottom:1px solid #ded2ae;padding-bottom:7px}@media(max-width:700px){#treasury{right:10px;top:10px;font-size:11px;max-width:104px;padding:7px 9px}}@media(max-height:520px){#treasury{top:8px;right:10px}}
 
 .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+
+.story-chapters{list-style:none;padding:0;margin:20px 0 0;display:grid;gap:12px}.story-chapter{padding:14px 16px;border:1px solid #d7caa6;border-left:4px solid #b8b68a;border-radius:4px;background:#f3e9cc}.story-chapter.finished{border-left-color:#6d895b;background:#e9e8c9}.story-chapter h3{margin:6px 0}.story-chapter p{margin:4px 0;font-size:14px}#objective button{font-weight:650;min-height:44px;text-align:left}@media(max-width:370px){#objective{max-width:184px}.story-chapter{padding:12px}}

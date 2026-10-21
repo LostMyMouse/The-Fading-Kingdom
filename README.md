@@ -57,3 +57,7 @@ Restore a neglected square, gather contributions from Orin, Mara and Rowan, and 
 
 ### 0.11.1 · Regression testing
 Added a fresh-story journey, 80 simulated days of seeded stress tests and automatic checks for pushes and pull requests. Fixed market NPC locations across rooms, cooking while Mara is away, and the decoration/save capacity mismatch. Run `npm run check` (147 checks) or `npm run test:journey`. See [regression report](docs/regression-run-0.11.1.md) for scope and limits.
+
+
+### 0.12.0 · A clearer first chapter
+The objective card now offers specific optional actions, and the journal remembers the village story through seven earned milestones. Guidance covers seeds, deliveries, equipment, funding and preparing the first square gathering. No save fields or rewards were added. See [first-hour guidance](docs/first-hour-guidance.md) for the tested scope and remaining playtests. 157 checks pass.

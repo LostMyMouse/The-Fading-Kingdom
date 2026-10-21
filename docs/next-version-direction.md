@@ -109,3 +109,7 @@ The first earned axe/pickaxe, renewable fallen-log/small-rock patches, physical 
 
 ## Our village square · 0.11.0
 One complete public project connects earned materials, remembered neighbour contributions, free furnishing placement, independent market-day routines and additional shared income. Missing work supplies have local, repairable effects on help and trade. See village-square.md. Bespoke sitting, full commutes, more visitors and the arrival cutscene remain later work.
+
+
+## First-hour guidance · 0.12.0
+Implemented optional, actionable guidance and a seven-part village story derived from real progress. Seed, material, food and funding gaps now have context. See first-hour-guidance.md. The next stages remain deeper relationship episodes, bespoke sitting/working polish, sound and observed player/device testing before expansion.
