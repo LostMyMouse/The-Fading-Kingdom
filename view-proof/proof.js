@@ -1,12 +1,15 @@
 import {preparePlayer,drawPlayer} from '../player-layered.js';
 import {prepareCharacters,drawCharacter} from '../chapter-characters.js';
 import {animationFrame} from '../chapter-actors.js';
+import {preparePixelCast,drawPixelCast,audit} from './pixel-cast.js';
 
 // Presentation only: use the actual shared character renderer without story state.
 const $=id=>document.getElementById(id),canvas=$('scene'),c=canvas.getContext('2d');
 const look={skin:1,hair:0,shirt:0,style:0,outfit:0,hat:0};
 const reduce=matchMedia('(prefers-reduced-motion: reduce)');
-let direction='down',zoom=innerWidth<700?2:3,walking=false,running=false,clock=0,last=0,grid=false,baseline=false,building=true,ready=false;
+let direction='down',zoom=innerWidth<700?2:3,walking=false,running=false,clock=0,last=0,grid=false,baseline=false,building=true,ready=false,castMode='pixel';
+const directionNames={down:'Front',left:'Left',right:'Right',up:'Back'},matrix=[];
+for(const d of ['down','left','right','up']){const figure=document.createElement('figure'),cv=document.createElement('canvas'),caption=document.createElement('figcaption'),labels=document.createElement('div');figure.className='matrix-card';caption.textContent=directionNames[d];cv.setAttribute('aria-label',`New pixel candidate: ${directionNames[d]}. Mara, player and Orin at the same height.`);labels.className='matrix-labels';labels.innerHTML='<span>Mara</span><span>You</span><span>Orin</span>';figure.append(caption,cv,labels);$('pixel-matrix').append(figure);matrix.push({canvas:cv,direction:d});}
 const cottage=new Image();
 const cottageReady=new Promise((resolve,reject)=>{cottage.onload=()=>resolve();cottage.onerror=()=>reject(Error('The cottage image could not load.'));});
 cottage.src=new URL('./cottage-front.png',import.meta.url).href;
@@ -36,14 +39,17 @@ function draw(){
  if(baseline){rect(104,169,112,1,'#fff1b7');rect(104,170,112,1,'#4d5c3c');}
  const frame=clock/170%4;
  if(ready)for(const [i,p]of cast.entries()){
-  if(p.name)drawCharacter(c,{name:p.name,direction,walking,gait:frame,frame:animationFrame({direction,walking,clock})},p.x,168);
+  if(castMode==='pixel')drawPixelCast(c,p.name||'player',direction,p.x,168);
+  else if(p.name)drawCharacter(c,{name:p.name,direction,walking,gait:frame,frame:animationFrame({direction,walking,clock})},p.x,168);
   else drawPlayer(c,p.x,168,look,frame,direction,walking,false,false);
   names[i].style.left=Math.round((p.x-camera.x)*zoom)+'px';names[i].style.top=Math.round((177-camera.y)*zoom)+'px';
  }
- const pose=!walking?'standing':['passing','left foot forward','passing','right foot forward'][Math.floor(frame)];
+ const pose=castMode==='pixel'?'standing study':!walking?'standing':['passing','left foot forward','passing','right foot forward'][Math.floor(frame)];
  $('status').textContent=`${{down:'Front',left:'Left',right:'Right',up:'Back'}[direction]} · ${pose} · ${zoom}×`;
 }
-function sync(){document.querySelectorAll('[data-direction]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.direction===direction)));document.querySelectorAll('[data-zoom]').forEach(b=>b.setAttribute('aria-pressed',String(Number(b.dataset.zoom)===zoom)));$('walk').textContent=running?'Pause walking':'Play walking';$('walk').setAttribute('aria-pressed',String(running));draw();}
+function drawMatrix(){if(!ready)return;for(const {canvas:cv,direction:d}of matrix){const box=cv.getBoundingClientRect(),dpr=devicePixelRatio||1,ctx=cv.getContext('2d');cv.width=Math.round(box.width*dpr);cv.height=Math.round(box.height*dpr);ctx.setTransform(dpr*2,0,0,dpr*2,0,0);ctx.imageSmoothingEnabled=false;ctx.fillStyle='#92a76e';ctx.fillRect(0,0,box.width/2,box.height/2);const middle=Math.floor(box.width/4),foot=52;ctx.fillStyle='#c7d2a0';ctx.fillRect(middle-52,foot+2,104,.5);for(const [i,name]of ['mara','player','orin'].entries())drawPixelCast(ctx,name,d,middle+(i-1)*36,foot);}}
+function sync(){document.querySelectorAll('[data-direction]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.direction===direction)));document.querySelectorAll('[data-zoom]').forEach(b=>b.setAttribute('aria-pressed',String(Number(b.dataset.zoom)===zoom)));document.querySelectorAll('[data-cast]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.cast===castMode)));$('walk').textContent=running?'Pause walking':'Play walking';$('walk').setAttribute('aria-pressed',String(running));$('walk').disabled=$('step').disabled=castMode==='pixel';$('cast-label').textContent=castMode==='pixel'?'New pixel candidate · standing poses':'Current game cast · unchanged';$('motion-note').textContent=castMode==='pixel'?'The new cast has standing poses only. Choose Current game cast to inspect the existing walking animation.':'Current game sprites: walking uses the existing shared character rig. The candidate below remains a standing-pose study.';draw();drawMatrix();}
+document.querySelectorAll('[data-cast]').forEach(b=>b.onclick=()=>{castMode=b.dataset.cast;walking=false;running=false;clock=0;sync();});
 document.querySelectorAll('[data-direction]').forEach(b=>b.onclick=()=>{direction=b.dataset.direction;sync();});
 document.querySelectorAll('[data-zoom]').forEach(b=>b.onclick=()=>{zoom=Number(b.dataset.zoom);sync();});
 $('walk').onclick=()=>{walking=true;running=!running;sync();};
@@ -51,9 +57,9 @@ $('step').onclick=()=>{running=false;walking=true;clock=(Math.floor(clock/170)+1
 $('reset').onclick=()=>{clock=0;walking=false;running=false;sync();};
 for(const [id,get,set,texts]of [['grid',()=>grid,v=>grid=v,['Show ground grid','Hide ground grid']],['baseline',()=>baseline,v=>baseline=v,['Show foot line','Hide foot line']],['building',()=>building,v=>building=v,['Show cottage','Hide cottage']]])$(id).onclick=()=>{set(!get());$(id).setAttribute('aria-pressed',String(get()));$(id).textContent=texts[Number(get())];draw();};
 canvas.addEventListener('keydown',e=>{if(['1','2','3','4'].includes(e.key)){direction=['down','left','right','up'][Number(e.key)-1];sync();}if(e.code==='Space'){e.preventDefault();$('walk').click();}});
-new ResizeObserver(()=>draw()).observe(canvas);
+const observer=new ResizeObserver(()=>{draw();drawMatrix();});observer.observe(canvas);for(const m of matrix)observer.observe(m.canvas);
 document.querySelectorAll('button').forEach(b=>b.disabled=true);
-Promise.all([preparePlayer(),prepareCharacters(),cottageReady]).then(([player,characters])=>{if(!player||!characters)throw Error('Some character artwork could not load.');crop=findBounds();ready=true;$('loading').hidden=true;document.querySelectorAll('button').forEach(b=>b.disabled=false);sync();}).catch(err=>{$('loading').textContent=err.message+' Reload to try again.';});
+Promise.all([preparePlayer(),prepareCharacters(),cottageReady,preparePixelCast()]).then(([player,characters])=>{if(!player||!characters)throw Error('Some character artwork could not load.');crop=findBounds();ready=true;$('loading').hidden=true;document.querySelectorAll('button').forEach(b=>b.disabled=false);const flagged=audit.filter(a=>a.footRow!==31||a.components!==1);$('pixel-audit').textContent=`${audit.length} display frames · 24×32 cells · 48-colour shared palette. ${flagged.length?flagged.length+' frames have pixel-group or foot-row flags; inspect the table.':'All frames have a shared foot row and one connected silhouette.'} These checks do not establish animation or art approval.`;for(const a of audit){const tr=document.createElement('tr');for(const value of [a.name,directionNames[a.direction],a.colours,a.footRow,a.components]){const td=document.createElement('td');td.textContent=value;tr.append(td);}$('audit-rows').append(tr);}sync();}).catch(err=>{$('loading').textContent=err.message+' Reload to try again.';});
 function tick(now){if(running&&!document.hidden){clock+=Math.min(50,last?now-last:0);draw();}last=now;requestAnimationFrame(tick);}requestAnimationFrame(tick);
 // Reduced motion starts still; explicit Play remains available for an intentional inspection.
 if(reduce.matches){walking=false;running=false;}
