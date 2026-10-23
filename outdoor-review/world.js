@@ -1,5 +1,6 @@
 export const WIDTH=24,HEIGHT=20,TILE=16;
 export const HOME={x:128,y:142};
+export const HOME_DOOR={x:8,y:8},HOME_APPROACH={x:8,y:9};
 export const DECOR=[
  ['oak',40,106,2,6],['pine',328,126,20,7],['oak',352,275,22,17],['pine',38,295,2,18],
  ['bench',266,218,16,13],['well',247,156,15,9],['chest',178,148,11,9],['lantern',198,154,12,9],
@@ -12,6 +13,7 @@ export const SPAWN={x:10,y:13};
 export const point=p=>({x:p.x*TILE+8,y:p.y*TILE+14});
 export function blocked(p){
  if(!Number.isInteger(p.x)||!Number.isInteger(p.y)||p.x<1||p.y<1||p.x>=WIDTH-1||p.y>=HEIGHT-1)return true;
+ if(p.x===HOME_DOOR.x&&p.y===HOME_DOOR.y)return false;
  if(p.x>=4&&p.x<=9&&p.y>=3&&p.y<=8)return true;
  return DECOR.some(([,x,y,tx,ty])=>tx!==undefined&&p.y===ty&&Math.abs(p.x-tx)<=(x===266?1:0));
 }

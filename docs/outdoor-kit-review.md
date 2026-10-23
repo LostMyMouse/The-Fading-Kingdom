@@ -1,5 +1,7 @@
 # Outdoor art kit · 24 October 2026
 
+Follow-up: this document records the earlier outdoor-only pass. The same walkthrough now includes an enterable cottage and a limited furniture trial; see [cottage interior review](cottage-interior-review.md) for current scope, separate preview storage and checks.
+
 Status: isolated, walkable outdoor art review. Not an approved replacement map. Original player, Mara, Orin, Rowan and canonical dialogue portraits retain their source artwork, identities and proportions. The rejected replacement cast is not imported.
 
 ## What this contains
