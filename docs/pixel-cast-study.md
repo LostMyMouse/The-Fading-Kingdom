@@ -1,6 +1,6 @@
 # Pixel cast study · 24 October 2026
 
-Status: an isolated standing-pose candidate, not production character replacement. James asked us to continue towards crisper world sprites after the camera proof exposed the mismatch between the soft, large-headed existing cast and the desired pixel farming-game style.
+Status: **REJECTED by James on 24 October 2026. Do not use or promote this candidate.** It changed the characters' identity, faces, warmth and proportions too much. It has been removed from the active review. The files remain historical evidence only. See original-cast-direction.md. The notes below describe the rejected experiment, not current art direction.
 
 ## Artwork and source authority
 

@@ -1,3 +1,5 @@
+// REJECTED by James, 24 October 2026. Historical evidence only; do not import
+// into active reviews or the game. See docs/original-cast-direction.md.
 import {CHARACTER_HEIGHT,pixelAnchor} from '../character-rig.js';
 
 // New artwork candidate, never a filter over the current production cast.

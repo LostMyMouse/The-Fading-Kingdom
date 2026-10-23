@@ -1,6 +1,6 @@
 # Camera and cast proof · 22 October 2026
 
-24 October follow-up: the review page now adds a new standing-pose pixel candidate and a Current game cast comparison toggle. See [pixel cast study](pixel-cast-study.md) for actual scope, source limitations and the remaining animation/customisation gates. The initial camera study below describes the unchanged current-cast mode.
+24 October correction: James rejected the replacement pixel cast. The active review now uses only the original character artwork, plus a cottage-scale comparison and original-cast direction matrix. See [original cast direction](original-cast-direction.md). The pixel cast study is archived as rejected; it is not an active direction. The initial camera study below describes the original-cast context.
 
 James's feedback on the first village concept: the view does not make sense beside the sprites and does not fit the farming-game style he wants. Treat that environment image as an earlier concept under revision, not accepted production direction. Retain the desired warmth, open land and original identity. The canonical dialogue portraits remain approved and unchanged.
 

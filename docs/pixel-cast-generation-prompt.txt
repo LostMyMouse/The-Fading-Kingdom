@@ -1,3 +1,6 @@
+REJECTED OUTPUT — archived prompt only. James rejected this character redesign on 24 October 2026. Do not reuse it as current art direction. See original-cast-direction.md.
+
+Original generation prompt:
 Create an ORIGINAL strict low-resolution 16-bit PIXEL ART SPRITE SHEET for a cosy top-down farming RPG.
 Not an illustration. Not a painted cartoon. No smooth rendering. The image must look like a tiny classic game sprite atlas zoomed up with nearest-neighbour pixels: large perfectly square solid pixel blocks with hard stair-stepped edges, one logical pixel outline, NO antialiasing, gradients, texture, brushwork or subpixel features. Use solid pixel clusters only and at most32 colours shared across the entire sheet.
 Canvas1024x1536. Exact4 columns x3 rows, equal256x512cells. A single full-body sprite centred in each cell. Each sprite is a design at16x32 LOGICAL PIXELS enlarged exactly12x (thus192x384px sprite maximum). Foot baseline448px below cell top. Each logical pixel is one solid12x12 square. DO NOT subdivide the12x12 squares. All12 characters share this coarse grid and body height. Eyes each ONE square pixel. A nose is optional one pixel. Head including hair is10 pixels high, torso10 pixels, legs and boots12 pixels. Small heads, longer legs, three-head-tall bodies. Simple approachable adult proportions. Hands attached. Standing only.
