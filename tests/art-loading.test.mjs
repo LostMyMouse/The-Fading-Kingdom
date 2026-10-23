@@ -8,7 +8,8 @@ test('held basket follows the same hand pivot through both contacts and passing 
   const still=handAnchor({direction,frame,walking:true,reduce:true});assert.deepEqual(still,handAnchor({direction}));
  }
  for(const direction of ['left','right'])assert.notEqual(handAnchor({direction,frame:1,walking:true}).x,handAnchor({direction,frame:3,walking:true}).x);
- assert.equal(handAnchor({direction:'down',frame:1,walking:true}).y-handAnchor({direction:'down'}).y,gaitPose(1).leftArm*1.5);
+ // Front/rear sleeves now rotate about a shoulder instead of detaching vertically.
+ for(const direction of ['down','up']){const shoulder={x:-.375*(216/366*32),y:-32+2+.49*32};for(let frame=0;frame<4;frame+=.125){const p=handAnchor({direction,frame,walking:true});assert.ok(Math.abs(Math.hypot(p.x-shoulder.x,p.y-shoulder.y)-.31*32)<1e-8);}}
 });
 
 test('all player layers must load; a failed hairstyle can be retried without caching a false ready state',async()=>{

@@ -1,6 +1,10 @@
 // One world-character contract: common height, foot baseline and textured limb regions.
 export const CHARACTER_HEIGHT=32;
 export const RIG={head:[0,0,1,.53],leftArm:[0,.51,.25,.80],rightArm:[.75,.51,1,.80],leftLeg:[.23,.84,.50,1],rightLeg:[.50,.84,.77,1]};
+// Extend moving regions underneath the fixed clothing. Butt-joined rectangles
+// exposed the background at the hips and shoulders during rotation/translation.
+const WALK_LEFT_LEG=[.23,.78,.50,1],WALK_RIGHT_LEG=[.50,.78,.77,1];
+const WALK_LEFT_ARM=[0,.49,.25,.80],WALK_RIGHT_ARM=[.75,.49,1,.80];
 export function gaitPose(frame=0){const cycle=((frame%4)+4)%4,index=Math.floor(cycle),t=cycle-index,ease=t*t*(3-2*t),keys=[0,1,0,-1,0],phase=keys[index]+(keys[index+1]-keys[index])*ease;return {leftLeg:phase,rightLeg:-phase,leftArm:-phase,rightArm:phase};}
 function piece(c,image,rect,box,x,y,w,h,dx=0,dy=0,dark=false){
  const [sx,sy,sw,sh]=rect,[l,t,r,b]=box;c.save();if(dark)c.filter='brightness(.78)';
@@ -22,7 +26,8 @@ export function handAnchor({direction='down',walking=false,frame=0,reduce=false}
   const angle=p.leftArm*(left?-1:1)*-.18,length=(arm[3]-arm[1])*h;
   return {x:((arm[0]+arm[2])/2-.5)*w-Math.sin(angle)*length,y:-h+2+arm[1]*h+Math.cos(angle)*length,behind:false};
  }
- return {x:-.375*w,y:-h+2+.80*h+p.leftArm*(direction==='up'?-1:1)*1.5,behind:direction==='up'};
+ const angle=p.leftArm*(direction==='up'?-1:1)*-.18,length=.31*h;
+ return {x:-.375*w-Math.sin(angle)*length,y:-h+2+.49*h+Math.cos(angle)*length,behind:direction==='up'};
 }
 export function drawRig(c,image,rect,{direction='down',walking=false,frame=0,layout=null,action=null},x,y){
  const h=CHARACTER_HEIGHT,w=rect[2]/rect[3]*h;const anchor=pixelAnchor(c,x,y);x=anchor[0]-w/2;y=anchor[1]-h+2;
@@ -31,17 +36,19 @@ export function drawRig(c,image,rect,{direction='down',walking=false,frame=0,lay
  const p=gaitPose(action?0:frame),side=direction==='left'||direction==='right',sign=direction==='left'?-1:1,back=direction==='up'?-1:1;
  const sideArm=layout?.[direction]?.arm??(direction==='left'?[.66,.51,.96,.79]:[.04,.51,.34,.79]);
  const torso=layout?.[direction]?.torso??(direction==='left'?[.15,.53,.66,.88]:direction==='right'?[.34,.53,.85,.88]:[.25,.53,.75,.88]);
- if(side){hinged(c,image,rect,RIG.leftLeg,x,y,w,h,p.leftLeg*sign*-.34,true);hinged(c,image,rect,RIG.rightLeg,x,y,w,h,p.rightLeg*sign*-.34);}
- else{piece(c,image,rect,RIG.leftLeg,x,y,w,h,0,p.leftLeg*back,true);piece(c,image,rect,RIG.rightLeg,x,y,w,h,0,p.rightLeg*back);}
+ if(side){hinged(c,image,rect,WALK_LEFT_LEG,x,y,w,h,p.leftLeg*sign*-.34,true);hinged(c,image,rect,WALK_RIGHT_LEG,x,y,w,h,p.rightLeg*sign*-.34);}
+ else{piece(c,image,rect,WALK_LEFT_LEG,x,y,w,h,0,p.leftLeg*back,true);piece(c,image,rect,WALK_RIGHT_LEG,x,y,w,h,0,p.rightLeg*back);}
  if(side){
   // Preserve the entire torso silhouette around the visible arm. A shoulder pivot
   // keeps the sleeve attached; duplicating/translating this arm made floating hands.
   const [l,t,r,b]=sideArm;
-  piece(c,image,rect,[0,.53,l,.84],x,y,w,h);piece(c,image,rect,[r,.53,1,.84],x,y,w,h);
+  piece(c,image,rect,[0,.53,l,.90],x,y,w,h);piece(c,image,rect,[r,.53,1,.90],x,y,w,h);
   if(t>.53)piece(c,image,rect,[l,.53,r,t],x,y,w,h);
-  if(b<.84)piece(c,image,rect,[l,b,r,.84],x,y,w,h);
+  if(b<.90)piece(c,image,rect,[l,b,r,.90],x,y,w,h);
  }
- else{if(action)hinged(c,image,rect,RIG.leftArm,x,y,w,h,swingAngle(direction,action.progress));else piece(c,image,rect,RIG.leftArm,x,y,w,h,0,p.leftArm*back*1.5);piece(c,image,rect,RIG.rightArm,x,y,w,h,0,p.rightArm*back*1.5);}
- piece(c,image,rect,RIG.head,x,y,w,h);if(!side)piece(c,image,rect,torso,x,y,w,h);
+ else{if(action)hinged(c,image,rect,RIG.leftArm,x,y,w,h,swingAngle(direction,action.progress));else hinged(c,image,rect,WALK_LEFT_ARM,x,y,w,h,p.leftArm*back*-.18);hinged(c,image,rect,WALK_RIGHT_ARM,x,y,w,h,p.rightArm*back*-.18);}
+ if(!side)piece(c,image,rect,[torso[0],torso[1],torso[2],.90],x,y,w,h);
  if(side)hinged(c,image,rect,sideArm,x,y,w,h,action?swingAngle(direction,action.progress):p.leftArm*sign*-.18);
+ // The neck/hair cap covers the shoulder overlap last in every direction.
+ piece(c,image,rect,RIG.head,x,y,w,h);
 }
