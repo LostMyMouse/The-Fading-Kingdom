@@ -1,9 +1,10 @@
 import test from 'node:test';import assert from 'node:assert/strict';
 import {HOME_DOOR,HOME_APPROACH,SPAWN,point,route} from '../outdoor-review/world.js';
-import {ENTRY,EXIT,PREVIEW_KEY,startingFurniture,placement,roomRoute,roomBlocked,portalAt,readFurniture,writeFurniture} from '../outdoor-review/cottage.js';
+import {ENTRY,EXIT,EXIT_RIGHT,PREVIEW_KEY,startingFurniture,placement,roomRoute,roomBlocked,portalAt,readFurniture,writeFurniture} from '../outdoor-review/cottage.js';
 import {moveActor} from '../outdoor-review/movement.js';
 const actor=tile=>({tile:{...tile},...point(tile),direction:'down',clock:0,path:[],walking:false});
 test('the cottage opens automatically only after completed threshold movement, and both spawns can leave safely',()=>{
+ assert.deepEqual(portalAt('cottage',EXIT_RIGHT),{room:'outside',tile:HOME_APPROACH,direction:'down'});assert.ok(roomRoute(startingFurniture(),ENTRY,EXIT_RIGHT));
  for(const fps of [30,60,120]){const p=actor(SPAWN);p.path=route(SPAWN,HOME_DOOR);assert.ok(p.path.length);let entry=null;for(let i=0;i<fps*10&&!entry;i++)entry=moveActor(p,1000/fps,tile=>portalAt('outside',tile));assert.deepEqual(entry,{room:'cottage',tile:ENTRY,direction:'up'});assert.deepEqual(p.path,[]);assert.deepEqual(p.tile,HOME_DOOR);
  const inside=actor(entry.tile);assert.equal(moveActor(inside,50,tile=>portalAt('cottage',tile)),null);inside.path=roomRoute(startingFurniture(),ENTRY,EXIT);let exit=null;for(let i=0;i<fps*2&&!exit;i++)exit=moveActor(inside,1000/fps,tile=>portalAt('cottage',tile));assert.deepEqual(exit,{room:'outside',tile:HOME_APPROACH,direction:'down'});const outside=actor(exit.tile);assert.equal(moveActor(outside,50,tile=>portalAt('outside',tile)),null);assert.ok(route(outside.tile,SPAWN));}
 });
