@@ -27,7 +27,7 @@ function update(dt){
  if(!paused&&!reduce.matches)for(const npc of npcs){if(!npc.path.length){npc.wait-=dt;if(npc.wait<=0){npc.stop=(npc.stop+1)%STOPS[npc.name].length;npc.path=route(npc.tile,STOPS[npc.name][npc.stop])||[];npc.wait=npc.name==='mara'?4200:6100;}}move(npc,dt);}
 }
 function draw(){if(!ready)return;const box=canvas.getBoundingClientRect(),dpr=devicePixelRatio||1,w=Math.round(box.width*dpr),h=Math.round(box.height*dpr);if(canvas.width!==w||canvas.height!==h){canvas.width=w;canvas.height=h;}
- const vw=box.width/zoom,vh=box.height/zoom,axis=(v,span,total)=>span>total?(total-span)/2:Math.max(0,Math.min(total-span,v-span/2));camera={x:Math.round(axis(player.x,vw,WIDTH*16)),y:Math.round(axis(player.y-18,vh,HEIGHT*16))};
+ const vw=box.width/zoom,vh=box.height/zoom,axis=(v,span,total)=>span>total?(total-span)/2:Math.max(0,Math.min(total-span,v-span/2));camera={x:Math.round(axis(player.x,vw,WIDTH*16)),y:Math.round(axis(player.y-90,vh,HEIGHT*16))};
  c.setTransform(dpr*zoom,0,0,dpr*zoom,0,0);c.imageSmoothingEnabled=false;c.translate(-camera.x,-camera.y);c.fillStyle=c.createPattern(art.patterns[0],'repeat');c.fillRect(camera.x,camera.y,vw+1,vh+1);c.drawImage(ground,0,0);
  const crops=['seedling','growing','carrot'];for(let row=0;row<3;row++)for(let col=0;col<4;col++){const chosen=$('crop').value;drawProp(c,art,chosen==='mixed'?crops[(row+col)%3]:chosen,69+col*16,206+row*16,13);}
  const objects=DECOR.map(([name,x,y])=>({y,draw:()=>drawProp(c,art,name,x,y)}));objects.push({y:HOME.y,draw:()=>drawCottage(c,art,HOME.x,HOME.y)});
