@@ -1,7 +1,7 @@
 import {blocked,route,FIXED} from './chapter-model.js';
 import {bakeryOpen,record} from './chapter-economy.js';
 export const BRIDGE={x:45,y:25,left:46,right:48,top:24,bottom:25};
-export const RIVERSIDE={x:51,y:24,left:49,right:52,top:22,bottom:27};
+export const RIVERSIDE={x:51,y:24,left:49,right:51,top:22,bottom:27};
 export const BRIDGE_COST={gold:24,wood:6,stone:4};
 export const BRIDGE_LINES={
  plan:'There’s a little island across the pond. Wild berries, shady grass… no way over without very wet socks. Fancy fixing the old footbridge?',

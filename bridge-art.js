@@ -5,7 +5,7 @@ const load=path=>new Promise(resolve=>{const image=new Image();image.onload=()=>
 export function prepareBridgeArt(){if(loading)return loading;loading=Promise.all([load('./assets/environment/footbridge-v1.png'),load('./assets/environment/terrain-v1.png')]).then(([a,t])=>{if(!a||!t){loading=null;return false;}atlas=a;grass=document.createElement('canvas');grass.width=grass.height=64;const c=grass.getContext('2d');c.imageSmoothingEnabled=false;c.drawImage(t,0,0,t.width/2,t.height/2,0,0,64,64);c.fillStyle='#8da16b55';c.fillRect(0,0,64,64);return true;});return loading;}
 function piece(c,id,x,y,w,h){if(atlas)c.drawImage(atlas,...RECTS[id],Math.round(x),Math.round(y),w,h);}
 export function drawRiverside(c,s){
- if(grass){c.fillStyle=c.createPattern(grass,'repeat');c.beginPath();c.roundRect(RIVERSIDE.left*16,RIVERSIDE.top*16,64,96,5);c.fill();}
+ if(grass){c.fillStyle=c.createPattern(grass,'repeat');c.beginPath();c.roundRect(RIVERSIDE.left*16,RIVERSIDE.top*16,(RIVERSIDE.right-RIVERSIDE.left+1)*16,(RIVERSIDE.bottom-RIVERSIDE.top+1)*16,5);c.fill();}
  c.fillStyle='#d4c49a';c.fillRect(49*16,24*16,17,32);
  piece(c,'berries',RIVERSIDE.x*16-4,23*16-4,24,20);
  const x=BRIDGE.left*16,y=(BRIDGE.bottom+1)*16;
