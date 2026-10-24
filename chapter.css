@@ -21,3 +21,4 @@ dialog.character-dialogue{width:min(700px,calc(100% - 24px))}
 .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
 
 .story-chapters{list-style:none;padding:0;margin:20px 0 0;display:grid;gap:12px}.story-chapter{padding:14px 16px;border:1px solid #d7caa6;border-left:4px solid #b8b68a;border-radius:4px;background:#f3e9cc}.story-chapter.finished{border-left-color:#6d895b;background:#e9e8c9}.story-chapter h3{margin:6px 0}.story-chapter p{margin:4px 0;font-size:14px}#objective button{font-weight:650;min-height:44px;text-align:left}@media(max-width:370px){#objective{max-width:184px}.story-chapter{padding:12px}}
+.resident-chapters p{font-size:16px;line-height:1.5}.resident-chapters h3{font-size:18px}

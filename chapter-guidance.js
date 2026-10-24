@@ -1,3 +1,4 @@
+import {BRIDGE} from './chapter-bridge.js';
 import {FIXED,RESOURCES} from './chapter-model.js';
 import {carryCapacity} from './chapter-hauling.js';
 import {SITES,siteStatus} from './chapter-gathering.js';
@@ -52,6 +53,7 @@ export function nextStep(s){const e=s.story,h=s.house,g=s.gardener;
  if(h.stage===2)return step('finish-home','A front door for Mara','Set out Mara’s herbs and choose the finishing touches.','Finish Mara’s home','building',{x:h.x+2,y:h.y+4});
  if(s.economy.flour.noticed&&missingFlour(s))return s.economy.flour.state==='used'?npc('orin','Morning orders','Orin can swap two carrots for fresh flour. Put the sack on Mara’s shelf afterwards.','Find replacement flour','flourTrade'):step('flour-shelf','Morning orders','Put the flour sack back on the kitchen shelf for Mara’s next batch.','Visit the flour shelf','flourShelf',{x:h.x+2,y:h.y+4});
  if(!e.cooked){if(!s.inventory.carrot&&!e.cooking)return farming(s);return step('cook','Something in the oven',e.cooking?'Your batch is waiting in the kitchen. Pick up where you left off.':'Bring a carrot to Mara’s kitchen. Make your first tray together.','Visit Mara’s kitchen','kitchen',{x:h.x+2,y:h.y+4});}
+ if(s.bridge?.started&&!s.bridge.built)return npc('orin','A path across the pond','The bridge supplies are set aside. Find Orin to put them together.','About the footbridge','bridgeHelp');
  if(!e.wideCan)return npc('orin','A hand on the farm','Orin has a wider spout for your can. Same can, fewer trips.','Visit Orin','equipment');
  if(s.gathering.job!=='done')return npc('orin','Handier tools','Orin’s bench could use a repair. Ask him about an axe and a pickaxe.','Ask about gathering tools','tools');
  if(!s.economy.projects.nursery)return project(s,'nursery');
@@ -76,5 +78,6 @@ export function villageStory(s){return [
  {id:'tools',title:'Handier tools',done:s.gathering.job==='done',text:'Help repair Orin’s bench and earn your axe and pickaxe.'},
  {id:'trade',title:'A village at work',done:s.economy.projects.nursery&&s.economy.projects.market,text:'The nursery and market turn everyday work into a shared village fund.'},
  {id:'rowan',title:'Room for Rowan',done:s.gardener.house?.stage===3,text:'A home, a seed counter and new things to grow.'},
- {id:'square',title:'Somewhere to gather',done:s.square.opened,text:'You arrange the square. Your neighbours bring their skills and a little company.'}
+ {id:'square',title:'Somewhere to gather',done:s.square.opened,text:'You arrange the square. Your neighbours bring their skills and a little company.'},
+ ...(s.bridge?.started?[{id:'bridge',title:'A path across the pond',done:s.bridge.built,text:'Mara’s morning trade and your gathered materials help open the island.'}]:[])
  ].map(chapter=>({...chapter,done:!!chapter.done}));}

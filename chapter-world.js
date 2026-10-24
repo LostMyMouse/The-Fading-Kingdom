@@ -1,3 +1,4 @@
+import {drawRiverside,drawBridgeFront} from './bridge-art.js';
 import {drawSquare} from './square-art.js';
 import {drawGatheringSites,drawGatheringTool} from './gathering-art.js';
 import {drawPlayer} from './player-layered.js';
@@ -37,6 +38,7 @@ export function draw(c,s,v){
   for(let y=0;y<H;y++)for(let x=0;x<W;x++){const n=noise(x,y)%100;r(c,x*16,y*16,16,16,n>70?'#91a970':n>35?'#8ca56a':'#88a166');if(n>78){r(c,x*16+4,y*16+7,1,3,'#6f8f55');r(c,x*16+6,y*16+8,1,3,'#719357');r(c,x*16+5,y*16+11,3,1,'#b1bd7c');}if(y===17||x===11&&y>=12&&y<=17||x===45&&y>=10&&y<17){r(c,x*16,y*16,16,16,'#cabd91');r(c,x*16+3,y*16+4,7,2,'#daceaa');r(c,x*16+11,y*16+12,3,1,'#b4a77e');}}
   drawSquare(c,s);
   for(let y=20;y<29;y++)for(let x=46;x<53;x++){r(c,x*16,y*16,16,16,'#679b94');if((x+y)%3===0)r(c,x*16+(reduce?3:Math.floor(time/750)%4),y*16+7,10,1,'#a9c7ae');}for(let y=20;y<29;y++)r(c,46*16-3,y*16,3,16,'#b5b88d');
+  drawRiverside(c,s);label(c,45*16+8,24*16-14,s.bridge?.built?'Riverside footbridge':'Old footbridge');
   if(s.economy.projects.market){r(c,5*16,15*16,48,32,'#b7a37b');r(c,5*16+2,15*16-6,3,31,'#826243');r(c,8*16-5,15*16-6,3,31,'#826243');for(let j=0;j<6;j++)r(c,5*16+j*8,15*16-13,8,12,j%2?'#e5cea0':'#879e71');r(c,5*16,16*16-4,48,9,'#a87f50');for(let j=0;j<(s.economy.lastBatch==='small'?2:5);j++){r(c,5*16+5+j*7,16*16-8,5,4,'#d8a565');r(c,5*16+6+j*7,16*16-8,2,1,'#f0ce91');}label(c,6*16+8,15*16-18,'Village market');}else{r(c,6*16+2,16*16,13,10,'#d2b27b');r(c,6*16+7,16*16+9,2,9,'#8b6847');}
   for(let j=0;j<70;j++){const x=4+j*17%47,y=8+j*11%24;if((x<15||y>28)&&!s.plots.some(p=>p.x===x&&p.y===y))plant(c,x*16+5,y*16+10,j%3?'#e9d9a1':'#d7a6a0');}
   building(c,{x:8,y:8,stage:3,style:0,trim:0},reduce?null:time,true);
@@ -72,7 +74,7 @@ export function draw(c,s,v){
  for(const actor of v.npcs||[]){people.push({x:actor.x*16+8,y:actor.y*16+12,actor,name:actor.name==='mara'?'Mara':actor.name==='rowan'?'Rowan':'Orin',look:actor.name==='mara'?{skin:2,hair:2,shirt:3,style:1}:{skin:3,hair:0,shirt:1,hat:'cap'}});}
  const layers=people.map(p=>({y:p.y,draw:()=>{const pose={direction:p.dir||'down',frame:p.frame||0,walking:v.walking,reduce},carry=!p.name&&!v.action&&(s.carry.wood+s.carry.stone||s.story.basket==='held'),behind=handAnchor(pose).behind,handles=s.story.basket==='held'||s.story.carryBasket;if(carry&&behind)drawCarryBasket(c,p.x,p.y,pose,handles);if(!p.name&&v.action&&p.dir==='up')drawGatheringTool(c,p.x,p.y,p.dir,v.action);if(p.actor){if(!drawCharacter(c,p.actor,p.x,p.y))person(c,p.x,p.y,p.look);}else if(!drawPlayer(c,p.x,p.y,p.look,p.frame||0,p.dir||'down',v.walking,reduce,v.blink,v.action))person(c,p.x,p.y,p.look,p.frame||0,p.dir||'down');if(!p.name&&v.action&&p.dir!=='up')drawGatheringTool(c,p.x,p.y,p.dir,v.action);if(carry&&!behind)drawCarryBasket(c,p.x,p.y,pose,handles);if(p.name)label(c,p.x,p.y-36,p.name);}}));
 
- if(out)for(let j=0;j<TREES.length;j++){const t=TREES[j];layers.push({y:t.y*16+12,draw:()=>tree(c,t.x,t.y,j)});}layers.sort((a,b)=>a.y-b.y).forEach(p=>p.draw());
+ if(out)for(let j=0;j<TREES.length;j++){const t=TREES[j];layers.push({y:t.y*16+12,draw:()=>tree(c,t.x,t.y,j)});}if(out&&s.bridge?.built)layers.push({y:26*16+8,draw:()=>drawBridgeFront(c)});layers.sort((a,b)=>a.y-b.y).forEach(p=>p.draw());
  if(!v.dialogOpen){const voice=(v.npcs||[]).find(n=>n.speech);if(voice){const speaker=voice.speechSpeaker==='Mara'?(v.npcs||[]).find(n=>n.name==='mara'):voice;if(speaker){const sx=speaker.x*16+8,sy=speaker.y*16-34;if(sx>camera.x&&sx<camera.x+width&&sy>camera.y&&sy<camera.y+height){const words=voice.speech.split(' '),lines=[''];for(const word of words){if((lines.at(-1)+' '+word).trim().length>23)lines.push(word);else lines[lines.length-1]=(lines.at(-1)+' '+word).trim();}c.font='7px system-ui';c.textAlign='center';const bw=Math.max(...lines.map(line=>c.measureText(line).width))+12,bh=lines.length*10+8,bx=Math.max(camera.x+3,Math.min(camera.x+width-bw-3,sx-bw/2)),by=Math.max(camera.y+3,sy-bh);r(c,bx-1,by-1,bw+2,bh+2,'#6f593f');r(c,bx,by,bw,bh,'#fff0cd');c.fillStyle='#503f30';lines.forEach((line,j)=>c.fillText(line,bx+bw/2,by+11+j*10));}}}}
  c.restore();
 }

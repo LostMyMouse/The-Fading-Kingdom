@@ -1,3 +1,4 @@
+import {BRIDGE_LINES} from './chapter-bridge.js';
 import {SQUARE_LINES} from './chapter-square.js';
 import {TOOL_LINES} from './chapter-gathering.js';
 import {ROWAN_LINES} from './chapter-gardener.js';
@@ -85,3 +86,7 @@ export function portraitFor(speaker,text,expression=authored.get(text)||'neutral
 }
 
 for(const name of ['orin','mara','rowan']){authored.set(SQUARE_LINES[name],'happy');authored.set(SQUARE_LINES[name+'Wait'],'concerned');}
+
+authored.set(BRIDGE_LINES.plan,'thoughtful');authored.set(BRIDGE_LINES.ready,'happy');authored.set(BRIDGE_LINES.waiting,'concerned');authored.set(BRIDGE_LINES.built,'amused');authored.set(BRIDGE_LINES.visit,'happy');
+
+authored.set(BRIDGE_LINES.waitingBasket,'concerned');authored.set(BRIDGE_LINES.waitingWood,'concerned');

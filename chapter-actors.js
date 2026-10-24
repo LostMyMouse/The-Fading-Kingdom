@@ -36,7 +36,8 @@ export function routineFor(s,name,anchor){
  if(s.house?.stage===3)return [
   {...anchor,hold:9000,face:'up',activity:'Checking the herbs'},
   {x:anchor.x,y:anchor.y+2,hold:6000,face:'down',activity:'Getting some air'},
-  {x:anchor.x+1,y:anchor.y+2,hold:7000,face:'left',activity:'Taking a break'}
+  {x:anchor.x+1,y:anchor.y+2,hold:7000,face:'left',activity:'Taking a break'},
+  ...(s.bridge?.built?[{x:50,y:26,hold:8500,face:'left',activity:'Lunch by the pond'}]:[])
  ];
  return [
   {...anchor,hold:10000,face:'down',activity:'Sorting the cart'},
