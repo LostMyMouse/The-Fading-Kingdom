@@ -15,7 +15,7 @@ import {prepareCharacters} from './chapter-characters.js';
 import {portraitFor,preparePortraits} from './chapter-portraits.js';
 import {ARRIVAL,EQUIPMENT} from './chapter-progression.js';
 import {SAVE_KEY as CHAPTER_SAVE_KEY,W,H,STYLES,DECOR,RESOURCES,FIXED,fresh,mara,blocked,route,walkingRoute,validHouse,validDecor,goal,act,readSave,wateringArea,canEarnWideCan} from './chapter-model.js';
-import {draw} from './chapter-world.js';
+import {draw,prepareVillageArt} from './chapter-world.js';
 import {person,icon} from './world.js';
 import {SKINS,HAIRS,SHIRTS} from './model.js';
 const $=id=>document.getElementById(id),canvas=$('world'),ctx=canvas.getContext('2d'),dialog=$('dialog');
@@ -232,8 +232,8 @@ function tick(now){if(workAction&&now-workAction.start>=420)workAction=null;cons
 window.addEventListener('error',()=>{$('fatal').classList.remove('hide');});resize();hud();requestAnimationFrame(tick);
 async function loadArtwork(){
  $('begin').disabled=true;$('continue').disabled=true;$('art-retry').classList.add('hide');$('art-status').textContent='Unpacking the village artwork…';
- const results=await Promise.all([preparePlayer(),prepareCharacters(),preparePortraits(),prepareBridgeArt()]).catch(()=>[false]);
- const ready=results.length===4&&results.every(Boolean);$('begin').disabled=!ready;$('continue').disabled=!ready||!stored;
+ const results=await Promise.all([preparePlayer(),prepareCharacters(),preparePortraits(),prepareBridgeArt(),new URLSearchParams(location.search).get('scenery')==='village'?prepareVillageArt():Promise.resolve(true)]).catch(()=>[false]);
+ const ready=results.length===5&&results.every(Boolean);$('begin').disabled=!ready;$('continue').disabled=!ready||!stored;
  $('art-status').textContent=ready?'Ready when you are.':'Some artwork couldn’t load. Your story is safe. Try loading it again.';
  $('art-retry').classList.toggle('hide',ready);
 }

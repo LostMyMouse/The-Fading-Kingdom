@@ -1,0 +1,8 @@
+Use case: stylized-concept. Asset type: transparent pixel-art environment atlas for The Fading Kingdom browser farming game.
+Reference image is the existing cottage, environment style and frontal farming-game perspective ONLY. Preserve its warm chunky painted pixel clusters, dark warm timber edges, soft cream plaster and slight top-down view; NO characters.
+Create one transparent 2 by 2 atlas with four separated objects, generous clear alpha gutters and consistent front view (horizontal eaves, centered front door, no side-wall/isometric angle). All bases align within each cell.
+Top left: finished compact timber cottage, warm horizontal timber walls, muted terracotta roof, two front windows, centered full-height wooden front door, two little pots. Same shape and generous door proportions as reference.
+Top right: finished compact stone cottage, cream-grey small stone blocks, muted blue slate roof, warm timber window/door trim, two front windows, same centered front doorway, two little pots. Match same silhouette and size.
+Bottom left: stone foundation only for that exact cottage footprint, shallow ground slab and low perimeter stones with a centered front threshold, no roof or walls or tools.
+Bottom right: timber construction frame for the same footprint, two side uprights, triangular/stepped roof framing from front, crossbeam, open doorway clear at centered front, shallow stone foundation, no finished walls or roof.
+Actual transparent background, not white/checker. No text, labels, people, scenery, grass, UI, watermarks or extra standalone objects. Clean isolated silhouettes. Restrained coherent storybook pixel art, lighting from upper left; keep exact character-neutral world scale.
