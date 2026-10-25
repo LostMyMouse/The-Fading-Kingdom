@@ -9,12 +9,12 @@ export function prepareRoomDetails(){if(loading)return loading;loading=Promise.a
 export const residentFor=room=>room==='bakery'?'mara':room==='garden'?'rowan':null;
 export function detailPlan(room){
  if(room==='bakery')return [
-  {id:'shelf',surface:'wall',x:153,y:45,width:22}, {id:'clock',surface:'wall',x:75,y:44,width:11}, {id:'herbs',surface:'wall',x:236,y:45,width:19},
+  {id:'shelf',surface:'wall',x:153,y:47,width:22}, {id:'clock',surface:'wall',x:75,y:44,width:11}, {id:'herbs',surface:'wall',x:236,y:45,width:19},
   {id:'cloth',surface:'counter-left',x:76,y:60,width:16}, {id:'book',surface:'table',x:150,y:124,width:12}, {id:'tea',surface:'table',x:121,y:127,width:14}
  ];
  if(room==='garden')return [
-  {id:'shelf',surface:'wall',x:153,y:45,width:23}, {id:'tools',surface:'wall',x:72,y:45,width:24}, {id:'frames',surface:'wall',x:236,y:44,width:22},
-  {id:'seedlings',surface:'counter-right',x:150,y:58,width:25}, {id:'pot',surface:'counter-left',x:76,y:58,width:10}, {id:'pot',surface:'cupboard',x:200,y:48,width:14},
+  {id:'shelf',surface:'wall',x:153,y:47,width:23}, {id:'tools',surface:'wall',x:72,y:45,width:24}, {id:'frames',surface:'wall',x:236,y:44,width:22},
+  {id:'pot',surface:'counter-middle',x:122,y:60,width:12}, {id:'seedlings',surface:'cupboard',x:200,y:48,width:26},
   {id:'rug',surface:'floor',x:136,y:188,width:88}
  ];
  return [];

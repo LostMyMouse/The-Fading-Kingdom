@@ -5,7 +5,7 @@ export const KITCHEN_RECTS={oven:[80,125,434,475],counter:[562,266,634,334],flou
 export const ROOM_FLOOR={left:16,top:48,right:272,bottom:208,doorX:136,doorY:200};
 let art=null,kitchen=null,grounds=new Map(),loading=null;
 const load=path=>new Promise(resolve=>{const image=new Image();image.onload=()=>resolve(image);image.onerror=()=>resolve(null);image.src=new URL(path,import.meta.url).href;});
-export function prepareInteriorArt(){if(loading)return loading;loading=Promise.all([prepareCottage().catch(()=>null),load('./assets/environment/kitchen-furniture-v1.png'),(typeof location==='undefined'||new URLSearchParams(location.search).get('details')==='personal'?prepareRoomDetails():Promise.resolve(true))]).then(([a,k,d])=>{if(!a||!k||!d){loading=null;return false;}art=a;kitchen=k;grounds=new Map();return true;});return loading;}
+export function prepareInteriorArt(){if(loading)return loading;loading=Promise.all([prepareCottage().catch(()=>null),load('./assets/environment/kitchen-furniture-v1.png'),prepareRoomDetails()]).then(([a,k,d])=>{if(!a||!k||!d){loading=null;return false;}art=a;kitchen=k;grounds=new Map();return true;});return loading;}
 function part(c,id,x,y,width){const rect=KITCHEN_RECTS[id],height=Math.round(width*rect[3]/rect[2]);c.drawImage(kitchen,...rect,Math.round(x-width/2),Math.round(y-height),width,height);}
 function fill(c,i,x,y,w,h){c.fillStyle=c.createPattern(art.patterns[i],'repeat');c.fillRect(x,y,w,h);}
 function ground(room){
@@ -29,8 +29,8 @@ export function drawInteriorGround(c,s){if(!art||!kitchen||s.room==='outside')re
 export function interiorPlan(s){
  if(s.room==='home')return [{id:'bed',x:56,y:112,width:26},{id:'chest',x:88,y:80,width:16},{id:'mirror',x:216,y:80,width:18}];
  const counter=[{id:'counter',x:68,y:80,width:40},{id:'counter',x:108,y:80,width:40},{id:'counter',x:148,y:80,width:40}];
- if(s.room==='garden')return [...counter,{id:'cupboard',x:200,y:80,width:32},{id:'bed',x:216,y:176,width:26},{id:'chest',x:56,y:160,width:16}];
- return [...counter,{id:'cupboard',x:176,y:80,width:16},{id:'oven',x:208,y:80,width:30},{id:'table',x:136,y:144,width:44},{id:'chest',x:56,y:160,width:16}];
+ if(s.room==='garden')return [...counter,{id:'bookcase',x:176,y:80,width:16},{id:'cupboard',x:200,y:80,width:32},{id:'bed',x:216,y:176,width:26},{id:'chest',x:56,y:160,width:16}];
+ return [...counter,{id:'bookcase',x:180,y:80,width:24},{id:'oven',x:208,y:80,width:30},{id:'table',x:136,y:144,width:44},{id:'chest',x:56,y:160,width:16}];
 }
 function bread(c,x,y){c.fillStyle='#73452d';c.fillRect(x,y,6,4);c.fillStyle='#dca55d';c.fillRect(x,y-1,6,4);c.fillStyle='#f2d49a';c.fillRect(x+1,y-1,1,2);c.fillRect(x+4,y-1,1,2);}
 export function interiorLayers(c,s,npcs=[]){
@@ -41,6 +41,7 @@ export function interiorLayers(c,s,npcs=[]){
   else drawFurnishing(c,art,p.id,p.x,p.y,p.width);
   if(p.id==='counter'&&p.x===68)drawRoomDetails(c,s,'counter-left');
   if(p.id==='counter'&&p.x===148)drawRoomDetails(c,s,'counter-right');
+  if(p.id==='counter'&&p.x===108)drawRoomDetails(c,s,'counter-middle');
   if(p.id==='cupboard')drawRoomDetails(c,s,'cupboard');
   if(p.id==='table')drawRoomDetails(c,s,'table',{breakfast:npcs.some(n=>n.breakfast)});
   if(p.id==='counter'&&p.x===108&&s.room==='bakery'&&s.story.cooked){for(let j=0;j<(s.economy.flour.noticed&&['held','used','replacement'].includes(s.economy.flour.state)?2:5);j++)bread(c,88+j*7,59);}
@@ -48,7 +49,7 @@ export function interiorLayers(c,s,npcs=[]){
   if(p.id==='counter'&&p.x===68&&s.room==='bakery'&&s.story.cooking){c.fillStyle='#e1c694';c.fillRect(61,58,12,5);if(s.story.cooking>=2)for(let j=0;j<3;j++){c.fillStyle='#efdab0';c.fillRect(61+j*4,56,3,3);}}
   if(p.id==='chest'&&s.room==='bakery'&&['shelf','returned','replaced'].includes(s.economy.flour.state))part(c,'flour',56,148,12);
   if(p.id==='table'&&npcs.some(n=>n.breakfast)){c.fillStyle='#f3e5bf';c.fillRect(120,118,10,5);bread(c,122,117);}
-  if(p.id==='counter'&&s.room==='garden'){const missing=s.gardener.noticed&&['held','used'].includes(s.gardener.parcel);const count=missing?1:2;for(let j=0;j<count;j++){c.fillStyle='#d7b57a';c.fillRect(p.x-10+j*13,57,9,7);c.fillStyle=j?'#ad7790':'#799454';c.fillRect(p.x-8+j*13,59,4,3);}if(p.x===68&&['shelf','returned','replaced'].includes(s.gardener.parcel)){c.fillStyle='#c3a175';c.fillRect(50,51,12,7);c.fillStyle='#ead7a5';c.fillRect(55,50,2,9);}}
+  if(p.id==='counter'&&s.room==='garden'){const missing=s.gardener.noticed&&['held','used'].includes(s.gardener.parcel);const count=missing?1:2;for(let j=0;j<count;j++){c.fillStyle='#d7b57a';const offset=roomDetailsReady()&&p.x===108?-18+j*12:-10+j*13;c.fillRect(p.x+offset,57,9,7);c.fillStyle=j?'#ad7790':'#799454';c.fillRect(p.x+offset+2,59,4,3);}if(p.x===68&&['shelf','returned','replaced'].includes(s.gardener.parcel)){c.fillStyle='#c3a175';c.fillRect(50,51,12,7);c.fillStyle='#ead7a5';c.fillRect(55,50,2,9);}}
  }}));
  return layers;
 }
