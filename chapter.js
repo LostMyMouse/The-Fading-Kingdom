@@ -1,3 +1,4 @@
+import {prepareWorkProps} from './village-work-props.js';
 import {interiorHotspot} from './interior-art.js';
 import {verticalCamera} from './chapter-camera.js';
 import {sessionSaveKey} from './chapter-session.js';
@@ -56,7 +57,7 @@ function show(title,text,choices=[],tag='ROOM FOR ONE MORE'){
 function endNpcTalk(){if(npcCue){npcCue.talking=false;npcCue.until=performance.now()+1400;}}
 function close(){endNpcTalk();if(arrivalOpen)finishArrival();dialog.close();stop();canvas.focus({preventScroll:true});}
 $('close').onclick=close;dialog.addEventListener('cancel',()=>{endNpcTalk();if(arrivalOpen)finishArrival();stop();});
-function start(){actors.reset();playing=true;$('welcome').classList.add('hide');stop();resize();save();music();canvas.focus();toast('Tap the ground to walk. Your journal keeps the next step handy.');if(s.story.arrival<ARRIVAL.length)arrivalSequence();}
+function start(){actors.reset();playing=true;$('welcome').classList.add('hide');stop();resize();save();music();canvas.focus();toast(s.roomUpdate&&(s.roomUpdate.moved||s.roomUpdate.stored||s.roomUpdate.outside)?`The rooms have been rearranged. ${s.roomUpdate.moved} decorations moved nearby, ${s.roomUpdate.stored} returned to storage${s.roomUpdate.outside?', '+s.roomUpdate.outside+' placed beside the cottage':''}.`:'Tap the ground to walk. Your journal keeps the next step handy.');if(s.story.arrival<ARRIVAL.length)arrivalSequence();}
 function newStory(){if(stored||loadError){show('Begin a new chapter?', 'Your current Chapter One save will be replaced. Earlier prototype progress stays separate.',[['Keep my story',close],['Download a backup',backup],['Begin again',()=>{s=fresh();undo=null;preview=null;activity=null;appearance(true);},'warning']]);}else{s=fresh();appearance(true);}}
 $('begin').onclick=newStory;$('continue').onclick=()=>{s=structuredClone(stored);start();};
 function finishArrival(){arrivalOpen=false;act(s,'arrivalSkip');$('close').textContent='Back to the world';save();}
@@ -237,8 +238,8 @@ function tick(now){if(workAction&&now-workAction.start>=420)workAction=null;cons
 window.addEventListener('error',()=>{$('fatal').classList.remove('hide');});resize();hud();requestAnimationFrame(tick);
 async function loadArtwork(){
  $('begin').disabled=true;$('continue').disabled=true;$('art-retry').classList.add('hide');$('art-status').textContent='Unpacking the village artwork…';
- const results=await Promise.all([preparePlayer(),prepareCharacters(),preparePortraits(),prepareBridgeArt(),prepareVillageArt(),prepareInteriorArt()]).catch(()=>[false]);
- const ready=results.length===6&&results.every(Boolean);$('begin').disabled=!ready;$('continue').disabled=!ready||!stored;
+ const results=await Promise.all([preparePlayer(),prepareCharacters(),preparePortraits(),prepareBridgeArt(),prepareVillageArt(),prepareInteriorArt(),prepareWorkProps()]).catch(()=>[false]);
+ const ready=results.length===7&&results.every(Boolean);$('begin').disabled=!ready;$('continue').disabled=!ready||!stored;
  $('art-status').textContent=ready?'Ready when you are.':'Some artwork couldn’t load. Your story is safe. Try loading it again.';
  $('art-retry').classList.toggle('hide',ready);
 }

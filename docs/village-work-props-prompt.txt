@@ -1,0 +1,7 @@
+Use case: stylized-concept. Asset: transparent 2x2 game environment atlas. Reference is our existing outdoor prop atlas, style ONLY. Match warm original storybook chunky pixel clusters, dark warm brown outlines, timber grain, earthy cream/sage, upper-left light, front-facing farming-game view with a little top surface visible. No characters.
+Four isolated pieces separated by generous transparent gutters:
+TOP LEFT: compact rustic carpenter's handcart with two dark wooden wheels, sturdy worktop, a few small hand tools tucked at the rear. No loose timber on its surface, no person, no wheels cut off. Horizontal frontal orientation, low enough that a character can stand in front.
+TOP RIGHT: one compact bundle of clean squared timber boards tied with muted green twine, lying horizontally; a small blank cream tag attached. No text or labels.
+BOTTOM LEFT: small village market stall, sage-and-cream striped fabric awning, two timber uprights, timber selling counter with EMPTY top, no produce and no sign text. Same frontal shallow top-down farming perspective. Entire awning and feet visible.
+BOTTOM RIGHT: compact wooden bedside cabinet with a closed drawer and little cream candle in a dark iron holder on top. Fits the cottage furniture style. No flames, no background.
+Actual transparent background; no coloured glow or opaque background, no text, no letters, no UI, no people, no scenery, no wall/floor. Separate usable sprites, not a full scene.

@@ -1,6 +1,6 @@
 import {route,blocked,FIXED} from './chapter-model.js';
 import {blinkAt} from './chapter-motion.js';
-export function breakfastRoute(s){const h=s.house,door={x:h.x+2,y:h.y+4};const open=(choices)=>choices.find(p=>!blocked(s,p.x,p.y,'bakery'))||choices[0];const counter=open([{x:6,y:5},{x:5,y:5},{x:6,y:6}]),seat=open([{x:6,y:8},{x:6,y:9},{x:5,y:8}]);return [
+export function breakfastRoute(s){const h=s.house,door={x:h.x+2,y:h.y+4};const open=(choices)=>choices.find(p=>!blocked(s,p.x,p.y,'bakery'))||choices[0];const counter=open([{x:6,y:5},{x:5,y:5},{x:6,y:6}]),seat=open([{x:9,y:8},{x:9,y:9},{x:5,y:8}]);return [
  {room:'outside',...FIXED.orin,hold:5000,face:'down',activity:'Carpentry',work:true},
  ...(s.economy.projects.market?[{room:'outside',x:6,y:17,hold:5000,face:'up',activity:'Checking the breakfast stall'}]:[]),
  {room:'outside',...door,hold:0,face:'up',activity:'Visiting the bakery'},

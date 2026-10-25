@@ -21,11 +21,11 @@ export function animationFrame({direction='down',walking=false,work=false,emotio
 }
 export function routineFor(s,name,anchor){
  if(squareActive(s)&&s.room==='outside'&&!squareDelay(s,name))return squareStops(s,name);
- if(name==='rowan')return s.room==='garden'?[{...anchor,hold:10000,work:true,face:'down',activity:'Sorting seeds'},{x:10,y:6,hold:6000,face:'left',activity:'Checking seedlings'},{x:11,y:7,hold:7000,face:'down',activity:'Taking a break'}]:[{...anchor,hold:11000,work:true,face:'down',activity:'Tending the nursery'},{x:44,y:12,hold:6500,face:'up',activity:'Checking the berry pots'},{x:42,y:12,hold:6500,face:'right',activity:'Taking a break'}];
+ if(name==='rowan')return s.room==='garden'?[{x:11,y:4,hold:10000,work:true,face:'down',activity:'Sorting seeds'},{x:10,y:6,hold:6000,face:'left',activity:'Checking seedlings'},{x:9,y:9,hold:7000,face:'left',activity:'Taking a break'},{x:14,y:4,hold:5000,face:'up',activity:'Putting things away'}]:[{...anchor,hold:11000,work:true,face:'down',activity:'Tending the nursery'},{x:44,y:12,hold:6500,face:'up',activity:'Checking the berry pots'},{x:42,y:12,hold:6500,face:'right',activity:'Taking a break'}];
  if(s.room==='bakery')return [
-  {x:11,y:5,hold:11000,work:true,face:'down',activity:'Baking'},
+  {x:11,y:4,hold:11000,work:true,face:'down',activity:'Baking'},
   {x:10,y:6,hold:6000,face:'left',activity:'Tidying the kitchen'},
-  {x:11,y:7,hold:7000,face:'down',activity:'Taking a break'}
+  {x:9,y:9,hold:7000,face:'left',activity:'Taking a break'},{x:14,y:4,hold:5000,face:'up',activity:'Putting things away'}
  ];
  if(name==='orin')return [
   ...(s.economy?.projects.market?[{x:6,y:17,hold:7500,face:'up',activity:'Buying breakfast'}]:[]),

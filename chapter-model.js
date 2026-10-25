@@ -1,3 +1,4 @@
+import {ROOM_LAYOUT,furnitureBlocked,roomReserved,roomGoals} from './chapter-rooms.js';
 import {initialBridge,readBridge,bridgeAction,bridgeGround,bridgeDeck,BRIDGE,RIVERSIDE} from './chapter-bridge.js';
 import {initialSquare,readSquare,squareAction,settleSquare,squareAvailable,squareActive,squareDelay,SQUARE} from './chapter-square.js';
 import {initialGathering,readGathering,gatheringAction,WORKSHOP,replenishLoose} from './chapter-gathering.js';
@@ -13,16 +14,18 @@ export const DECOR=['planter','bench','lantern','path','fence'];
 export const TREES=Array.from({length:40},(_,i)=>({x:2+(i*13%52),y:i<18?3+i%3:31+i%7}));
 export const RESOURCES=Array.from({length:26},(_,i)=>({id:i,type:i<16?'wood':'stone',x:19+(i*7%23),y:19+Math.floor(i/6)*2+(i%2)}));
 export const FIXED={home:{x:11,y:12},kit:{x:13,y:13},store:{x:8,y:13},orin:{x:18,y:17},timber:{x:20,y:17},nursery:{x:45,y:10}};
-export function fresh(){return {bridge:initialBridge(),square:initialSquare(),gathering:initialGathering(),gardener:initialGardener(),version:2,day:1,room:'outside',player:{x:12,y:14,skin:1,hair:0,shirt:0,style:0,outfit:0,hat:0},inventory:{seed:6,carrot:0,wood:0,stone:0,bun:0,berry:0,fruitbun:0,turnipSeed:0,flowerSeed:0,turnip:0,marigold:0,planter:4,bench:2,lantern:4,path:40,fence:12},carry:{wood:0,stone:0},plots:Array.from({length:9},(_,i)=>({x:8+i%3*2,y:16+Math.floor(i/3)*2,planted:false,watered:false,ripe:false,crop:'carrot',growth:0})),gathered:[],house:null,decor:[],story:{arrival:0,wideCan:false,carryBasket:false,kit:false,harvest:false,met:false,invited:false,orin:false,basket:'none',late:false,timber:'untouched',timberNoticed:false,dependable:false,returned:false,lifted:false,herbs:false,cooking:0,cooked:false,shared:false,nursery:false},conversation:{mara:0,orin:0,movedDay:0,cookedDay:0},economy:initialEconomy(),settings:{sound:true,music:false}};}
+export function fresh(){return {roomLayout:ROOM_LAYOUT,bridge:initialBridge(),square:initialSquare(),gathering:initialGathering(),gardener:initialGardener(),version:2,day:1,room:'outside',player:{x:12,y:14,skin:1,hair:0,shirt:0,style:0,outfit:0,hat:0},inventory:{seed:6,carrot:0,wood:0,stone:0,bun:0,berry:0,fruitbun:0,turnipSeed:0,flowerSeed:0,turnip:0,marigold:0,planter:4,bench:2,lantern:4,path:40,fence:12},carry:{wood:0,stone:0},plots:Array.from({length:9},(_,i)=>({x:8+i%3*2,y:16+Math.floor(i/3)*2,planted:false,watered:false,ripe:false,crop:'carrot',growth:0})),gathered:[],house:null,decor:[],story:{arrival:0,wideCan:false,carryBasket:false,kit:false,harvest:false,met:false,invited:false,orin:false,basket:'none',late:false,timber:'untouched',timberNoticed:false,dependable:false,returned:false,lifted:false,herbs:false,cooking:0,cooked:false,shared:false,nursery:false},conversation:{mara:0,orin:0,movedDay:0,cookedDay:0},economy:initialEconomy(),settings:{sound:true,music:false}};}
 export function mara(s){if(!s.story.harvest)return null;if(s.room==='bakery')return {x:11,y:s.day%2?5:7};if(s.room!=='outside')return null;if(s.house?.stage===3)return {x:s.house.x+5,y:s.house.y+4};return {x:22,y:16};}
 const within=(x,y,a,b,c,d)=>x>=a&&x<=c&&y>=b&&y<=d;
 export function blocked(s,x,y,room=s.room,house=s.house,decor=s.decor){
  if(!Number.isInteger(x)||!Number.isInteger(y))return true;
  if(room!=='outside'){
   if(x<1||y<3||x>16||y>12)return true;
+  if(s.roomLayout===1){
   if(room==='home'&&((x===3&&y>=4&&y<=6)||(x===13&&y===4)||(x===5&&y===4)))return true;
   if(room==='garden'&&(y===4&&x>=3&&x<=13||x===13&&y>=8&&y<=10))return true;
   if(room==='bakery'&&((y===4&&x>=3&&x<=13)||(within(x,y,7,7,9,8))))return true;
+  }else if(furnitureBlocked(room,x,y))return true;
  }else{
   if(s.bridge?.built&&x===51&&y===23)return true;
   if(s.economy?.projects.market&&within(x,y,5,15,7,16))return true;
@@ -42,7 +45,7 @@ export function route(s,from,to,room=s.room,house=s.house,decor=s.decor){
 export function walkingRoute(s,from,to){const doors=s.room==='outside'?[FIXED.home,...[s.house,s.gardener?.house].filter(h=>h?.stage===3).map(h=>({x:h.x+2,y:h.y+4}))]:[{x:8,y:12}];const reserved=doors.filter(p=>!(p.x===to.x&&p.y===to.y)&&!(p.x===from.x&&p.y===from.y)).map(p=>({...p,type:'bench',room:s.room}));return route(s,from,to,s.room,s.house,[...s.decor,...reserved]);}
 function reachable(s,room,house,decor){
  const start=room==='outside'?{x:11,y:12}:{x:8,y:12};
- const goals=room==='outside'?[FIXED.kit,FIXED.store,FIXED.orin,FIXED.timber,FIXED.nursery,{x:22,y:16},...s.plots,...RESOURCES,...(s.gathering?.job==='done'?[WORKSHOP]:[]),...(s.bridge?.started?[BRIDGE]:[]),...(s.bridge?.built?[RIVERSIDE]:[]),...(s.gardener?.house?[{x:s.gardener.house.x+2,y:s.gardener.house.y+4}]:[]),...(house?[{x:house.x+2,y:house.y+4},{x:house.x+5,y:house.y+4}]:[])]:room==='home'?[{x:3,y:7},{x:5,y:5},{x:13,y:5}]:[{x:4,y:5},{x:11,y:5},{x:11,y:7}];
+ const goals=room==='outside'?[FIXED.kit,FIXED.store,FIXED.orin,FIXED.timber,FIXED.nursery,{x:22,y:16},...s.plots,...RESOURCES,...(s.gathering?.job==='done'?[WORKSHOP]:[]),...(s.bridge?.started?[BRIDGE]:[]),...(s.bridge?.built?[RIVERSIDE]:[]),...(s.gardener?.house?[{x:s.gardener.house.x+2,y:s.gardener.house.y+4}]:[]),...(house?[{x:house.x+2,y:house.y+4},{x:house.x+5,y:house.y+4}]:[])]:s.roomLayout===1?(room==='home'?[{x:3,y:7},{x:5,y:5},{x:13,y:5}]:[{x:4,y:5},{x:11,y:5},{x:11,y:7}]):roomGoals(room);
  return goals.every(g=>(g.x===start.x&&g.y===start.y)||route(s,start,g,room,house,decor).length>0);
 }
 export function validHouse(s,x,y){
@@ -61,7 +64,7 @@ export function validDecor(s,type,x,y,ignore=-1){
  if(s.room==='outside'&&s.gathering?.job==='done'&&x===WORKSHOP.x&&y===WORKSHOP.y)return false;
  if(blocked(s,x,y,s.room,s.house,decor)||decor.some(d=>d.room===s.room&&d.x===x&&d.y===y)||s.player.x===x&&s.player.y===y)return false;
  if(s.room==='outside'&&(y===17||s.plots.some(p=>p.x===x&&p.y===y)||RESOURCES.some(p=>p.x===x&&p.y===y)||Object.values(FIXED).some(p=>Math.abs(p.x-x)+Math.abs(p.y-y)<=1)||s.house&&within(x,y,s.house.x,s.house.y,s.house.x+5,s.house.y+4)||s.gardener?.house&&within(x,y,s.gardener.house.x,s.gardener.house.y,s.gardener.house.x+5,s.gardener.house.y+4)||within(x,y,21,15,23,16)))return false;
- if(s.room!=='outside'&&(y===12||y===5||within(x,y,10,5,12,7)||s.room==='home'&&within(x,y,2,4,6,7)))return false;
+ if(s.room!=='outside'&&(s.roomLayout===1?(y===12||y===5||within(x,y,10,5,12,7)||s.room==='home'&&within(x,y,2,4,6,7)):roomReserved(s.room,x,y)))return false;
  return reachable(s,s.room,s.house,[...decor,{type,x,y,room:s.room,rotation:0}]);
 }
 export function wateringArea(s,index){const p=s.plots[index];if(s.room!=='outside'||!p||!p.planted||p.ripe)return [];return s.plots.filter(q=>q.y===p.y&&Math.abs(q.x-p.x)<=(s.story.wideCan?2:0));}
@@ -142,6 +145,8 @@ export function act(s,id,data={}){
 export function readSave(raw){
  const s=JSON.parse(raw),base=fresh(),int=(n,a,b)=>Number.isInteger(n)&&n>=a&&n<=b;
  if(!s||s.version!==2||!int(s.day,1,100000)||!['outside','home','bakery','garden'].includes(s.room))throw Error('Invalid chapter save');
+ if(s.roomLayout!==undefined&&!int(s.roomLayout,1,ROOM_LAYOUT))throw Error('Invalid room layout');
+ const oldRooms=s.roomLayout===undefined||s.roomLayout===1;
  for(const k of ['berry','fruitbun','turnipSeed','flowerSeed','turnip','marigold'])if(s.inventory&&s.inventory[k]===undefined)s.inventory[k]=0;
  const square=readSquare(s.square,int,s.day),gathering=readGathering(s.gathering,int,s.day),economy=readEconomy(s,int),bridge=readBridge(s,int),gardener=readGardener(s.gardener,int,s.day);
  for(const [k,n]of Object.entries(base.inventory))if(!int(s.inventory?.[k],0,1000000))throw Error('Invalid inventory');
@@ -161,10 +166,23 @@ export function readSave(raw){
  if(s.house&&(!int(s.house.x,16,44)||!int(s.house.y,7,29)||!int(s.house.stage,0,3)||!int(s.house.style,0,2)||!int(s.house.trim,0,2)))throw Error('Invalid home');
  if(!Array.isArray(s.decor)||s.decor.length>200)throw Error('Invalid decoration');const checked={...s,decor:[]};for(const d of s.decor){if(!DECOR.includes(d.type)||!['outside','home','bakery','garden'].includes(d.room)||!int(d.x,1,52)||!int(d.y,3,35)||!int(d.rotation,0,1)||checked.decor.some(o=>o.x===d.x&&o.y===d.y&&o.room===d.room))throw Error('Invalid item');checked.decor.push({type:d.type,x:d.x,y:d.y,room:d.room,rotation:d.rotation});}
  const conversation={...base.conversation};for(const k of Object.keys(conversation)){if(s.conversation?.[k]!==undefined){if(!int(s.conversation[k],0,k.endsWith('Day')?s.day:1000000))throw Error('Invalid conversation');conversation[k]=s.conversation[k];}}
- const clean={...base,bridge,square,gathering,gardener,conversation,economy,day:s.day,room:s.room,player:Object.fromEntries(Object.keys(base.player).map(k=>[k,s.player[k]])),inventory:Object.fromEntries(Object.keys(base.inventory).map(k=>[k,s.inventory[k]])),carry:{wood:s.carry.wood,stone:s.carry.stone},plots:s.plots.map(p=>({x:p.x,y:p.y,planted:p.planted,watered:p.watered,ripe:p.ripe,crop:p.crop,growth:p.growth})),gathered:[...s.gathered],house:s.house?{x:s.house.x,y:s.house.y,stage:s.house.stage,style:s.house.style,trim:s.house.trim}:null,decor:checked.decor,story:Object.fromEntries(Object.keys(base.story).map(k=>[k,s.story[k]])),settings:{sound:typeof s.settings?.sound==='boolean'?s.settings.sound:true,music:typeof s.settings?.music==='boolean'?s.settings.music:false}};
+ const clean={...base,roomLayout:oldRooms?1:ROOM_LAYOUT,bridge,square,gathering,gardener,conversation,economy,day:s.day,room:s.room,player:Object.fromEntries(Object.keys(base.player).map(k=>[k,s.player[k]])),inventory:Object.fromEntries(Object.keys(base.inventory).map(k=>[k,s.inventory[k]])),carry:{wood:s.carry.wood,stone:s.carry.stone},plots:s.plots.map(p=>({x:p.x,y:p.y,planted:p.planted,watered:p.watered,ripe:p.ripe,crop:p.crop,growth:p.growth})),gathered:[...s.gathered],house:s.house?{x:s.house.x,y:s.house.y,stage:s.house.stage,style:s.house.style,trim:s.house.trim}:null,decor:checked.decor,story:Object.fromEntries(Object.keys(base.story).map(k=>[k,s.story[k]])),settings:{sound:typeof s.settings?.sound==='boolean'?s.settings.sound:true,music:typeof s.settings?.music==='boolean'?s.settings.music:false}};
  if(clean.house&&!validHouse({...clean,decor:[],player:{...clean.player,x:-99,y:-99}},clean.house.x,clean.house.y))throw Error('Blocked home');
  if(clean.gardener.house&&!validGardenHouse({...clean,player:{...clean.player,x:-99,y:-99}},clean.gardener.house.x,clean.gardener.house.y))throw Error('Blocked gardener home');
  const items=clean.decor;clean.decor=[];for(const d of items){if(!validDecor({...clean,room:d.room,player:{...clean.player,x:-99,y:-99}},d.type,d.x,d.y))throw Error('Blocked decoration');clean.decor.push(d);}
+ if(oldRooms){
+  const old=clean.decor;clean.roomLayout=ROOM_LAYOUT;clean.decor=old.filter(d=>d.room==='outside');const report={moved:0,stored:0,outside:0};
+  for(const d of old.filter(d=>d.room!=='outside')){
+   const state={...clean,room:d.room,player:{...clean.player,x:-99,y:-99}};
+   if(validDecor(state,d.type,d.x,d.y)){clean.decor.push(d);continue;}
+   const choices=[];for(let y=3;y<=11;y++)for(let x=1;x<=16;x++)choices.push({x,y});choices.sort((a,b)=>(Math.abs(a.x-d.x)+Math.abs(a.y-d.y))-(Math.abs(b.x-d.x)+Math.abs(b.y-d.y)));
+   const spot=choices.find(p=>validDecor(state,d.type,p.x,p.y));
+   if(spot){clean.decor.push({...d,...spot});report.moved++;}
+   else if(clean.inventory[d.type]<1000000){clean.inventory[d.type]++;report.stored++;}
+   else{const outside={...state,room:'outside'},spots=[];for(let y=6;y<=35;y++)for(let x=3;x<=52;x++)spots.push({x,y});spots.sort((a,b)=>(Math.abs(a.x-FIXED.store.x)+Math.abs(a.y-FIXED.store.y))-(Math.abs(b.x-FIXED.store.x)+Math.abs(b.y-FIXED.store.y)));const safe=spots.find(p=>validDecor(outside,d.type,p.x,p.y));if(!safe)throw Error('No safe place for the saved decoration');clean.decor.push({...d,...safe,room:'outside'});report.outside++;}
+  }
+  Object.defineProperty(clean,'roomUpdate',{value:report,enumerable:false});
+ }
  if(clean.room==='garden'&&clean.gardener.house?.stage!==3)clean.room='outside';
  if(clean.room==='bakery'&&clean.house?.stage!==3)clean.room='outside';
  if(blocked(clean,clean.player.x,clean.player.y))Object.assign(clean.player,clean.room==='outside'?{x:12,y:14}:{x:8,y:11});
