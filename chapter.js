@@ -232,7 +232,7 @@ function tick(now){if(workAction&&now-workAction.start>=420)workAction=null;cons
 window.addEventListener('error',()=>{$('fatal').classList.remove('hide');});resize();hud();requestAnimationFrame(tick);
 async function loadArtwork(){
  $('begin').disabled=true;$('continue').disabled=true;$('art-retry').classList.add('hide');$('art-status').textContent='Unpacking the village artwork…';
- const results=await Promise.all([preparePlayer(),prepareCharacters(),preparePortraits(),prepareBridgeArt(),new URLSearchParams(location.search).get('scenery')==='village'?prepareVillageArt():Promise.resolve(true)]).catch(()=>[false]);
+ const results=await Promise.all([preparePlayer(),prepareCharacters(),preparePortraits(),prepareBridgeArt(),prepareVillageArt()]).catch(()=>[false]);
  const ready=results.length===5&&results.every(Boolean);$('begin').disabled=!ready;$('continue').disabled=!ready||!stored;
  $('art-status').textContent=ready?'Ready when you are.':'Some artwork couldn’t load. Your story is safe. Try loading it again.';
  $('art-retry').classList.toggle('hide',ready);
