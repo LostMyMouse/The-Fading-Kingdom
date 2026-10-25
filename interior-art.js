@@ -1,10 +1,11 @@
+import {prepareRoomDetails,drawRoomDetails,roomDetailsReady} from './room-personality.js';
 import {prepareCottage,drawFurnishing} from './cottage-art.js';
 import {drawVillageProp} from './village-art.js';
 export const KITCHEN_RECTS={oven:[80,125,434,475],counter:[562,266,634,334],flour:[142,758,365,401],mirror:[725,694,330,467]};
 export const ROOM_FLOOR={left:16,top:48,right:272,bottom:208,doorX:136,doorY:200};
 let art=null,kitchen=null,grounds=new Map(),loading=null;
 const load=path=>new Promise(resolve=>{const image=new Image();image.onload=()=>resolve(image);image.onerror=()=>resolve(null);image.src=new URL(path,import.meta.url).href;});
-export function prepareInteriorArt(){if(loading)return loading;loading=Promise.all([prepareCottage().catch(()=>null),load('./assets/environment/kitchen-furniture-v1.png')]).then(([a,k])=>{if(!a||!k){loading=null;return false;}art=a;kitchen=k;grounds=new Map();return true;});return loading;}
+export function prepareInteriorArt(){if(loading)return loading;loading=Promise.all([prepareCottage().catch(()=>null),load('./assets/environment/kitchen-furniture-v1.png'),(typeof location==='undefined'||new URLSearchParams(location.search).get('details')==='personal'?prepareRoomDetails():Promise.resolve(true))]).then(([a,k,d])=>{if(!a||!k||!d){loading=null;return false;}art=a;kitchen=k;grounds=new Map();return true;});return loading;}
 function part(c,id,x,y,width){const rect=KITCHEN_RECTS[id],height=Math.round(width*rect[3]/rect[2]);c.drawImage(kitchen,...rect,Math.round(x-width/2),Math.round(y-height),width,height);}
 function fill(c,i,x,y,w,h){c.fillStyle=c.createPattern(art.patterns[i],'repeat');c.fillRect(x,y,w,h);}
 function ground(room){
@@ -15,7 +16,10 @@ function ground(room){
  for(const x of [17,90,190,265])fill(c,2,x,22,4,22);
  for(const x of [114,210])drawFurnishing(c,art,'window',x,43,24);
  for(const x of [48,254])drawFurnishing(c,art,'wallLamp',x,41,8);
- drawFurnishing(c,art,'rug',136,177,48);
+ drawRoomDetails(c,{room,story:{}},'wall');
+ if(room==='garden'&&roomDetailsReady())drawRoomDetails(c,{room,story:{}},'floor');else drawFurnishing(c,art,'rug',136,room==='bakery'&&roomDetailsReady()?188:177,room==='bakery'&&roomDetailsReady()?88:48);
+ // Flour dust and potting-soil specks belong to the room, not collectible stock.
+ if(room!=='home'){c.fillStyle=room==='bakery'?'#ecdbbc99':'#71543288';for(const [x,y]of [[198,94],[202,97],[207,92],[204,99],[200,100]])c.fillRect(x,y,1,1);}
  // A walkable doormat leads to the existing one-tile automatic exit.
  c.fillStyle='#6f825c';c.fillRect(128,192,16,16);c.fillStyle='#d8bd8b';c.fillRect(130,194,12,10);
  grounds.set(room,cv);return cv;
@@ -35,6 +39,10 @@ export function interiorLayers(c,s,npcs=[]){
   if(p.id in KITCHEN_RECTS)part(c,p.id,p.x,p.y,p.width);
   else if(p.id==='chest')drawVillageProp(c,'chest',(p.x-8)/16,(p.y-14)/16,p.width);
   else drawFurnishing(c,art,p.id,p.x,p.y,p.width);
+  if(p.id==='counter'&&p.x===68)drawRoomDetails(c,s,'counter-left');
+  if(p.id==='counter'&&p.x===148)drawRoomDetails(c,s,'counter-right');
+  if(p.id==='cupboard')drawRoomDetails(c,s,'cupboard');
+  if(p.id==='table')drawRoomDetails(c,s,'table',{breakfast:npcs.some(n=>n.breakfast)});
   if(p.id==='counter'&&p.x===108&&s.room==='bakery'&&s.story.cooked){for(let j=0;j<(s.economy.flour.noticed&&['held','used','replacement'].includes(s.economy.flour.state)?2:5);j++)bread(c,88+j*7,59);}
   if(p.id==='counter'&&p.x===148&&s.room==='bakery'&&s.economy.bakery.order.state==='ready')for(let j=0;j<4;j++)bread(c,135+j*7,59);
   if(p.id==='counter'&&p.x===68&&s.room==='bakery'&&s.story.cooking){c.fillStyle='#e1c694';c.fillRect(61,58,12,5);if(s.story.cooking>=2)for(let j=0;j<3;j++){c.fillStyle='#efdab0';c.fillRect(61+j*4,56,3,3);}}
