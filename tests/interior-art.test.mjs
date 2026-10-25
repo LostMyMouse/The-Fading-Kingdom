@@ -1,7 +1,7 @@
 import test from 'node:test';import assert from 'node:assert/strict';
 import {fresh,blocked,route,readSave} from '../chapter-model.js';
 import {doorAt,advanceWalk} from '../chapter-motion.js';
-import {ROOM_FLOOR,KITCHEN_RECTS,interiorPlan,prepareInteriorArt,interiorLayers,drawInteriorGround,drawInteriorFront} from '../interior-art.js';
+import {ROOM_FLOOR,KITCHEN_RECTS,interiorPlan,prepareInteriorArt,interiorLayers,drawInteriorGround,drawInteriorFront,interiorHotspot} from '../interior-art.js';
 
 test('interior art bases occupy the original solid furniture cells and leave the exit unchanged',()=>{
  for(const room of ['home','bakery','garden']){const s=fresh();s.room=room;for(const p of interiorPlan(s)){assert.equal(blocked(s,Math.floor(p.x/16),Math.floor((p.y-1)/16)),!(p.id==='chest'&&room!=='home'),p.id+' changed the original solid/walkable contract');assert.ok(p.x-p.width/2>=ROOM_FLOOR.left&&p.x+p.width/2<=ROOM_FLOOR.right);}
@@ -19,7 +19,7 @@ test('interior art waits for complete loads and retries missing furniture withou
  const oldImage=globalThis.Image,oldDocument=globalThis.document,queue=[],draws=[];
  const c=new Proxy({drawImage:(...a)=>draws.push(a),createPattern:()=>({})},{get:(t,k)=>k in t?t[k]:(()=>{}),set:(t,k,v)=>(t[k]=v,true)});
  globalThis.Image=class{constructor(){this.width=this.height=4;queue.push(this);}set src(s){this.url=s;}};globalThis.document={createElement:()=>({width:4,height:4,getContext:()=>c})};
- try{const first=prepareInteriorArt();assert.equal(prepareInteriorArt(),first);assert.equal(queue.length,3);queue[0].onerror();queue.slice(1).forEach(i=>i.onload());assert.equal(await first,false);const retry=prepareInteriorArt();assert.equal(queue.length,6);queue.slice(3).forEach(i=>i.onload());assert.equal(await retry,true);
+ try{const first=prepareInteriorArt();assert.equal(prepareInteriorArt(),first);assert.equal(queue.length,3);queue[0].onerror();queue.slice(1).forEach(i=>i.onload());assert.equal(await first,false);const retry=prepareInteriorArt();assert.equal(queue.length,6);queue.slice(3).forEach(i=>i.onload());assert.equal(await retry,true);assert.equal(interiorHotspot('home',216,56).id,'mirror');assert.equal(interiorHotspot('home',56,78).id,'bed');assert.equal(interiorHotspot('bakery',208,48).id,'kitchen');assert.equal(interiorHotspot('home',136,200),null);
  for(const room of ['home','bakery','garden']){const s=fresh();s.room=room;const before=JSON.stringify(s);assert.equal(drawInteriorGround(c,s),true);for(const layer of interiorLayers(c,s))layer.draw();drawInteriorFront(c,s);assert.equal(JSON.stringify(s),before);}for(const a of draws)assert.ok(a.slice(1).every(Number.isFinite));
  const s=fresh();s.room='bakery';s.story.cooked=true;const bagCount=()=>draws.filter(a=>a.length===9&&a[1]===KITCHEN_RECTS.flour[0]&&a[2]===KITCHEN_RECTS.flour[1]).length;
  let n=bagCount();interiorLayers(c,s).forEach(l=>l.draw());assert.equal(bagCount(),n+1);s.economy.flour.state='held';s.economy.flour.noticed=false;n=bagCount();const before=JSON.stringify(s);interiorLayers(c,s).forEach(l=>l.draw());assert.equal(bagCount(),n);assert.equal(JSON.stringify(s),before);

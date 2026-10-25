@@ -45,3 +45,11 @@ export function interiorLayers(c,s,npcs=[]){
  return layers;
 }
 export function drawInteriorFront(c,s){if(!art||!kitchen||s.room==='outside')return;fill(c,2,12,208,116,7);fill(c,2,144,208,132,7);c.fillStyle='#c7a577';c.fillRect(128,208,16,4);}
+// Match taps to the visible silhouette, including art rising above its base tile.
+export function interiorHotspot(room,x,y){
+ if(!art||!kitchen||room==='outside')return null;
+ if(room==='home')for(const p of interiorPlan({room})){const rect=p.id==='mirror'?KITCHEN_RECTS.mirror:p.id==='bed'?[0,0,290,422]:[0,0,182,147];const h=Math.round(p.width*rect[3]/rect[2]);if(x>=p.x-p.width/2&&x<=p.x+p.width/2&&y>=p.y-h&&y<=p.y)return p.id==='bed'?{id:'bed',x:3,y:7}:p.id==='mirror'?{id:'mirror',x:13,y:4}:{id:'storage',x:5,y:4};}
+ if(room==='bakery'&&x>=47&&x<=65&&y>=134&&y<=160)return {id:'flour',x:3,y:10};
+ if((room==='bakery'||room==='garden')&&x>=48&&x<=225&&y>=44&&y<=80)return {id:room==='bakery'?'kitchen':'seedcounter',x:4,y:5};
+ return null;
+}
