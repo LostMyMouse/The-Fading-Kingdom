@@ -1,3 +1,4 @@
+import {verticalCamera} from './chapter-camera.js';
 import {sessionSaveKey} from './chapter-session.js';
 import {BRIDGE,RIVERSIDE,BRIDGE_COST,BRIDGE_LINES,bridgeDelay,bakeryContributed,bridgeSiteClear,residentLoop} from './chapter-bridge.js';
 import {prepareBridgeArt} from './bridge-art.js';
@@ -221,7 +222,7 @@ function tick(now){if(workAction&&now-workAction.start>=420)workAction=null;cons
  const lerp=reduce?1:1-step/STEP_MS,px=(old.x+(s.player.x-old.x)*lerp)*16+8,py=(old.y+(s.player.y-old.y)*lerp)*16+12;
  const out=s.room==='outside',mw=(out?W:18)*16,mh=(out?H:15)*16;
  let tx=preview?preview.x*16+(preview.kind==='house'?40:8):px,ty=preview?preview.y*16+(preview.kind==='house'?32:8):py;
- const targetX=mw<width?(mw-width)/2:Math.max(0,Math.min(mw-width,tx-width/2));const targetY=mh<height?(mh-height)/2:Math.max(0,Math.min(mh-height,ty-height*(preview?.kind==='house'?.35:.62)));
+ const targetX=mw<width?(mw-width)/2:Math.max(0,Math.min(mw-width,tx-width/2));const targetY=verticalCamera(out,mh,height,ty,preview?.kind==='house');
  if(preview){camera.x+=(targetX-camera.x)*.12;camera.y+=(targetY-camera.y)*.12;}else{camera.x=targetX;camera.y=targetY;}const renderScale=canvas.width/width;camera.x=Math.round(camera.x*renderScale)/renderScale;camera.y=Math.round(camera.y*renderScale)/renderScale;
  if(npcCue&&npcCue.until<now)npcCue=null;
  npcViews=actors.update(s,dt,{paused:!playing||(dialog.open&&!npcCue)||!!preview||document.hidden,reduce,cue:npcCue});

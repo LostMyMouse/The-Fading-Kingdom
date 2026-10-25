@@ -25,3 +25,5 @@ test('interior art waits for complete loads and retries missing furniture withou
  let n=bagCount();interiorLayers(c,s).forEach(l=>l.draw());assert.equal(bagCount(),n+1);s.economy.flour.state='held';s.economy.flour.noticed=false;n=bagCount();const before=JSON.stringify(s);interiorLayers(c,s).forEach(l=>l.draw());assert.equal(bagCount(),n);assert.equal(JSON.stringify(s),before);
  }finally{globalThis.Image=oldImage;globalThis.document=oldDocument;}
 });
+
+ test('indoor camera contains the full 32-unit actor range and door whenever it fits',async()=>{const {verticalCamera}=await import('../chapter-camera.js');for(const h of [176,184,220,300]){const y=verticalCamera(false,240,h,188);assert.ok(y<=30);assert.ok(y+h>=206);assert.equal(y,verticalCamera(false,240,h,60));}for(const focus of [60,120,204]){const y=verticalCamera(false,240,74,focus);assert.ok(focus-y>=0&&focus-y<=74);}assert.equal(verticalCamera(true,640,184,220),220-184*.62);});
