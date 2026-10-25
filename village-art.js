@@ -46,3 +46,5 @@ export function drawVillageDecor(c,d){
 export function drawVillageResource(c,n){if(!art)return false;drawProp(c,art,n.type==='wood'?'log':'rock',n.x*16+8,n.y*16+13,13);return true;}
 export function drawVillageCrop(c,p){if(!art||!p.planted||p.ripe&&(p.crop||'carrot')!=='carrot')return false;drawProp(c,art,p.ripe?'carrot':p.watered?'growing':'seedling',p.x*16+8,p.y*16+12,13);return true;}
 export function drawVillageSoil(c,p){if(!art)return; c.save();c.globalAlpha=p.watered?.65:.4;c.fillStyle=c.createPattern(art.patterns[2],'repeat');c.fillRect(p.x*16,p.y*16,16,14);c.restore();}
+
+export function drawVillageProp(c,id,x,y,width=16){if(!art)return false;drawProp(c,art,id,x*16+8,y*16+14,width);return true;}

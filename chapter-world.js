@@ -1,4 +1,4 @@
-import {prepareVillageArt,buildingLayout,drawVillageGround,drawVillageBuilding,drawVillageTree,drawVillageDecor,drawVillageResource,drawVillageCrop,drawVillageSoil} from './village-art.js';
+import {prepareVillageArt,buildingLayout,drawVillageGround,drawVillageBuilding,drawVillageTree,drawVillageDecor,drawVillageResource,drawVillageCrop,drawVillageSoil,drawVillageProp} from './village-art.js';
 import {drawRiverside,drawBridgeFront} from './bridge-art.js';
 import {drawSquare} from './square-art.js';
 import {drawGatheringSites,drawGatheringTool} from './gathering-art.js';
@@ -46,13 +46,13 @@ export function draw(c,s,v){
   for(let j=0;j<70;j++){const x=4+j*17%47,y=8+j*11%24;if((x<15||y>28)&&!s.plots.some(p=>p.x===x&&p.y===y))plant(c,x*16+5,y*16+10,j%3?'#e9d9a1':'#d7a6a0');}
   house({x:8,y:8,stage:3,style:0,trim:0},true);
   // The collision footprint includes the roof; the threshold is on row 12.
-  icon(c,'planter',8*16,12*16);icon(c,'planter',13*16,12*16);
-  if(!s.story.kit){furniture(c,'chest',13,13);icon(c,'water',13*16,13*16-8);}furniture(c,'chest',8,13);
+  for(const x of [8,13])if(!drawVillageProp(c,'planter',x,12))icon(c,'planter',x*16,12*16);
+  if(!s.story.kit){if(!drawVillageProp(c,'chest',13,13))furniture(c,'chest',13,13);icon(c,'water',13*16,13*16-8);}if(!drawVillageProp(c,'chest',8,13))furniture(c,'chest',8,13);
   // Carpenter's cart and distinctly owned timber, never free branches.
   r(c,17*16,16*16,42,13,'#9d764d');r(c,17*16-2,16*16-3,46,5,'#ccac76');r(c,17*16+3,16*16+10,7,7,'#65513b');r(c,19*16,16*16+10,7,7,'#65513b');
   for(let j=0;j<3;j++)r(c,20*16,17*16-6+j*4,17,3,j%2?'#d8b27c':'#a2794f');r(c,20*16+6,17*16-9,4,12,'#5c796a');
   if(s.gardener.house){const h=s.gardener.house;house(h);r(c,(h.x+1)*16,(h.y+4)*16-7,12,9,'#cfb27c');r(c,(h.x+1)*16+5,(h.y+4)*16+1,2,9,'#8c6b48');if(h.stage===3){label(c,(h.x+2)*16+8,h.y*16-42,'Rowan · seeds');for(const wx of [1,3])plant(c,(h.x+wx)*16+4,(h.y+3)*16,'#e8b965');}}
-  if(s.house){house({...s.house,lived:s.economy.bakery.porch});const h=s.house;if(s.story.herbs)icon(c,'planter',(h.x+5)*16,(h.y+3)*16);r(c,(h.x+1)*16,(h.y+4)*16-7,12,9,'#cfb27c');r(c,(h.x+1)*16+5,(h.y+4)*16+1,2,9,'#8c6b48');}
+  if(s.house){house({...s.house,lived:s.economy.bakery.porch});const h=s.house;if(s.story.herbs&&!drawVillageProp(c,'planter',h.x+5,h.y+3))icon(c,'planter',(h.x+5)*16,(h.y+3)*16);r(c,(h.x+1)*16,(h.y+4)*16-7,12,9,'#cfb27c');r(c,(h.x+1)*16+5,(h.y+4)*16+1,2,9,'#8c6b48');}
   for(const p of s.plots){const x=p.x*16,y=p.y*16;r(c,x-1,y-1,18,16,'#aa8c5d');r(c,x,y,16,14,p.watered?'#745b44':'#99734e');for(let j=0;j<3;j++)r(c,x+2,y+3+j*4,12,1,p.watered?'#8a7050':'#b18a5d');drawVillageSoil(c,p);if(drawVillageCrop(c,p))continue;if(p.ripe){if((p.crop||'carrot')==='carrot')icon(c,'carrot',x,y-4);else if(p.crop==='turnip'){r(c,x+4,y+1,9,8,'#e9d9af');r(c,x+4,y+1,9,3,'#b48ca0');r(c,x+8,y+8,2,4,'#e9d9af');r(c,x+7,y-3,3,5,'#5c8653');r(c,x+4,y-4,4,3,'#82a65d');}else{r(c,x+7,y-1,2,11,'#527b49');r(c,x+4,y+4,4,2,'#79a35c');r(c,x+9,y+2,4,2,'#79a35c');r(c,x+5,y-5,7,7,'#e7b35a');r(c,x+3,y-3,11,3,'#d99a45');r(c,x+7,y-3,3,3,'#f1d88d');}}else if(p.planted){r(c,x+7,y+4,2,6,'#56834b');r(c,x+4,y+3,4,3,'#83ab63');r(c,x+9,y+1,4,4,'#a2bc72');}}
   for(const n of RESOURCES)if(!s.gathered.includes(n.id)){if(drawVillageResource(c,n))continue;const x=n.x*16,y=n.y*16;if(n.type==='wood'){r(c,x+2,y+7,12,4,'#826443');r(c,x+4,y+5,10,3,'#ae8b58');r(c,x+10,y+2,3,5,'#99754a');r(c,x+2,y+7,2,3,'#d3b47a');}else{r(c,x+2,y+7,12,6,'#939b86');r(c,x+4,y+4,8,8,'#b5baa2');r(c,x+5,y+4,5,2,'#d2cfaf');}}
   drawGatheringSites(c,s,v.action);
