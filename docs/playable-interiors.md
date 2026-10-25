@@ -23,3 +23,5 @@ The requested phone/tablet viewport override did not apply in this browser sessi
 Remaining limits: the existing cutout rig is still a prototype rather than purpose-painted limb layers; basket/tool graphics are earlier simplified assets; painted fire is static; large room surfaces and dynamic bread/seed icons can receive further art polish. The entire wardrobe/palette Cartesian product, every tool progress fraction, DPR2 hardware and every device are not certified by this pass.
 
 Final activation loads the new interiors by default in the actual chapter; no interiors query is needed. The strictly selected review save remains available for testing.
+
+Additional chapter checks: tapping the bed advanced day five to six and added the expected ten-gold bakery contribution (30 to 40 village gold). Visible furniture hit zones preserve placed-item and NPC click priority so a resident standing at a work counter remains selectable.
