@@ -1,0 +1,8 @@
+Use case: stylized-concept. Asset type: transparent 2x2 pixel-art furniture atlas for The Fading Kingdom browser game.
+Reference image 1 is our existing furniture atlas: match exactly the warm rustic storybook pixel style, chunky textured pixel clusters, dark brown edges, warm timber and cream/grey stone, upper-left lighting. Environment style reference only. No characters.
+Four isolated furniture pieces, one in each quadrant, with generous transparent gutters:
+Top left: small front-facing country bakery oven, cream-grey stone arch and warm timber mantel, black iron baking chamber containing a small static amber glow, short chimney. Front view with a little top visible, flat horizontal base.
+Top right: long low front-facing timber cooking counter with pale cream worktop, four cupboard panels below and dark iron handles. Worktop is EMPTY so game ingredients can be placed dynamically. Same perspective as reference cupboard, wider than tall, about 3:1 width/height.
+Bottom left: a single tied cream flour sack with a small simple wheat emblem, no writing, standing on its flat base. Clearly a sack, not a cupboard.
+Bottom right: small standing oval mirror in warm carved timber frame, muted pale teal glass with a subtle diagonal glint, two short feet at its base.
+Actual transparent background, no checkerboard, no scenery, no room background, no labels, text, people or UI. Every object fully contained within its quadrant with clear gaps and no touching pieces. Same furnishing scale/density as the reference. No isometric side walls, no photorealism, no vector smoothness.

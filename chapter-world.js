@@ -1,3 +1,4 @@
+import {prepareInteriorArt,drawInteriorGround,interiorLayers,drawInteriorFront} from './interior-art.js';
 import {prepareVillageArt,buildingLayout,drawVillageGround,drawVillageBuilding,drawVillageTree,drawVillageDecor,drawVillageResource,drawVillageCrop,drawVillageSoil,drawVillageProp} from './village-art.js';
 import {drawRiverside,drawBridgeFront} from './bridge-art.js';
 import {drawSquare} from './square-art.js';
@@ -8,7 +9,7 @@ import {handAnchor} from './character-rig.js';
 import {drawCharacter} from './chapter-characters.js';
 import {person,icon} from './world.js';
 import {W,H,TREES,RESOURCES,FIXED,mara,validHouse,validDecor} from './chapter-model.js';
-export {prepareVillageArt};
+export {prepareVillageArt,prepareInteriorArt};
 export const T=16;
 const r=(c,x,y,w,h,col)=>{c.fillStyle=col;c.fillRect(Math.round(x),Math.round(y),w,h);};
 const noise=(x,y)=>((x*374761393+y*668265263)^(x*31+y*57))>>>0;
@@ -58,7 +59,7 @@ export function draw(c,s,v){
   for(const n of RESOURCES)if(!s.gathered.includes(n.id)){if(drawVillageResource(c,n))continue;const x=n.x*16,y=n.y*16;if(n.type==='wood'){r(c,x+2,y+7,12,4,'#826443');r(c,x+4,y+5,10,3,'#ae8b58');r(c,x+10,y+2,3,5,'#99754a');r(c,x+2,y+7,2,3,'#d3b47a');}else{r(c,x+2,y+7,12,6,'#939b86');r(c,x+4,y+4,8,8,'#b5baa2');r(c,x+5,y+4,5,2,'#d2cfaf');}}
   drawGatheringSites(c,s,v.action);
   r(c,44*16,9*16,35,17,'#8b9573');r(c,44*16+3,9*16+2,28,12,'#b0b494');for(let j=0;j<4;j++)plant(c,44*16+5+j*8,9*16-2,s.gardener.sower?'#e5b75c':'#b2bea1');label(c,45*16+8,9*16-12,s.economy.projects.nursery?'Village nursery':'Old nursery');if(s.economy.projects.nursery){for(let j=0;j<3;j++){const x=(44+j)*16;r(c,x,10*16,14,12,'#a68156');r(c,x+2,10*16+2,10,8,'#665a40');plant(c,x+7,10*16+3,'#91ad71');if(s.economy.berryDay<s.day){r(c,x+3,10*16-1,3,3,'#b05a73');r(c,x+8,10*16-3,3,3,'#bc7081');}}}
- }else{
+ }else if(drawInteriorGround(c,s)){scenery.push(...interiorLayers(c,s,v.npcs||[]));}else{
   r(c,8,29,272,182,'#172f2b');r(c,16,32,256,176,'#82684c');
   for(let y=3;y<13;y++)for(let x=1;x<17;x++){r(c,x*16,y*16,16,16,(x+y)%2?'#c6a77a':'#c0a173');r(c,x*16,y*16+15,16,1,'#a78963');r(c,x*16+((y%2)*7),y*16,1,15,'#ad9067');}
   r(c,16,23,256,27,'#b9c2a1');r(c,16,24,256,3,'#dce0b9');r(c,16,47,256,4,'#745f45');r(c,12,23,4,185,'#68593f');r(c,272,23,4,185,'#68593f');
@@ -69,16 +70,17 @@ export function draw(c,s,v){
    for(const x of [7,10,15])icon(c,'planter',x*16,7*16);label(c,8*16+8,14*16,'Village');}
   else{furniture(c,'counter',3,4);furniture(c,'oven',12,4);furniture(c,'table',7,7);icon(c,'planter',15*16,8*16);furniture(c,'chest',3,9);if(['shelf','returned','replaced'].includes(s.economy.flour.state)){r(c,3*16+2,9*16-12,12,12,'#e1caa0');r(c,3*16+4,9*16-14,8,3,'#b29a70');r(c,3*16+5,9*16-6,6,3,'#8d7856');}if(s.story.cooked){for(let j=0;j<(s.economy.flour.noticed&&['held','used','replacement'].includes(s.economy.flour.state)?2:5);j++){r(c,5*16+j*8,4*16-8,6,4,'#c99558');r(c,5*16+j*8+1,4*16-8,3,1,'#efd2a0');}}if(s.economy.bakery.order.state==='ready'){r(c,8*16,4*16-10,24,7,'#7f6648');for(let j=0;j<4;j++)r(c,8*16+2+j*5,4*16-12,4,4,'#d7ad6b');}if(s.economy.bakery.porch){plant(c,7*16+9,42,'#dfa5ab');plant(c,12*16+9,42,'#e8d49c');}if(s.story.cooking){r(c,4*16,4*16-5,12,5,'#e1c694');if(s.story.cooking>=2)for(let j=0;j<3;j++)r(c,4*16+j*4,4*16-7,3,3,'#efdab0');}label(c,8*16+8,14*16,'Village');}
  }
- if(s.room==='bakery'&&(v.npcs||[]).some(n=>n.breakfast)){r(c,7*16+3,7*16+12,10,5,'#f3e5bf');r(c,7*16+5,7*16+11,6,3,'#d5a065');}
- for(const d of s.decor)if(d.room===s.room){const paint=()=>{if(!out||!drawVillageDecor(c,d))icon(c,d.type,d.x*16,d.y*16,d.rotation);};if(out&&d.type!=='path')scenery.push({y:d.y*16+14,draw:paint});else paint();}
+ if(s.room==='bakery'&&!scenery.length&&(v.npcs||[]).some(n=>n.breakfast)){r(c,7*16+3,7*16+12,10,5,'#f3e5bf');r(c,7*16+5,7*16+11,6,3,'#d5a065');}
+ for(const d of s.decor)if(d.room===s.room){const paint=()=>{if(!drawVillageDecor(c,d))icon(c,d.type,d.x*16,d.y*16,d.rotation);};if(d.type!=='path')scenery.push({y:d.y*16+14,draw:paint});else paint();}
  if(out&&v.waterArea?.length){for(const p of v.waterArea){r(c,p.x*16,p.y*16,16,14,'#95c7d235');c.strokeStyle='#e2f1d1';c.lineWidth=1;c.strokeRect(p.x*16+.5,p.y*16+.5,15,13);r(c,p.x*16+7,p.y*16+3,2,5,'#b6e0de');r(c,p.x*16+6,p.y*16+6,4,2,'#b6e0de');}}
- if(preview){const valid=preview.valid;c.globalAlpha=.55;if(preview.kind==='house'){if(!drawVillageBuilding(c,{...preview,stage:3,trim:0}))building(c,{...preview,stage:3,trim:0},null);}else if(!out||!drawVillageDecor(c,preview))icon(c,preview.type,preview.x*16,preview.y*16,preview.rotation);c.globalAlpha=1;c.strokeStyle=valid?'#fff1ba':'#a44035';c.lineWidth=1;c.strokeRect(preview.x*16+.5,preview.y*16+.5,preview.kind==='house'?79:15,preview.kind==='house'?63:15);}
+ if(preview){const valid=preview.valid;c.globalAlpha=.55;if(preview.kind==='house'){if(!drawVillageBuilding(c,{...preview,stage:3,trim:0}))building(c,{...preview,stage:3,trim:0},null);}else if(!drawVillageDecor(c,preview))icon(c,preview.type,preview.x*16,preview.y*16,preview.rotation);c.globalAlpha=1;c.strokeStyle=valid?'#fff1ba':'#a44035';c.lineWidth=1;c.strokeRect(preview.x*16+.5,preview.y*16+.5,preview.kind==='house'?79:15,preview.kind==='house'?63:15);}
  if(guide){const g=guide;c.strokeStyle='#fff1ac';c.lineWidth=1;const bounce=reduce?0:Math.floor(Math.sin(time/250)*2);c.beginPath();c.moveTo(g.x*16+4,g.y*16-9+bounce);c.lineTo(g.x*16+8,g.y*16-5+bounce);c.lineTo(g.x*16+12,g.y*16-9+bounce);c.stroke();}
  const people=[{x:px,y:py,look:s.player,name:'',frame,dir:direction}];
  for(const actor of v.npcs||[]){people.push({x:actor.x*16+8,y:actor.y*16+12,actor,name:actor.name==='mara'?'Mara':actor.name==='rowan'?'Rowan':'Orin',look:actor.name==='mara'?{skin:2,hair:2,shirt:3,style:1}:{skin:3,hair:0,shirt:1,hat:'cap'}});}
  const layers=people.map(p=>({y:p.y,draw:()=>{const pose={direction:p.dir||'down',frame:p.frame||0,walking:v.walking,reduce},carry=!p.name&&!v.action&&(s.carry.wood+s.carry.stone||s.story.basket==='held'),behind=handAnchor(pose).behind,handles=s.story.basket==='held'||s.story.carryBasket;if(carry&&behind)drawCarryBasket(c,p.x,p.y,pose,handles);if(!p.name&&v.action&&p.dir==='up')drawGatheringTool(c,p.x,p.y,p.dir,v.action);if(p.actor){if(!drawCharacter(c,p.actor,p.x,p.y))person(c,p.x,p.y,p.look);}else if(!drawPlayer(c,p.x,p.y,p.look,p.frame||0,p.dir||'down',v.walking,reduce,v.blink,v.action))person(c,p.x,p.y,p.look,p.frame||0,p.dir||'down');if(!p.name&&v.action&&p.dir!=='up')drawGatheringTool(c,p.x,p.y,p.dir,v.action);if(carry&&!behind)drawCarryBasket(c,p.x,p.y,pose,handles);if(p.name)label(c,p.x,p.y-36,p.name);}}));
 
  if(out)for(let j=0;j<TREES.length;j++){const t=TREES[j];layers.push({y:t.y*16+12,draw:()=>{if(!drawVillageTree(c,t.x,t.y,j))tree(c,t.x,t.y,j);}});}if(out&&s.bridge?.built)layers.push({y:26*16+8,draw:()=>drawBridgeFront(c)});layers.push(...scenery);layers.sort((a,b)=>a.y-b.y).forEach(p=>p.draw());
+ if(!out)drawInteriorFront(c,s);
  if(!v.dialogOpen){const voice=(v.npcs||[]).find(n=>n.speech);if(voice){const speaker=voice.speechSpeaker==='Mara'?(v.npcs||[]).find(n=>n.name==='mara'):voice;if(speaker){const sx=speaker.x*16+8,sy=speaker.y*16-34;if(sx>camera.x&&sx<camera.x+width&&sy>camera.y&&sy<camera.y+height){const words=voice.speech.split(' '),lines=[''];for(const word of words){if((lines.at(-1)+' '+word).trim().length>23)lines.push(word);else lines[lines.length-1]=(lines.at(-1)+' '+word).trim();}c.font='7px system-ui';c.textAlign='center';const bw=Math.max(...lines.map(line=>c.measureText(line).width))+12,bh=lines.length*10+8,bx=Math.max(camera.x+3,Math.min(camera.x+width-bw-3,sx-bw/2)),by=Math.max(camera.y+3,sy-bh);r(c,bx-1,by-1,bw+2,bh+2,'#6f593f');r(c,bx,by,bw,bh,'#fff0cd');c.fillStyle='#503f30';lines.forEach((line,j)=>c.fillText(line,bx+bw/2,by+11+j*10));}}}}
  c.restore();
 }

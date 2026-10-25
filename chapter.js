@@ -15,7 +15,7 @@ import {prepareCharacters} from './chapter-characters.js';
 import {portraitFor,preparePortraits} from './chapter-portraits.js';
 import {ARRIVAL,EQUIPMENT} from './chapter-progression.js';
 import {SAVE_KEY as CHAPTER_SAVE_KEY,W,H,STYLES,DECOR,RESOURCES,FIXED,fresh,mara,blocked,route,walkingRoute,validHouse,validDecor,goal,act,readSave,wateringArea,canEarnWideCan} from './chapter-model.js';
-import {draw,prepareVillageArt} from './chapter-world.js';
+import {draw,prepareVillageArt,prepareInteriorArt} from './chapter-world.js';
 import {person,icon} from './world.js';
 import {SKINS,HAIRS,SHIRTS} from './model.js';
 const $=id=>document.getElementById(id),canvas=$('world'),ctx=canvas.getContext('2d'),dialog=$('dialog');
@@ -195,6 +195,8 @@ canvas.addEventListener('pointerdown',e=>{if(!playing||dialog.open||workAction)r
  const d=s.decor.findIndex(d=>d.room===s.room&&d.x===x&&d.y===y);if(d>=0){goTo({x,y},()=>editDecor(d));return;}const npcHit=npcViews.find(n=>Math.abs((x+.5)-(n.x+.5))<.7&&y>=Math.floor(n.y)-1&&y<=Math.round(n.y));const p=npcHit?points().find(p=>p.id===npcHit.name):points().find(p=>p.x===x&&p.y===y);if(p){if(doorAt(s,p)){walkToDoor(p);return;}if(p.id==='plot'&&tool==='water')waterTarget=p.index;if(['mara','orin','rowan'].includes(p.id))approachNpc(p.id,()=>interact(p));else goTo(p,()=>interact(p));return;}
  if(s.room==='outside'){if(!s.bridge.built&&x>=45&&x<=48&&y>=23&&y<=26){goTo(BRIDGE,bridgeMenu);return;}if(s.bridge.built&&x>=50&&x<=52&&y>=22&&y<=23){goTo(RIVERSIDE,riverPatch);return;}const gh=s.gardener.house;if(gh&&x>=gh.x&&x<=gh.x+4&&y>=gh.y&&y<=gh.y+3){if(gh.stage===3)walkToDoor({x:gh.x+2,y:gh.y+4});else goTo({x:gh.x+2,y:gh.y+4},gardenSign);return;}if(x>=5&&x<=7&&y>=14&&y<=17){goTo(MARKET,()=>projectDetails('market'));return;}if(x>=44&&x<=46&&y>=9&&y<=10){goTo(FIXED.nursery,()=>interact({id:'nursery'}));return;}if(x>=8&&x<=13&&y>=8&&y<=11){walkToDoor(FIXED.home);return;}const h=s.house;if(h&&x>=h.x&&x<=h.x+4&&y>=h.y&&y<=h.y+3){if(h.stage===3)walkToDoor({x:h.x+2,y:h.y+4});else goTo({x:h.x+2,y:h.y+4},buildingSign);return;}}
  if(s.room==='home'&&x===3&&y>=4&&y<=6){goTo({x:3,y:7},()=>interact({id:'bed'}));return;}
+ if(s.room==='home'&&x===5&&y===4){goTo({x:5,y:4},()=>interact({id:'storage'}));return;}
+ if(s.room==='home'&&x===13&&y===4){goTo({x:13,y:4},()=>interact({id:'mirror'}));return;}
  if(s.room==='garden'&&y===4&&x>=3&&x<=13){goTo({x:4,y:5},seedCounter);return;}
  if(s.room==='bakery'&&x===3&&y>=8&&y<=9){goTo({x:3,y:10},flourShelf);return;}
  if(s.room==='bakery'&&y===4&&x>=3&&x<=13){goTo({x:4,y:5},cook);return;}
@@ -232,8 +234,8 @@ function tick(now){if(workAction&&now-workAction.start>=420)workAction=null;cons
 window.addEventListener('error',()=>{$('fatal').classList.remove('hide');});resize();hud();requestAnimationFrame(tick);
 async function loadArtwork(){
  $('begin').disabled=true;$('continue').disabled=true;$('art-retry').classList.add('hide');$('art-status').textContent='Unpacking the village artwork…';
- const results=await Promise.all([preparePlayer(),prepareCharacters(),preparePortraits(),prepareBridgeArt(),prepareVillageArt()]).catch(()=>[false]);
- const ready=results.length===5&&results.every(Boolean);$('begin').disabled=!ready;$('continue').disabled=!ready||!stored;
+ const results=await Promise.all([preparePlayer(),prepareCharacters(),preparePortraits(),prepareBridgeArt(),prepareVillageArt(),new URLSearchParams(location.search).get('interiors')==='cozy'?prepareInteriorArt():Promise.resolve(true)]).catch(()=>[false]);
+ const ready=results.length===6&&results.every(Boolean);$('begin').disabled=!ready;$('continue').disabled=!ready||!stored;
  $('art-status').textContent=ready?'Ready when you are.':'Some artwork couldn’t load. Your story is safe. Try loading it again.';
  $('art-retry').classList.toggle('hide',ready);
 }
