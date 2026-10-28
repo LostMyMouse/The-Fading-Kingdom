@@ -1,0 +1,7 @@
+# Walking seam repair · 28 October 2026
+
+The side walk previously rotated lower-body rectangles from 78% of character height. This included the shorts, and the player's profile boot crossed the midpoint where the shared rig divided its two legs. Rotating those halves produced a split silhouette. The rig now preserves a fixed hip/shorts bridge, moves the lower feet with level soles and a small lift, and uses measured overlapping player profile boot regions. Front/back steps retain opposing phases with reduced lift. No source character image, portrait, wardrobe ID or save appearance changes. No new painted frames are claimed.
+
+An isolated cast-review-gait-review comparison was deployed first. Browser inspection covered front, left, right and back, both contact phases and passing poses, close-up and gameplay size. This fixes the observed cut line; it is still a cutout animation, not a new production animation sheet. Full device and wardrobe visual certification is not claimed by this repair. Existing palette/appearance and motion tests remain required.
+
+The house update is deployed: wall-aligned beds, bedside storage, dining areas and side pantry storage, sharing one rendering/collision plan. Older valid decorations move nearby or return to storage without loss. A follow-up preserves migration notices through Continue and backup restore. Browser house and action checks are recorded in the workspace verification report.

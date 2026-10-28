@@ -7,3 +7,7 @@ function covered(p,x,y){return p.pieces.some(({m:[a,b,c,d,e,f],box:[l,t,w,h]})=>
 test('side walking keeps a continuous clothing bridge over both hip pivots through the whole stride',()=>{
  for(const direction of ['left','right'])for(let frame=0;frame<4;frame+=.125){const c=probe();drawRig(c,{},[0,0,200,320],{direction,walking:true,frame},50,80);for(let u=.16;u<=.84;u+=.04)for(const v of [.845,.86,.88])assert.ok(covered(c,40+u*20,50+v*32),`${direction} phase ${frame}: exposed hip ${u},${v}`);}
 });
+
+test('walking feet stay level and their upper overlap remains under an unrotated pelvis',()=>{
+ for(const direction of ['left','right'])for(let frame=0;frame<4;frame+=.125){const c=probe();drawRig(c,{},[0,0,200,320],{direction,walking:true,frame},50,80);for(const foot of c.pieces.slice(0,2)){assert.equal(foot.m[1],0);assert.equal(foot.m[2],0);}for(let u=.16;u<=.84;u+=.04)for(const v of [.89,.90,.905])assert.ok(covered(c,40+u*20,50+v*32),`${direction} ${frame} exposed lower hip`);}
+});

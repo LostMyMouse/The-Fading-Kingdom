@@ -1,9 +1,10 @@
 // One world-character contract: common height, foot baseline and textured limb regions.
 export const CHARACTER_HEIGHT=32;
 export const RIG={head:[0,0,1,.53],leftArm:[0,.51,.25,.80],rightArm:[.75,.51,1,.80],leftLeg:[.23,.84,.50,1],rightLeg:[.50,.84,.77,1]};
+// Keep thighs/shorts fixed; only the lower leg moves under the clothing overlap.
 // Extend moving regions underneath the fixed clothing. Butt-joined rectangles
 // exposed the background at the hips and shoulders during rotation/translation.
-const WALK_LEFT_LEG=[.23,.78,.50,1],WALK_RIGHT_LEG=[.50,.78,.77,1];
+const WALK_LEFT_LEG=[.23,.89,.50,1],WALK_RIGHT_LEG=[.50,.89,.77,1];
 const WALK_LEFT_ARM=[0,.49,.25,.80],WALK_RIGHT_ARM=[.75,.49,1,.80];
 export function gaitPose(frame=0){const cycle=((frame%4)+4)%4,index=Math.floor(cycle),t=cycle-index,ease=t*t*(3-2*t),keys=[0,1,0,-1,0],phase=keys[index]+(keys[index+1]-keys[index])*ease;return {leftLeg:phase,rightLeg:-phase,leftArm:-phase,rightArm:phase};}
 function piece(c,image,rect,box,x,y,w,h,dx=0,dy=0,dark=false){
@@ -36,15 +37,21 @@ export function drawRig(c,image,rect,{direction='down',walking=false,frame=0,lay
  const p=gaitPose(action?0:frame),side=direction==='left'||direction==='right',sign=direction==='left'?-1:1,back=direction==='up'?-1:1;
  const sideArm=layout?.[direction]?.arm??(direction==='left'?[.66,.51,.96,.79]:[.04,.51,.34,.79]);
  const torso=layout?.[direction]?.torso??(direction==='left'?[.15,.53,.66,.88]:direction==='right'?[.34,.53,.85,.88]:[.25,.53,.75,.88]);
- if(side){hinged(c,image,rect,WALK_LEFT_LEG,x,y,w,h,p.leftLeg*sign*-.34,true);hinged(c,image,rect,WALK_RIGHT_LEG,x,y,w,h,p.rightLeg*sign*-.34);}
- else{piece(c,image,rect,WALK_LEFT_LEG,x,y,w,h,0,p.leftLeg*back,true);piece(c,image,rect,WALK_RIGHT_LEG,x,y,w,h,0,p.rightLeg*back);}
+ if(side){
+  // A profile boot crosses the atlas midpoint. Use its measured silhouette
+  // rather than cutting that boot in half and rotating its halves apart.
+  const legs=layout?.[direction]?.legs??[WALK_LEFT_LEG,WALK_RIGHT_LEG];
+  piece(c,image,rect,legs[0],x,y,w,h,p.leftLeg*sign*1.15,-Math.abs(p.leftLeg)*.3);
+  piece(c,image,rect,legs[1],x,y,w,h,p.rightLeg*sign*1.15,-Math.abs(p.rightLeg)*.3);
+ }
+ else{piece(c,image,rect,WALK_LEFT_LEG,x,y,w,h,0,p.leftLeg*back*.65);piece(c,image,rect,WALK_RIGHT_LEG,x,y,w,h,0,p.rightLeg*back*.65);}
  if(side){
   // Preserve the entire torso silhouette around the visible arm. A shoulder pivot
   // keeps the sleeve attached; duplicating/translating this arm made floating hands.
   const [l,t,r,b]=sideArm;
-  piece(c,image,rect,[0,.53,l,.90],x,y,w,h);piece(c,image,rect,[r,.53,1,.90],x,y,w,h);
+  piece(c,image,rect,[0,.53,l,.91],x,y,w,h);piece(c,image,rect,[r,.53,1,.91],x,y,w,h);
   if(t>.53)piece(c,image,rect,[l,.53,r,t],x,y,w,h);
-  if(b<.90)piece(c,image,rect,[l,b,r,.90],x,y,w,h);
+  if(b<.91)piece(c,image,rect,[l,b,r,.91],x,y,w,h);
  }
  else{if(action)hinged(c,image,rect,RIG.leftArm,x,y,w,h,swingAngle(direction,action.progress));else hinged(c,image,rect,WALK_LEFT_ARM,x,y,w,h,p.leftArm*back*-.18);hinged(c,image,rect,WALK_RIGHT_ARM,x,y,w,h,p.rightArm*back*-.18);}
  if(!side)piece(c,image,rect,[torso[0],torso[1],torso[2],.90],x,y,w,h);
