@@ -1,0 +1,9 @@
+# Responsive review and villager tapping · 28 October 2026
+
+The next-step panel is a native collapsible details control. It starts closed on narrow screens and when resuming indoors; the player can expand it at any time. This keeps the guide available without covering furniture or the small-screen scene. No save format, economy or appearance field changes.
+
+The browser viewport override reported success but still returned1280x720, so it is not counted as phone coverage. device-review.html embeds the actual game at390x844,320x740,768x1024 and844x390. Its visible report confirms those actual child viewports and no horizontal document overflow. The iframe uses the existing separate bridge playtest save slot. This is responsive browser layout coverage, not physical touch-device performance.
+
+Browser checks:16 offered wardrobe combinations (4 hairstyles x2 shirts x2 hats),4 directions and both opposite contacts at gameplay size. No new source sprite art is introduced. Existing legacy hairstyle2 is not newly offered and is not included in those16. The36 additional palette matrix rows were not recertified. Inspected phone quick slots, movement and interaction controls, collapsed/expanded guidance, journal and seed-counter menu, plus Rowan interior on phone and tablet and the village in landscape. Browser screenshot evidence is saved under outputs/responsive-audit in the workspace.
+
+Phone review exposed a character-tapping defect: the old target used only the NPC standing tile and the tile above it, but the painted head can rise into a second tile. The new hit test uses the same32-world-unit head/feet anchors as drawing, supports interpolated walking positions and chooses the frontmost person when silhouettes overlap. Reaching the NPC still uses their current route and approach logic; ordinary proximity does not pause or face them.
