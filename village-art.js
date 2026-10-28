@@ -7,6 +7,8 @@ export function buildingLayout(h,home=false){
  return {door,width,left:door.x-width/2,bottom:door.y-5,sortY:(h.y+4)*16+1};
 }
 let art=null,buildings=null,ground=null,loading=null;
+export function buildingLabelY(h,home=false){const g=buildingLayout(h,home),rect=h.style===1?BUILDING_RECTS.timber:h.style===2?BUILDING_RECTS.stone:art?.cottageRect;return g.bottom-Math.round(g.width*(rect?rect[3]/rect[2]:1))-6;}
+
 const load=path=>new Promise(resolve=>{const image=new Image();image.onload=()=>resolve(image);image.onerror=()=>resolve(null);image.src=new URL(path,import.meta.url).href;});
 export function prepareVillageArt(){
  if(loading)return loading;
