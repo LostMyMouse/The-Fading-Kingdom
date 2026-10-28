@@ -1,6 +1,6 @@
 import {blinkImage} from './character-blink.js';
 import {SKINS,HAIRS,SHIRTS} from './model.js';
-import {drawRig,gaitPose,pixelAnchor} from './character-rig.js';
+import {drawRig,gaitPose,pixelAnchor,PLAYER_RIG_LAYOUT} from './character-rig.js';
 // Whole, coherent figures share proportions. Swaps are made at measured landmarks, not by stretching isolated anatomy.
 export const PLAYER_RECTS=[
  [[35,175,217,364],[287,175,218,367],[519,175,219,367],[773,175,213,364]],
@@ -11,7 +11,7 @@ export const HAIRSTYLES=[[0,'Tousled'],[1,'Tied back'],[3,'Rounded bob'],[4,'Twi
 export const HAIR_RECTS=[[[34,131,273,433],[349,134,254,433],[652,134,253,432],[946,131,274,433]],[[37,649,281,458],[349,647,262,464],[642,647,260,464],[931,647,285,460]]];
 const views={down:0,left:1,right:2,up:3};
 // The same joints/timeline as the NPCs, fitted to this character's hair and sleeve silhouette.
-const layout={left:{arm:[.51,.53,.73,.80],legs:[[.23,.89,.39,1],[.36,.89,.73,1]],torso:[.24,.53,.67,.88]},right:{arm:[.27,.53,.49,.80],legs:[[.61,.89,.77,1],[.27,.89,.64,1]],torso:[.33,.53,.76,.88]}};
+const layout=PLAYER_RIG_LAYOUT;
 export function playerPose(frame=0,walking=false,reduce=false){return gaitPose(walking&&!reduce?frame:0);}
 let atlas=null,hairAtlas=null,cap=null,ready=false,failed=false,loading=null;const cache=new Map();
 export function preparePlayer(){if(loading)return loading;loading=Promise.all([['atlas','./assets/player/coherent-template.png'],['cap','./assets/player/parts.png'],['hair','./assets/player/hairstyles.png']].map(([name,url])=>new Promise(resolve=>{const img=new Image();img.onload=()=>resolve(true);img.onerror=()=>resolve(false);if(name==='atlas')atlas=img;else if(name==='hair')hairAtlas=img;else cap=img;img.src=new URL(url,import.meta.url).href;}))).then(results=>{ready=results.every(Boolean);failed=!ready;cache.clear();if(failed)loading=null;return ready;});return loading;}
