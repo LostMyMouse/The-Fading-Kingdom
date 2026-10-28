@@ -1,3 +1,4 @@
+import {bakeryLife,carpenterWaiting,workRemark} from './village-life.js';
 import {squareActive,squareDelay,squareStops} from './chapter-square.js';
 import {rowan} from './chapter-gardener.js';
 import {createBakeryVisitor} from './chapter-visits.js';
@@ -23,13 +24,13 @@ export function routineFor(s,name,anchor){
  if(squareActive(s)&&s.room==='outside'&&!squareDelay(s,name))return squareStops(s,name);
  if(name==='rowan')return s.room==='garden'?[{x:11,y:4,hold:10000,work:true,face:'down',activity:'Sorting seeds'},{x:10,y:6,hold:6000,face:'left',activity:'Checking seedlings'},{x:9,y:9,hold:7000,face:'left',activity:'Taking a break'},{x:14,y:4,hold:5000,face:'up',activity:'Putting things away'}]:[{...anchor,hold:11000,work:true,face:'down',activity:'Tending the nursery'},{x:44,y:12,hold:6500,face:'up',activity:'Checking the berry pots'},{x:42,y:12,hold:6500,face:'right',activity:'Taking a break'}];
  if(s.room==='bakery')return [
-  {x:11,y:4,hold:11000,work:true,face:'down',activity:'Baking'},
+  {x:11,y:4,hold:11000,work:true,face:'down',activity:bakeryLife(s).restocking?'Preparing tomorrow’s dough':bakeryLife(s).short?'Packing a small batch':'Baking'},
   {x:10,y:6,hold:6000,face:'left',activity:'Tidying the kitchen'},
   {x:9,y:9,hold:7000,face:'left',activity:'Taking a break'},{x:14,y:4,hold:5000,face:'up',activity:'Putting things away'}
  ];
  if(name==='orin')return [
   ...(s.economy?.projects.market?[{x:6,y:17,hold:7500,face:'up',activity:'Buying breakfast'}]:[]),
-  {...anchor,hold:11000,work:true,face:'down',activity:'Carpentry'},
+  {...anchor,hold:11000,work:!carpenterWaiting(s),face:'down',activity:carpenterWaiting(s)?'Sorting a delayed delivery':'Carpentry'},
   {x:18,y:19,hold:6500,face:'left',activity:'Checking supplies'},
   {x:16,y:19,hold:7500,face:'right',activity:'Taking a break'}
  ];
@@ -46,9 +47,9 @@ export function routineFor(s,name,anchor){
  ];
 }
 export function createActors(){
- const actors=new Map(),visitor=createBakeryVisitor(),marketLocations=new Map();
- return {reset(){actors.clear();visitor.reset();marketLocations.clear();},location(name){return marketLocations.get(name)||(name==='orin'?visitor.location():null);},update(s,dt,{paused=false,reduce=false,cue=null}={}){
-  const market=squareActive(s),visit=market?null:visitor.update(s,dt,{paused,reduce,cue});const delta=Math.max(0,Math.min(dt,50)),anchors=[];if(s.room==='outside'&&!visit)anchors.push(['orin',FIXED.orin]);const m=mara(s);if(m)anchors.push(['mara',m]);const r=rowan(s);if(r)anchors.push(['rowan',r]);
+ const actors=new Map(),visitor=createBakeryVisitor(),seedVisitor=createBakeryVisitor('rowan'),marketLocations=new Map();
+ return {reset(){actors.clear();visitor.reset();seedVisitor.reset();marketLocations.clear();},location(name){return marketLocations.get(name)||(name==='orin'?visitor.location():name==='rowan'?seedVisitor.location():null);},update(s,dt,{paused=false,reduce=false,cue=null}={}){
+  const market=squareActive(s),visit=market?null:visitor.update(s,dt,{paused,reduce,cue}),seedVisit=market?null:seedVisitor.update(s,dt,{paused,reduce,cue});const delta=Math.max(0,Math.min(dt,50)),anchors=[];if(s.room==='outside'&&!visit)anchors.push(['orin',FIXED.orin]);const m=mara(s);if(m)anchors.push(['mara',m]);const r=rowan(s);if(r&&!seedVisit)anchors.push(['rowan',r]);
   if(market){for(const name of ['orin','mara','rowan']){if(squareDelay(s,name)){marketLocations.delete(name);if(name==='orin')marketLocations.set(name,{room:'outside',...FIXED.orin});}else{const last=marketLocations.get(name),a=actors.get(name),p=a||last||squareStops(s,name)[0];marketLocations.set(name,{room:'outside',x:Math.round(p.x),y:Math.round(p.y)});}}}else marketLocations.clear();
   if(market){for(let j=anchors.length-1;j>=0;j--)if(!squareDelay(s,anchors[j][0]))anchors.splice(j,1);if(s.room==='outside')for(const name of ['orin','mara','rowan'])if(!squareDelay(s,name))anchors.push([name,squareStops(s,name)[0]]);}
   const visible=new Set(anchors.map(([name])=>name));for(const name of actors.keys())if(!visible.has(name))actors.delete(name);
@@ -78,9 +79,9 @@ export function createActors(){
    }
    if(speaking&&cue.talking){const dx=s.player.x-a.x,dy=s.player.y-a.y;a.direction=Math.abs(dx)>Math.abs(dy)?dx>0?'right':'left':dy>0?'down':'up';}
    const work=!speaking&&!walking&&!a.next&&!a.path.length&&!!stops[a.index].work;
-   const emotion=speaking?cue.emotion:'neutral',talking=!!(speaking&&cue.talking);
-   return {blink:blinkAt(a.clock,name==='mara'?1:name==='rowan'?3:4,reduce),gait:a.clock/150,name,anchor:{...anchor},x:a.x,y:a.y,tileX:Math.round(a.x),tileY:Math.round(a.y),direction:a.direction,walking,work,emotion,talking,activity:stops[a.index].activity,...(market&&!speaking&&!walking&&!a.path.length&&a.wait>6500?{speech:name==='mara'?'Tray’s here. Mind the warm ones!':name==='orin'?'Built this bench. Very thorough testing.':"That plant’s enjoying the company.",speechSpeaker:name==='mara'?'Mara':name==='orin'?'Orin':'Rowan'}:{}),clock:a.clock,frame:animationFrame({direction:a.direction,walking,work,emotion,talking,clock:a.clock,reduce})};
-  });if(market&&s.room==='outside')for(const n of views)marketLocations.set(n.name,{room:'outside',x:n.tileX,y:n.tileY});if(visit&&visit.room===s.room){visit.frame=animationFrame({...visit,reduce});views.push(visit);}return views;
+   const emotion=speaking?cue.emotion:'neutral',talking=!!(speaking&&cue.talking),remark=!market&&!speaking&&!walking&&!a.next&&!a.path.length&&a.index===0&&a.wait>8500?workRemark(s,name):null;
+   return {blink:blinkAt(a.clock,name==='mara'?1:name==='rowan'?3:4,reduce),gait:a.clock/150,name,anchor:{...anchor},x:a.x,y:a.y,tileX:Math.round(a.x),tileY:Math.round(a.y),direction:a.direction,walking,work,emotion,talking,activity:stops[a.index].activity,...(remark?{speech:remark,speechSpeaker:name==='mara'?'Mara':'Orin'}:{}),...(market&&!speaking&&!walking&&!a.path.length&&a.wait>6500?{speech:name==='mara'?'Tray’s here. Mind the warm ones!':name==='orin'?'Built this bench. Very thorough testing.':"That plant’s enjoying the company.",speechSpeaker:name==='mara'?'Mara':name==='orin'?'Orin':'Rowan'}:{}),clock:a.clock,frame:animationFrame({direction:a.direction,walking,work,emotion,talking,clock:a.clock,reduce})};
+  });if(market&&s.room==='outside')for(const n of views)marketLocations.set(n.name,{room:'outside',x:n.tileX,y:n.tileY});if(visit&&visit.room===s.room){visit.frame=animationFrame({...visit,reduce});views.push(visit);}if(seedVisit&&seedVisit.room===s.room){seedVisit.frame=animationFrame({...seedVisit,reduce});views.push(seedVisit);}return views;
  }};
 }
 

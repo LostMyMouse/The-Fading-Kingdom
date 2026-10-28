@@ -1,3 +1,4 @@
+import {bakeryLife} from './village-life.js';
 import {roomFurniture} from './chapter-rooms.js';
 import {drawWorkProp} from './village-work-props.js';
 import {prepareRoomDetails,drawRoomDetails,roomDetailsReady} from './room-personality.js';
@@ -45,7 +46,7 @@ export function interiorLayers(c,s,npcs=[]){
   if(p.role==='counter-middle')drawRoomDetails(c,s,'counter-middle');
   if(p.id==='cupboard')drawRoomDetails(c,s,'cupboard');
   if(p.id==='table')drawRoomDetails(c,s,'table',{breakfast:npcs.some(n=>n.breakfast)});
-  if(p.role==='counter-middle'&&s.room==='bakery'&&s.story.cooked){for(let j=0;j<(s.economy.flour.noticed&&['held','used','replacement'].includes(s.economy.flour.state)?2:5);j++)bread(c,p.x-20+j*7,p.y-21);}
+  if(p.role==='counter-middle'&&s.room==='bakery'&&s.story.cooked){for(let j=0;j<bakeryLife(s).bread;j++)bread(c,p.x-20+j*7,p.y-21);}
   if(p.role==='counter-right'&&s.room==='bakery'&&s.economy.bakery.order.state==='ready')for(let j=0;j<4;j++)bread(c,p.x-13+j*7,p.y-21);
   if(p.role==='counter-left'&&s.room==='bakery'&&s.story.cooking){c.fillStyle='#e1c694';c.fillRect(p.x-7,p.y-22,12,5);if(s.story.cooking>=2)for(let j=0;j<3;j++){c.fillStyle='#efdab0';c.fillRect(p.x-7+j*4,p.y-24,3,3);}}
   if(p.id==='pantry'&&s.room==='bakery'&&['shelf','returned','replaced'].includes(s.economy.flour.state))part(c,'flour',p.x,p.y-29,12);

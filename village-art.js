@@ -32,7 +32,7 @@ export function drawVillageBuilding(c,h,home=false){
  if(h.stage===3){
   // Retain the chosen finishing trim as a small doorstep ribbon, not a roof filter.
   c.fillStyle=['#bf9c62','#77947b','#a07b8d'][h.trim||0];c.fillRect(g.door.x-6,g.bottom-3,12,2);
-  if(h.lived){c.fillStyle='#efd593';for(const dx of [-24,24])c.fillRect(g.door.x+dx-2,g.bottom-25,3,5);}
+  if(h.lived||h.bakeryLit){for(const dx of [-24,24]){c.fillStyle='#efca7640';c.fillRect(g.door.x+dx-4,g.bottom-27,7,9);c.fillStyle='#efd593';c.fillRect(g.door.x+dx-2,g.bottom-25,3,5);}}
  }
  return true;
 }

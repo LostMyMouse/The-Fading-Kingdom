@@ -1,6 +1,8 @@
+import {neighbourGreeting} from './village-life.js';
 // Original everyday conversations. They never award items or relationship points.
 export function chatLine(s,who){
  const turn=s.conversation?.[who]||0,e=s.story;
+ const memory=neighbourGreeting(s,who);if(memory&&turn%4===1)return memory;
  let lines;
  if(who==='mara'){
   if(s.economy?.flour.noticed&&['held','used','replacement'].includes(s.economy.flour.state)&&turn%4===0)return 'Bit of a small batch today. I couldn’t find that sack for the morning orders.';

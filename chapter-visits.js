@@ -1,24 +1,32 @@
+import {bakeryLife,carpenterWaiting,workRemark} from './village-life.js';
 import {route,blocked,FIXED} from './chapter-model.js';
 import {blinkAt} from './chapter-motion.js';
-export function breakfastRoute(s){const h=s.house,door={x:h.x+2,y:h.y+4};const open=(choices)=>choices.find(p=>!blocked(s,p.x,p.y,'bakery'))||choices[0];const counter=open([{x:6,y:5},{x:5,y:5},{x:6,y:6}]),seat=open([{x:9,y:8},{x:9,y:9},{x:5,y:8}]);return [
- {room:'outside',...FIXED.orin,hold:5000,face:'down',activity:'Carpentry',work:true},
- ...(s.economy.projects.market?[{room:'outside',x:6,y:17,hold:5000,face:'up',activity:'Checking the breakfast stall'}]:[]),
- {room:'outside',...door,hold:0,face:'up',activity:'Visiting the bakery'},
- {room:'bakery',x:8,y:11,hold:0,face:'up',activity:'Visiting the bakery'},
- {room:'bakery',...counter,hold:10000,face:'up',activity:'Buying breakfast',exchange:true},
- {room:'bakery',...seat,hold:6000,face:'left',activity:'Breakfast break'},
- {room:'bakery',x:8,y:12,hold:0,face:'down',activity:'Back to the workshop'},
- {room:'outside',...door,hold:0,face:'down',activity:'Back to the workshop'},
- {room:'outside',...FIXED.orin,hold:16000,face:'down',activity:'Carpentry',work:true},
- {room:'outside',x:18,y:19,hold:6000,face:'left',activity:'Checking supplies'}
- ];}
+export function breakfastRoute(s,name='orin'){
+ const seed=name==='rowan',start=seed?{room:'garden',x:11,y:4}:{room:'outside',...FIXED.orin},h=s.house,door={x:h.x+2,y:h.y+4},gh=s.gardener.house,gardenDoor=seed?{x:gh.x+2,y:gh.y+4}:null;
+ const open=choices=>choices.find(p=>!blocked(s,p.x,p.y,'bakery'))||choices[0];
+ const counter=open(seed?[{x:5,y:5},{x:6,y:5},{x:5,y:6}]:[{x:6,y:5},{x:5,y:5},{x:6,y:6}]),seat=open(seed?[{x:5,y:8},{x:5,y:9},{x:9,y:9}]:[{x:9,y:8},{x:9,y:9},{x:5,y:8}]);
+ const work={...start,hold:seed?14000:5000,face:'down',activity:seed?'Sorting seeds':carpenterWaiting(s)?'Sorting a delayed delivery':'Carpentry',work:seed||!carpenterWaiting(s)};
+ return [work,
+  ...(seed?[{room:'garden',x:8,y:12,hold:0,face:'down',activity:'Visiting the nursery'},{room:'outside',...gardenDoor,hold:0,face:'down',activity:'Visiting the nursery'},{room:'outside',x:43,y:11,hold:6000,face:'down',work:true,activity:'Tending the nursery'}]:[]),
+  ...(s.economy.projects.market?[{room:'outside',x:6,y:17,hold:5000,face:'up',activity:'Checking the breakfast stall'}]:[]),
+  {room:'outside',...door,hold:0,face:'up',activity:'Visiting the bakery'},
+  {room:'bakery',x:8,y:11,hold:0,face:'up',activity:'Visiting the bakery'},
+  {room:'bakery',...counter,hold:10000,face:'up',activity:'Buying breakfast',exchange:true},
+  {room:'bakery',...seat,hold:6000,face:seed?'right':'left',activity:'Breakfast break'},
+  {room:'bakery',x:8,y:12,hold:0,face:'down',activity:seed?'Back to the seed shop':'Back to the workshop'},
+  {room:'outside',...door,hold:0,face:'down',activity:seed?'Back to the seed shop':'Back to the workshop'},
+  ...(seed?[{room:'outside',...gardenDoor,hold:0,face:'up',activity:'Back to the seed shop'},{room:'garden',x:8,y:11,hold:0,face:'up',activity:'Back to the seed shop'}]:[]),
+  {...work,hold:16000},
+  {room:start.room,x:seed?10:18,y:seed?6:19,hold:6000,face:'left',activity:seed?'Checking seedlings':'Checking supplies'}
+ ];
+}
 // One persistent visitor across rooms. Looking away never restarts his journey.
-export function createBakeryVisitor(){let a=null;
+export function createBakeryVisitor(name='orin'){let a=null;
  return {reset(){a=null;},location(){return a?{room:a.room,x:Math.round(a.x),y:Math.round(a.y)}:null;},update(s,dt,{paused=false,reduce=false,cue=null}={}){
-  if(s.house?.stage!==3||!s.story.cooked){a=null;return null;}
-  const stops=breakfastRoute(s),key=[s.day,s.house.x,s.house.y,s.economy.projects.market].join(':'),delta=Math.max(0,Math.min(50,dt));
-  if(!a||a.key!==key)a={key,room:'outside',node:{...FIXED.orin},x:18,y:17,index:0,wait:stops[0].hold,path:[],next:null,progress:0,clock:0,direction:'down'};
-  const speaking=cue?.speaker==='orin';if(!paused||speaking)a.clock+=delta;let walking=false;
+  if(s.house?.stage!==3||!s.story.cooked||name==='rowan'&&s.gardener.house?.stage!==3){a=null;return null;}
+  const stops=breakfastRoute(s,name),start=stops[0],key=[s.day,s.house.x,s.house.y,s.economy.projects.market,...(name==='rowan'?[s.gardener.house.x,s.gardener.house.y]:[])].join(':'),delta=Math.max(0,Math.min(50,dt));
+  if(!a||a.key!==key)a={key,room:start.room,node:{x:start.x,y:start.y},x:start.x,y:start.y,index:0,wait:stops[0].hold,path:[],next:null,progress:0,clock:0,direction:'down'};
+  const speaking=cue?.speaker===name;if(!paused||speaking)a.clock+=delta;let walking=false;
   if(!paused&&!reduce&&!speaking){
    if(a.next){const occupied=s.room===a.room&&s.player.x===a.next.x&&s.player.y===a.next.y;
     if(blocked(s,a.next.x,a.next.y,a.room)){a.next=null;a.path=[];a.x=a.node.x;a.y=a.node.y;a.wait=500;}
@@ -32,8 +40,8 @@ export function createBakeryVisitor(){let a=null;
   }
   const stop=stops[a.index],settled=!walking&&!a.next&&!a.path.length&&a.node.x===stop.x&&a.node.y===stop.y;
   if(speaking&&cue.talking){const dx=s.player.x-a.x,dy=s.player.y-a.y;a.direction=Math.abs(dx)>Math.abs(dy)?dx>0?'right':'left':dy>0?'down':'up';}
-  const short=s.economy.lastBatch==='small',exchange=settled&&stop.exchange&&!speaking;
-  const speech=exchange?(a.wait>6500?(short?'Just the small loaf today?':'Morning! Usual breakfast?'):a.wait>3000?(short?'Save the last one for the road.':'One now. One for the road.'):null):null;
-  return {name:'orin',room:a.room,anchor:{...FIXED.orin},x:a.x,y:a.y,tileX:Math.round(a.x),tileY:Math.round(a.y),direction:a.direction,walking,work:settled&&!!stop.work&&!speaking,emotion:speaking?cue.emotion:'neutral',talking:!!(speaking&&cue.talking),activity:stop.activity,clock:a.clock,gait:a.clock/150,blink:blinkAt(a.clock,4,reduce),speech,speechSpeaker:a.wait>6500&&!short?'Mara':'Orin',breakfast:settled&&stop.activity==='Breakfast break',frame:0};
+  const life=bakeryLife(s),short=life.short,exchange=settled&&stop.exchange&&!speaking;
+  const speech=exchange?(a.wait>6500?(short?'Just the small loaf today?':name==='rowan'?'Morning! Saved you a crusty one.':'Morning! Usual breakfast?'):a.wait>3000?(short?(life.restocking?'Full tray tomorrow, then.':'Save the last one for the road.'):name==='rowan'?'A crumb for me. Several for the birds.':'One now. One for the road.'):null):settled&&!speaking&&stop.activity==='Sorting a delayed delivery'&&a.wait>3000?workRemark(s,name):null;
+  return {name,room:a.room,anchor:{x:start.x,y:start.y},x:a.x,y:a.y,tileX:Math.round(a.x),tileY:Math.round(a.y),direction:a.direction,walking,work:settled&&!!stop.work&&!speaking,emotion:speaking?cue.emotion:'neutral',talking:!!(speaking&&cue.talking),activity:stop.activity,clock:a.clock,gait:a.clock/150,blink:blinkAt(a.clock,4,reduce),speech,speechSpeaker:exchange&&a.wait>6500&&!short?'Mara':name==='rowan'?'Rowan':'Orin',breakfast:settled&&stop.activity==='Breakfast break',frame:0};
  }};
 }
