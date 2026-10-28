@@ -3,7 +3,7 @@ import {SITES,siteStatus,siteVisible,WORKSHOP} from './chapter-gathering.js';
 const rect=(c,x,y,w,h,col)=>{c.fillStyle=col;c.fillRect(x,y,w,h);};
 export function drawGatheringTool(c,x,y,direction,action){
  const hand=toolHand(direction,action.progress),[hx,hy]=pixelAnchor(c,x+hand.x,y+hand.y);
- c.save();c.translate(hx,hy);c.rotate(hand.angle+(direction==='up'?Math.PI:0));rect(c,-1,-2,3,16,'#654c36');rect(c,0,-1,1,14,'#ba9360');
+ c.save();c.translate(hx,hy);c.rotate(direction==='up'?Math.PI-hand.angle:hand.angle);rect(c,-1,-2,3,16,'#654c36');rect(c,0,-1,1,14,'#ba9360');
  if(action.tool==='axe'){rect(c,-6,8,9,7,'#493f36');rect(c,-5,9,6,5,'#7d938e');rect(c,-5,9,5,2,'#b5c6b4');rect(c,-6,10,1,3,'#e2e5ca');rect(c,-4,12,4,2,'#9daea0');rect(c,0,9,2,4,'#a98b5c');rect(c,0,10,1,1,'#e0c591');}
  else{rect(c,-6,9,12,4,'#493f36');rect(c,-4,8,9,2,'#6d847d');rect(c,-4,9,9,2,'#bdcab6');rect(c,-7,11,3,2,'#8da397');rect(c,-7,12,2,2,'#d7ddc2');rect(c,5,11,3,2,'#84998e');rect(c,6,12,2,2,'#d6ddc3');rect(c,0,9,1,2,'#c3a878');}
  c.restore();
