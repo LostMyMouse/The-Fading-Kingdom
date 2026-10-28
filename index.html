@@ -8,7 +8,7 @@ if (!/\/$|\.html$/.test(location.pathname)) {const base=document.createElement('
 <section id="scene" aria-label="Game world"><p id="village-moment" class="sr-only" aria-live="polite"></p>
 <canvas id="world" tabindex="0" aria-label="Walk with arrow keys or WASD. Doorways enter and exit automatically. E interacts with other things. Tap an object to walk to it. In placement mode arrow keys move the preview and Enter confirms."></canvas>
 <button id="treasury" class="hide" disabled aria-label="Open village fund">Village · 12 G</button>
-<aside id="objective"><span class="eyebrow" id="quest-title">A little ground</span><p id="quest-text">Pick up your tools by the cottage.</p><button id="guide">Show me</button></aside>
+<details id="objective" open><summary>Next step</summary><div id="objective-copy"><span class="eyebrow" id="quest-title">A little ground</span><p id="quest-text">Pick up your tools by the cottage.</p><button id="guide">Show me</button></div></details>
 <div id="toast" role="status" aria-live="polite"></div>
 <div id="activity" class="hide"><span id="activity-text"></span><button id="activity-next">Continue</button></div>
 <div id="placement" class="hide"><div><b id="placement-title">Choose a spot</b><span id="placement-status"></span></div><div class="placement-buttons"><button id="placement-confirm">Place here</button><button id="rotate">Rotate</button><button id="placement-cancel">Cancel</button></div></div>

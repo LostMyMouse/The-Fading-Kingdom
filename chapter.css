@@ -22,3 +22,11 @@ dialog.character-dialogue{width:min(700px,calc(100% - 24px))}
 
 .story-chapters{list-style:none;padding:0;margin:20px 0 0;display:grid;gap:12px}.story-chapter{padding:14px 16px;border:1px solid #d7caa6;border-left:4px solid #b8b68a;border-radius:4px;background:#f3e9cc}.story-chapter.finished{border-left-color:#6d895b;background:#e9e8c9}.story-chapter h3{margin:6px 0}.story-chapter p{margin:4px 0;font-size:14px}#objective button{font-weight:650;min-height:44px;text-align:left}@media(max-width:370px){#objective{max-width:184px}.story-chapter{padding:12px}}
 .resident-chapters p{font-size:16px;line-height:1.5}.resident-chapters h3{font-size:18px}
+
+/* Keep the next step available without covering a room or small-screen scene. */
+#objective{padding:0;max-width:min(265px,calc(100% - 140px))}
+#objective summary{min-height:44px;padding:11px 14px;cursor:pointer;font-size:13px;font-weight:650;touch-action:manipulation}
+#objective summary:focus-visible{outline:3px solid #b77342;outline-offset:2px}
+#objective-copy{padding:0 14px 10px}
+#objective:not([open]){width:auto}
+@media(max-width:700px){#objective{max-width:calc(100% - 130px)}#objective summary{padding:11px 10px}#objective-copy{padding:0 10px 8px}}
