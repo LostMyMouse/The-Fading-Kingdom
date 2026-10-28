@@ -5,6 +5,7 @@ export const PROJECTS={nursery:{name:'Restore the nursery',gold:18,wood:4,stone:
 export const MARKET={x:6,y:17};
 export function initialEconomy(day=1,homeBuilt=false){return {bakery:initialBakery(),gold:homeBuilt?0:12,homeFunded:homeBuilt,lastDay:day-1,lastIncome:0,lastBatch:'closed',fullDays:0,projects:{nursery:false,market:false},berryDay:0,recipe:false,fruitBatch:false,flour:{state:'shelf',noticed:false,takenDay:0,repairedDay:0},ledger:[{day,kind:'welcome',amount:12},...(homeBuilt?[{day,kind:'home',amount:-12}]:[])]};}
 export const bakeryOpen=s=>s.house?.stage===3&&s.story.cooked;
+export const firstTradePending=s=>bakeryOpen(s)&&!s.economy.fullDays&&s.economy.lastBatch==='closed'&&!s.economy.projects.nursery&&!s.economy.projects.market&&!s.gardener.invited;
 export const missingFlour=s=>['held','used','replacement'].includes(s.economy.flour.state);
 export const hasFlour=s=>['held','replacement'].includes(s.economy.flour.state);
 export const canOfferRecipe=s=>bakeryOpen(s)&&s.economy.fullDays>0&&!missingFlour(s)&&!s.economy.recipe;

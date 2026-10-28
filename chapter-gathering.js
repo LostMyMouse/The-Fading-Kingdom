@@ -13,7 +13,7 @@ export function readGathering(value,int,day){
  const sites=g.sites.map(n=>{if(!n||!int(n.hits,0,2)||!int(n.left,0,2)||!int(n.readyDay,0,day+2)||n.left&&(!n.readyDay||n.hits)||n.hits&&n.readyDay||g.job!=='done'&&(n.hits||n.left||n.readyDay))throw Error('Invalid gathering patch');return {hits:n.hits,left:n.left,readyDay:n.readyDay};});
  return {job:g.job,axe:g.axe,pickaxe:g.pickaxe,improved:g.improved,cleared:g.cleared,sites};
 }
-export const toolJobAvailable=s=>!!(s.story.kit&&s.story.harvest&&s.story.orin);
+export const toolJobAvailable=s=>!!(s.story.kit&&s.story.orin&&(s.story.harvest||s.plots.some(p=>p.planted&&p.watered)));
 export function siteVisible(s,n){return s.room==='outside'&&!s.decor.some(d=>d.room==='outside'&&d.type!=='path'&&d.x===n.x&&d.y===n.y);}
 export function siteStatus(s,n){const p=s.gathering.sites[n.id];return {...p,depleted:p.left===0&&p.readyDay>s.day,tool:n.kind==='wood'?'axe':'pickaxe',strikes:s.gathering.improved?2:3};}
 const near=(s,p)=>Math.abs(s.player.x-p.x)+Math.abs(s.player.y-p.y)<=1;
@@ -22,11 +22,13 @@ function pay(s,wood,stone){if(s.inventory.wood<wood||s.inventory.stone<stone)ret
 export function gatheringAction(s,id,data){
  const g=s.gathering;
  switch(id){
- case 'acceptToolsJob':if(!toolJobAvailable(s))return 'Grow your first carrot and meet Orin. He knows his way around tools.';if(g.job!=='none')return 'That bench job’s already in our book.';g.job='accepted';return TOOL_LINES.accept;
+ case 'acceptToolsJob':if(!toolJobAvailable(s))return 'Get something planted and watered, then meet Orin by the cart.';if(g.job!=='none')return 'That bench job’s already in our book.';g.job='accepted';return TOOL_LINES.accept;
  case 'finishTools':
   if(g.job==='done')return 'Those tools are yours. Take them out for a spin.';
   if(g.job!=='accepted')return 'Ask Orin about the workbench first.';
   if(!carpenterHere(s,data.npc))return 'Bring those supplies over to Orin.';
+  if(s.story.timber==='taken'){s.story.timberNoticed=true;return 'Those tied boards are for the mill roof. Pop them back on the stack, then we can sort this bench.';}
+  if(s.story.basket==='held')return 'My tool basket! Could you drop off what you’re carrying and bring it back? The fittings are in there.';
   if(s.decor.some(d=>d.room==='outside'&&d.type!=='path'&&d.x===WORKSHOP.x&&d.y===WORKSHOP.y))return 'Move the decoration beside the workbench first. We need that corner clear.';
   if(!pay(s,2,2))return 'Two wood and two stone from storage. Drop off what you’re carrying first.';
   g.job='done';g.axe=g.pickaxe=true;return TOOL_LINES.gift;

@@ -2,7 +2,7 @@ import {BRIDGE} from './chapter-bridge.js';
 import {FIXED,RESOURCES} from './chapter-model.js';
 import {carryCapacity} from './chapter-hauling.js';
 import {SITES,siteStatus} from './chapter-gathering.js';
-import {PROJECTS,missingFlour} from './chapter-economy.js';
+import {PROJECTS,missingFlour,firstTradePending} from './chapter-economy.js';
 import {SQUARE,SQUARE_COST,squareActive,squareDelay,squareLayout,squareReady} from './chapter-square.js';
 const step=(key,title,text,label,action,target,extra={})=>({key,title,text,label,action,target,...extra});
 const npc=(name,title,text,label,action='talk')=>step(name+':'+action,title,text,label,action,name==='orin'?FIXED.orin:name==='rowan'?{x:43,y:11}:{x:22,y:16},{npc:name});
@@ -12,6 +12,8 @@ function materials(s,wood,stone,title,target,delivery='deposit'){
  if(total&&(total>=carryCapacity(s)||['wood','stone'].every(k=>s.inventory[k]+s.carry[k]>=needs[k])))return step('drop-off',title,'Drop off the materials you’re carrying. Stored supplies are ready for building and repairs.','Drop off materials',delivery,target);
  const kind=['stone','wood'].find(k=>s.inventory[k]+s.carry[k]<needs[k]);
  if(!kind)return null;
+ const worked=SITES.find(n=>n.kind===kind&&!siteStatus(s,n).depleted&&!s.decor.some(d=>d.room==='outside'&&d.type!=='path'&&d.x===n.x&&d.y===n.y));
+ if(s.gathering.axe&&worked)return step('work:'+worked.id,title,`Use your ${kind==='wood'?'axe on a fallen log':'pickaxe on a small rock'} for ${kind}. Drop off the materials when your basket is full.`,kind==='wood'?'Chop a fallen log':'Mine a small rock','worksite',worked,{node:worked.id});
  const n=RESOURCES.filter(n=>n.type===kind&&!s.gathered.includes(n.id)).sort((a,b)=>Math.abs(a.x-s.player.x)+Math.abs(a.y-s.player.y)-Math.abs(b.x-s.player.x)-Math.abs(b.y-s.player.y))[0];
  if(n)return step('gather:'+n.id,title,`Gather ${kind} · ${s.inventory[kind]+s.carry[kind]}/${needs[kind]}. Loose branches and stones are free to pick up.`,'Gather loose '+kind,'resource',n,{node:n.id});
  const site=SITES.find(n=>n.kind===kind&&!siteStatus(s,n).depleted&&!s.decor.some(d=>d.room==='outside'&&d.type!=='path'&&d.x===n.x&&d.y===n.y));
@@ -35,14 +37,29 @@ function project(s,key){const p=PROJECTS[key],title='A village at work';
  if(s.economy.gold<p.gold)return bed(title,`The ${key==='nursery'?'nursery':'market stall'} needs ${p.gold} village gold. The bakery contributes when you sleep. Your garden and decorating are here whenever you fancy them.`);
  return materials(s,p.wood,p.stone,title,FIXED.store)||step('project:'+key,title,p.benefit+' You can check the costs before spending anything.','Plan the '+(key==='nursery'?'nursery':'market stall'),'project',key==='nursery'?FIXED.nursery:{x:6,y:17},{project:key});
 }
+const siteVisibleForGuide=(s,n)=>!s.decor.some(d=>d.room==='outside'&&d.type!=='path'&&d.x===n.x&&d.y===n.y);
+function benchStep(s){
+ if(s.story.timber==='taken'&&s.story.timberNoticed)return step('mill-boards','The mill roof','Put the tied bundle back beside the cart. Orin can finish the bench once his delivery is sorted.','Return the tied bundle','timber',FIXED.timber);
+ if(s.story.basket==='held')return s.carry.wood+s.carry.stone?step('drop-off','Orin’s tool basket','Drop off your materials, then bring Orin his basket. The tool fittings are in there.','Drop off materials','deposit',FIXED.store):npc('orin','Orin’s tool basket','Orin needs the basket to finish the tools. Bring it over when you’re ready.','Bring Orin his basket','tools');
+ return materials(s,2,2,'A workbench for Orin',FIXED.store)||npc('orin','A workbench for Orin','Two stored wood and two stored stone. Orin has the tool heads ready.','Bring supplies to Orin','tools');
+}
 // Presentation only: suggestions never change saves, award gifts, or select a moral reply.
 export function nextStep(s){const e=s.story,h=s.house,g=s.gardener;
  if(!e.kit)return step('kit','A little ground','Your starter tools are beside the cottage. Pick them up when you’re ready.','Find my tools','kit',FIXED.kit);
- if(!e.harvest)return farming(s,'carrot',Infinity);
+ if(s.gathering.job==='accepted')return benchStep(s);
+ if(!e.harvest){
+  const crop=farming(s,'carrot',Infinity);
+  if(crop.action==='sleep'&&s.room!=='home'){
+   if(!e.orin)return npc('orin','While the garden grows','Your carrot is watered. Orin is working by the cart; go and say hello while it grows.','Meet Orin');
+   if(s.gathering.job==='none')return npc('orin','A wobbly workbench','Orin could use a hand with his bench. He has an axe and a pickaxe to fit afterwards.','Ask about the bench','tools');
+   if(!s.gathering.cleared){const site=SITES.find(n=>siteVisibleForGuide(s,n)&&n.kind==='wood');if(site)return step('first-chop','Try your new axe','Try the axe on a fallen log. Three swings, then gather the wood. Big trees can keep growing.','Try my axe','worksite',site,{node:site.id});}
+  }
+  return crop;
+ }
  if(!e.invited)return npc('mara','Room for one more','A traveller has stopped by the road. Go and say hello.','Meet Mara');
  if(!h)return step('plan-home','A place to call home','Mara needs a home and a kitchen. You choose the style and the spot.','Plan Mara’s home','plan',{x:30,y:10});
  if(!e.orin&&h.stage<3)return npc('orin','A helping hand','Meet Orin at his cart. He can help with the house.','Meet Orin');
- if(s.gathering.job==='accepted')return materials(s,2,2,'A workbench for Orin',FIXED.store)||npc('orin','A workbench for Orin','Two stored wood and two stored stone. Orin has the tool heads ready.','Bring supplies to Orin','tools');
+
  if(h.stage<2){
   if(h.stage===1&&e.timber==='taken')return npc('orin',e.timberNoticed?'Boards for the mill':'The house frame',e.timberNoticed?'Orin needs the mill boards back. Talk to him when you’re ready.':'Talk to Orin about lifting the frame.','Talk to Orin');
   if(h.stage===1&&e.basket==='held'&&s.carry.wood+s.carry.stone)return step('drop-off','Orin’s tools','Drop off your materials before returning the borrowed basket.','Drop off materials','building',{x:h.x+2,y:h.y+4});
@@ -53,6 +70,7 @@ export function nextStep(s){const e=s.story,h=s.house,g=s.gardener;
  if(h.stage===2)return step('finish-home','A front door for Mara','Set out Mara’s herbs and choose the finishing touches.','Finish Mara’s home','building',{x:h.x+2,y:h.y+4});
  if(s.economy.flour.noticed&&missingFlour(s))return s.economy.flour.state==='used'?npc('orin','Morning orders','Orin can swap two carrots for fresh flour. Put the sack on Mara’s shelf afterwards.','Find replacement flour','flourTrade'):step('flour-shelf','Morning orders','Put the flour sack back on the kitchen shelf for Mara’s next batch.','Visit the flour shelf','flourShelf',{x:h.x+2,y:h.y+4});
  if(!e.cooked){if(!s.inventory.carrot&&!e.cooking)return farming(s);return step('cook','Something in the oven',e.cooking?'Your batch is waiting in the kitchen. Pick up where you left off.':'Bring a carrot to Mara’s kitchen. Make your first tray together.','Visit Mara’s kitchen','kitchen',{x:h.x+2,y:h.y+4});}
+ if(firstTradePending(s))return bed('The oven’s going','Mara has a home, an oven and her first batch. Sleep when you’re ready; her morning trade will start filling the village fund.');
  if(s.bridge?.started&&!s.bridge.built)return npc('orin','A path across the pond','The bridge supplies are set aside. Find Orin to put them together.','About the footbridge','bridgeHelp');
  if(!e.wideCan)return npc('orin','A hand on the farm','Orin has a wider spout for your can. Same can, fewer trips.','Visit Orin','equipment');
  if(s.gathering.job!=='done')return npc('orin','Handier tools','Orin’s bench could use a repair. Ask him about an axe and a pickaxe.','Ask about gathering tools','tools');
