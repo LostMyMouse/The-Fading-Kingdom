@@ -34,3 +34,5 @@ test('remembered help changes greetings without generating gifts or resetting an
 });
 
 test('the delayed carpenter speaks for himself rather than borrowing Mara’s speech bubble',()=>{const s=settled();s.story.timber='taken';s.story.timberNoticed=true;const v=createBakeryVisitor();let remarks=0;for(let i=0;i<4000;i++){const n=v.update(s,50);if(n.activity==='Sorting a delayed delivery'&&n.speech){assert.equal(n.speechSpeaker,'Orin');assert.equal(n.work,false);remarks++;}}assert.ok(remarks>0);});
+
+test('Mara begins each indoor shift at the actual oven work stop, including even-numbered days',()=>{for(const day of [3,4]){const s=settled();s.day=day;s.room='bakery';const n=createActors().update(s,0).find(n=>n.name==='mara');assert.deepEqual([n.tileX,n.tileY],[11,4]);assert.equal(n.work,true);}});

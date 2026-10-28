@@ -31,8 +31,8 @@ test('ordinary pickup does not trigger a reaction; only explicit dialogue does',
 });
 test('routines follow room visibility and home placement without stale actors',()=>{
  const s=fresh(),actors=createActors();assert.equal(actors.update(s,0).length,1);s.story.harvest=true;assert.equal(actors.update(s,0).length,2);
- s.room='home';assert.equal(actors.update(s,0).length,0);s.room='bakery';let [m]=actors.update(s,0);assert.equal(m.name,'mara');assert.equal(m.x,11);assert.equal(m.y,5);
- s.day=2;[m]=actors.update(s,0);assert.equal(m.y,7);
+ s.room='home';assert.equal(actors.update(s,0).length,0);s.room='bakery';let [m]=actors.update(s,0);assert.equal(m.name,'mara');assert.equal(m.x,11);assert.equal(m.y,4);
+ s.day=2;[m]=actors.update(s,0);assert.equal(m.y,4);
  s.room='outside';s.house={x:28,y:10,stage:3,style:0,trim:0};m=actors.update(s,0).find(n=>n.name==='mara');assert.equal(m.x,33);assert.equal(m.y,14);assert.equal(routineFor(s,'mara',m.anchor)[0].activity,'Checking the herbs');
 });
 test('a moving carpenter can fit the upgrade beside his current location',()=>{
