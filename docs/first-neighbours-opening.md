@@ -13,3 +13,5 @@ Taking the tied mill bundle still gives no immediate moral verdict. When Orin ne
 No save fields/version migration are added. Owned tools, house positions, wardrobe, economy, room decorations and advanced story progress are preserved. A newly accepted job may become the guide's next suggestion on an old save; it does not lock farming, sleeping or building.
 
 Automated opening-journey uses real actions, pathfinding, doorways and save/reload after every committed action. It covers two freely chosen house sites, with/without the loan basket, taking/returning boards and the smaller flour batch, without minting test materials or gold. Existing full-chapter tests remain required. Screenshots/actual browser checks are recorded in the workspace outputs/opening-playtest verification report. This is a focused opening slice, not a claim of whole-game completion or physical-device testing.
+
+Meeting Orin is recorded when the player actually opens the introductory conversation. Leaving politely or asking about supplies still counts as meeting him; no exact reply is needed to make his job available. Accepting the bench job remains a separate choice.
