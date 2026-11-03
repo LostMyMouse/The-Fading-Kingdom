@@ -1,5 +1,7 @@
 # Authored left-walk proof · 29 October 2026
 
+Historical v1 record. The current four-direction proof and its completed checks are described in authored-walk-proof-v2.md.
+
 This is an isolated experiment, not a live character replacement. The game continues to use the original renderer, wardrobe, character images and saved progress. The proof is at walk-frame-proof/index.html and imports existing cast art for comparison. No production module imports the proof.
 
 The selected sheet supplies four connected full-body poses, drawn as continuous shapes rather than split boots. The first generation repeated the lead leg in both contact poses and was rejected. A targeted correction reverses the near/far legs and opposing arms in the final cell. Face drift in the generated sheet was also rejected: the assembled proof discards its head region and retains the exact original head/hair rectangle from coherent-template.png. Shared scale is fixed at32/545 for the body; measured per-frame foot/head-centre registration compensates for the sheet's uneven cell placement without resizing each pose. The original head uses its existing367px source height at32 world units, identically in every frame.
