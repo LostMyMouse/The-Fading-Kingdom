@@ -9,4 +9,6 @@ for(const name of await readdir(root)){
   if(!code.trim())continue;const result=spawnSync(process.execPath,['--check','--input-type=module'],{input:code,encoding:'utf8'});if(result.status!==0)throw Error(name+': '+result.stderr);count++;
  }
 }
+// Preview modules are deployed too; cover them instead of checking only root scripts.
+for(const name of await readdir(root+'walk-frame-proof/'))if(name.endsWith('.js')){const result=spawnSync(process.execPath,['--check',root+'walk-frame-proof/'+name],{encoding:'utf8'});if(result.status!==0)throw Error(result.stderr);count++;}
 console.log(`${count} runtime and inline scripts passed syntax checks; ${maps} import maps parsed.`);
