@@ -1,5 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
+import {readFile} from 'node:fs/promises';
 import {garmentMask,colourGarment} from '../walk-frame-proof/garment-mask.js';
 import {DIRECTIONS,frameSpec,handAt,drawBody,VEST_DATA} from '../walk-frame-proof/cycle-v2.js';
 
@@ -31,4 +32,12 @@ test('vests have separate bounded cells and grips reflected consistently with th
   assert.deepEqual(drawBody(c,{},0,0,dir,pose,{outfit:1}),handAt(0,0,dir,pose,false,1));assert.equal(calls.length,1);
   assert.deepEqual(calls[0].slice(1,5),spec.rect);
  }
+});
+
+test('device review keeps the embedded proof on a directory URL after clean-URL redirects',async()=>{
+ const html=await readFile(new URL('../walk-frame-proof/device-review.html',import.meta.url),'utf8');
+ const src=html.match(/<iframe[^>]+src="([^"]+)"/)[1];
+ const resolved=new URL(src,'https://example.test/games/the-fading-kingdom/walk-frame-proof/device-review');
+ assert.equal(resolved.pathname,'/games/the-fading-kingdom/walk-frame-proof/');
+ assert.equal(new URL('proof.js',resolved).pathname,'/games/the-fading-kingdom/walk-frame-proof/proof.js');
 });
