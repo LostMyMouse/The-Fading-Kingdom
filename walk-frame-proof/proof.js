@@ -132,7 +132,7 @@ function cast() {
     c.fillStyle = '#354b3c';
     c.font = '14px system-ui';
     c.textAlign = 'center';
-    c.fillText(labels[i],x,y+24);
+    c.fillText(labels[i],x,y+(tool ? 40 : 24));
   }
   const poses = tool ? ACTION_POSES : POSES;
   const playback = $('reduce').checked ? 'reduced motion' : !tool && !moving ? 'standing' : playing ? 'playing' : 'paused';
