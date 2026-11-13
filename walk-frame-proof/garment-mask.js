@@ -1,5 +1,7 @@
 import {materialRamp} from '../player-layered.js';
 import {SHIRTS} from '../model.js';
+import {colourBodySkin} from './character-colour.js';
+import {skinRegions} from './skin-regions.js';
 
 // A bounded material selection, not a whole-character hue shift. Each source
 // cell has its own foot registration. Cream sleeves, skin and brown outlines
@@ -37,10 +39,11 @@ export function colourGarment(pixels,mask,palette=-1,showMask=false){
  return result;
 }
 
-export function garmentCanvas(image,geometry,palette=-1,showMask=false){
- if(palette===-1&&!showMask)return image;
+export function garmentCanvas(image,geometry,palette=-1,showMask=false,skin=-1,key){
+ if(palette===-1&&!showMask&&skin===-1)return image;
  const canvas=document.createElement('canvas');canvas.width=image.naturalWidth;canvas.height=image.naturalHeight;
  const c=canvas.getContext('2d',{willReadFrequently:true});c.drawImage(image,0,0);
  const data=c.getImageData(0,0,canvas.width,canvas.height),mask=garmentMask(data.data,canvas.width,canvas.height,geometry);
+ if(skin!==-1)colourBodySkin(data.data,canvas.width,geometry,skinRegions(key,geometry),skin);
  data.data.set(colourGarment(data.data,mask,palette,showMask));c.putImageData(data,0,0);return canvas;
 }

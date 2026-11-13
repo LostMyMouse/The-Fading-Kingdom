@@ -1,7 +1,38 @@
 import {PLAYER_RECTS,HAIR_RECTS,tiedHairOverlap} from '../player-layered.js';
+import {colourHead,colourTail} from './character-colour.js';
 const views={down:0,left:1,right:2,up:3},cache=new Map(),caps=[[18,1580,190,114],[453,1582,194,128],[240,1582,194,128],[682,1579,184,131]];let atlas,hair,parts;
 const load=url=>new Promise((resolve,reject)=>{const image=new Image();image.onload=()=>resolve(image);image.onerror=()=>reject(Error('Original art unavailable'));image.src=new URL(url,import.meta.url).href;});
 export async function prepareHeads(){[atlas,hair,parts]=await Promise.all([load('../assets/player/coherent-template.png'),load('../assets/player/hairstyles.png'),load('../assets/player/parts.png')]);}
 function source(style,direction){const d=views[direction],key=style+':'+d;if(cache.has(key))return cache.get(key);const canvas=document.createElement('canvas');canvas.width=216;canvas.height=366;const c=canvas.getContext('2d',{willReadFrequently:true});c.imageSmoothingEnabled=false;if(style===3||style===4)c.drawImage(hair,...HAIR_RECTS[style-3][d],0,0,216,366);else c.drawImage(atlas,...PLAYER_RECTS[style===1?1:0][d],0,0,216,366);const tail=document.createElement('canvas');tail.width=216;tail.height=366;if(style===1){const data=c.getImageData(0,0,216,366);for(let y=0;y<366;y++)for(let x=0;x<216;x++){const i=(y*216+x)*4,[r,g,b]=data.data.slice(i,i+3);if(y/366<.53||!tiedHairOverlap(1,d,x/216,y/366)||!(r>g*1.12&&g>b*1.04&&g<b*1.9&&(r+g+b)/3<160))data.data[i+3]=0;}tail.getContext('2d').putImageData(data,0,0);}const result={canvas,tail};cache.set(key,result);return result;}
-export function drawHead(c,x,feet,direction,style=0,hat=false){const {canvas,tail}=source(style,direction),w=216/366*32;c.drawImage(canvas,0,0,216,366*.53,x-w/2,feet-32,w,32*.53);if(style===1)c.drawImage(tail,x-w/2,feet-32,w,32);if(hat)c.drawImage(parts,...caps[views[direction]],x-9.5,feet-33,19,10);}
+const coloured = new Map();
+
+function tint(canvas, paint) {
+  const copy = document.createElement('canvas');
+  copy.width = canvas.width;
+  copy.height = canvas.height;
+  const context = copy.getContext('2d', {willReadFrequently:true});
+  context.drawImage(canvas, 0, 0);
+  const image = context.getImageData(0, 0, copy.width, copy.height);
+  paint(image.data);
+  context.putImageData(image, 0, 0);
+  return copy;
+}
+
+export function drawHead(c,x,feet,direction,style=0,hat=false,skin=-1,hairColour=-1) {
+  let {canvas, tail} = source(style,direction);
+  if (skin !== -1 || hairColour !== -1) {
+    const key = [style,direction,skin,hairColour].join(':');
+    if (!coloured.has(key)) {
+      const head = tint(canvas, pixels => colourHead(pixels,216,366,style,views[direction],skin,hairColour));
+      const ponytail = style === 1 && hairColour !== -1 ? tint(tail, pixels => colourTail(pixels,hairColour)) : tail;
+      coloured.set(key, {canvas:head,tail:ponytail});
+      if (coloured.size > 32) coloured.delete(coloured.keys().next().value);
+    }
+    ({canvas,tail} = coloured.get(key));
+  }
+  const width = 216 / 366 * 32;
+  c.drawImage(canvas,0,0,216,366*.53,x-width/2,feet-32,width,32*.53);
+  if (style === 1) c.drawImage(tail,x-width/2,feet-32,width,32);
+  if (hat) c.drawImage(parts,...caps[views[direction]],x-9.5,feet-33,19,10);
+}
 export function drawReference(c,x,feet,direction,style=0,hat=false){const {canvas}=source(style,direction),w=216/366*32;c.drawImage(canvas,x-w/2,feet-32,w,32);if(hat)c.drawImage(parts,...caps[views[direction]],x-9.5,feet-33,19,10);}
